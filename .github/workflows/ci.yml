@@ -1,0 +1,48 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        
+    - name: Install Dependencies
+      run: |
+        cd backend && npm install
+        cd ../frontend && npm install
+        
+    - name: Run Backend Tests
+      run: cd backend && npm test
+      
+    - name: Run Frontend Tests
+      run: cd frontend && npm test
+      
+    - name: Build
+      run: |
+        cd backend && npm run build
+        cd ../frontend && npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to Production
+      run: echo "Deploy to production server"

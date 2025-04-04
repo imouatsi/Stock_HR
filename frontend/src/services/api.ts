@@ -1,10 +1,16 @@
 import axios from 'axios';
+import { setupCache } from 'axios-cache-adapter';
+
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000 // Cache for 15 minutes
+});
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
+  adapter: cache.adapter
 });
 
 // Logging function
@@ -90,4 +96,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api; 
+export default api;

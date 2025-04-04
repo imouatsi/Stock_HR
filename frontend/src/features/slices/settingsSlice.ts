@@ -8,11 +8,32 @@ interface Settings {
   dateFormat: string;
   timeFormat: string;
   notifications: {
-    email: boolean;
+    email: {
+      security: boolean;
+      updates: boolean;
+      marketing: boolean;
+    };
     browser: boolean;
     sound: boolean;
+    desktop: boolean;
   };
   autoLogout: number; // in minutes
+  accessibility: {
+    fontSize: 'small' | 'medium' | 'large';
+    contrast: 'normal' | 'high';
+    animations: boolean;
+  };
+  workspace: {
+    defaultView: 'grid' | 'list';
+    defaultLanguage: 'en' | 'fr' | 'ar';
+    startPage: string;
+  };
+  security: {
+    sessionTimeout: number;
+    mfaEnabled: boolean;
+    autoLock: boolean;
+    lastSeen: boolean;
+  };
 }
 
 interface SettingsState {
@@ -21,20 +42,53 @@ interface SettingsState {
   error: string | null;
 }
 
-const initialState: SettingsState = {
-  settings: {
+const loadSettings = () => {
+  try {
+    const savedSettings = localStorage.getItem('settings');
+    if (savedSettings) {
+      return JSON.parse(savedSettings);
+    }
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+  return {
     language: DEFAULT_LANGUAGE,
     theme: 'light',
     currency: 'DZD',
     dateFormat: 'DD/MM/YYYY',
     timeFormat: 'HH:mm',
     notifications: {
-      email: true,
+      email: {
+        security: true,
+        updates: true,
+        marketing: true,
+      },
       browser: true,
       sound: true,
+      desktop: true,
     },
     autoLogout: 30,
-  },
+    accessibility: {
+      fontSize: 'medium',
+      contrast: 'normal',
+      animations: true,
+    },
+    workspace: {
+      defaultView: 'grid',
+      defaultLanguage: 'en',
+      startPage: '/dashboard',
+    },
+    security: {
+      sessionTimeout: 30,
+      mfaEnabled: true,
+      autoLock: true,
+      lastSeen: true,
+    },
+  };
+};
+
+const initialState: SettingsState = {
+  settings: loadSettings(),
   isLoading: false,
   error: null,
 };
@@ -58,19 +112,24 @@ const settingsSlice = createSlice({
     updateLanguage: (state, action: PayloadAction<string>) => {
       if (SUPPORTED_LANGUAGES.includes(action.payload)) {
         state.settings.language = action.payload;
+        localStorage.setItem('settings', JSON.stringify(state.settings));
       }
     },
     toggleTheme: (state) => {
       state.settings.theme = state.settings.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     updateCurrency: (state, action: PayloadAction<string>) => {
       state.settings.currency = action.payload;
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     updateDateFormat: (state, action: PayloadAction<string>) => {
       state.settings.dateFormat = action.payload;
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     updateTimeFormat: (state, action: PayloadAction<string>) => {
       state.settings.timeFormat = action.payload;
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     updateNotificationSettings: (
       state,
@@ -80,9 +139,32 @@ const settingsSlice = createSlice({
         ...state.settings.notifications,
         ...action.payload,
       };
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     updateAutoLogout: (state, action: PayloadAction<number>) => {
       state.settings.autoLogout = action.payload;
+      localStorage.setItem('settings', JSON.stringify(state.settings));
+    },
+    updateAccessibility: (state, action: PayloadAction<Partial<Settings['accessibility']>>) => {
+      state.settings.accessibility = {
+        ...state.settings.accessibility,
+        ...action.payload
+      };
+      localStorage.setItem('settings', JSON.stringify(state.settings));
+    },
+    updateWorkspace: (state, action: PayloadAction<Partial<Settings['workspace']>>) => {
+      state.settings.workspace = {
+        ...state.settings.workspace,
+        ...action.payload
+      };
+      localStorage.setItem('settings', JSON.stringify(state.settings));
+    },
+    updateSecurity: (state, action: PayloadAction<Partial<Settings['security']>>) => {
+      state.settings.security = {
+        ...state.settings.security,
+        ...action.payload
+      };
+      localStorage.setItem('settings', JSON.stringify(state.settings));
     },
     clearError: (state) => {
       state.error = null;
@@ -101,7 +183,10 @@ export const {
   updateTimeFormat,
   updateNotificationSettings,
   updateAutoLogout,
+  updateAccessibility,
+  updateWorkspace,
+  updateSecurity,
   clearError,
 } = settingsSlice.actions;
 
-export default settingsSlice.reducer; 
+export default settingsSlice.reducer;

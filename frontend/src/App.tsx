@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
 import { RootState } from './features/store';
+import { LanguageThemeBar } from './components/LanguageThemeBar';
 
 // Pages
 import Login from './pages/Login';
@@ -21,70 +22,74 @@ import Invoices from './pages/Invoices';
 import Users from './pages/Users';
 import Settings from './pages/Settings';
 
-// Create dark theme with animations
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#90caf9',
-    },
-    secondary: {
-      main: '#f48fb1',
-    },
-    background: {
-      default: '#121212',
-      paper: '#1e1e1e',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            transform: 'scale(1.05)',
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
-          },
-        },
-      },
-    },
-    MuiTableRow: {
-      styleOverrides: {
-        root: {
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          },
-        },
-      },
-    },
-  },
-});
-
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { token } = useSelector((state: RootState) => state.auth);
   return token ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 function App() {
+  const { settings } = useSelector((state: RootState) => state.settings);
+
+  // Create theme with current preferences
+  const theme = createTheme({
+    palette: {
+      mode: settings.theme,
+      primary: {
+        main: '#90caf9',
+      },
+      secondary: {
+        main: '#f48fb1',
+      },
+      background: {
+        default: '#121212',
+        paper: '#1e1e1e',
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+            },
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            },
+          },
+        },
+      },
+    },
+    direction: settings.language === 'ar' ? 'rtl' : 'ltr',
+  });
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
+          <LanguageThemeBar />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -113,11 +118,11 @@ function App() {
           hideProgressBar={false}
           newestOnTop
           closeOnClick
-          rtl={false}
+          rtl={settings.language === 'ar'}
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="dark"
+          theme={settings.theme}
         />
       </ThemeProvider>
     </Provider>
