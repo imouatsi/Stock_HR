@@ -1,5 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import contractService from '../../services/contractService';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Contract {
   id: string;
@@ -127,4 +126,4 @@ export const {
   clearError,
 } = contractSlice.actions;
 
-export default contractSlice.reducer; 
+export default contractSlice.reducer;

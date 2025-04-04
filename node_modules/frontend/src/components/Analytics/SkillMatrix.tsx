@@ -28,7 +28,6 @@ export const SkillMatrix: React.FC = () => {
     skill: skill.skill,
     level: skill.level,
     growth: skill.growth,
-    endorsements: skill.endorsements
   }));
 
   return (
@@ -37,7 +36,6 @@ export const SkillMatrix: React.FC = () => {
         <School color="primary" sx={{ mr: 1 }} />
         <Typography variant="h6">Skill Matrix</Typography>
       </Box>
-
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
@@ -63,8 +61,10 @@ export const SkillMatrix: React.FC = () => {
               motionConfig="gentle"
               theme={{
                 background: 'transparent',
-                textColor: '#333333',
-                fontSize: 11
+                text: {
+                  fill: '#333333',
+                },
+                fontSize: 11,
               }}
             />
           </Box>

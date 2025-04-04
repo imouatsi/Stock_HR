@@ -27,7 +27,7 @@ const validationSchema = Yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     return () => {
@@ -135,4 +135,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

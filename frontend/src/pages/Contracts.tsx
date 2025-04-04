@@ -3,15 +3,6 @@ import { Box, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import contractService, { ContractTemplate } from '../services/contractService';
 
-interface ContractFormData extends Omit<ContractTemplate, 'party'> {
-  party: {
-    name: string;
-    type: 'individual' | 'company';
-    contact: string;
-    address: string;
-  };
-}
-
 const Contracts: React.FC = () => {
   const { t } = useTranslation();
 

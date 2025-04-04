@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import {
   Language as LanguageIcon,
-  AccountCircle,
   Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
@@ -101,4 +100,4 @@ const BottomBar: React.FC = () => {
   );
 };
 
-export default BottomBar; 
+export default BottomBar;

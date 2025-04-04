@@ -37,7 +37,7 @@ class InventoryService {
 
   public async getAllItems(): Promise<InventoryItem[]> {
     try {
-      const response = await api.get<ApiResponse<InventoryItem>>('/inventory');
+      const response = await api.get<ApiResponse<InventoryItem>>('/inventory'); // Ensure `api.get` is valid
       return response.data.data.items || [];
     } catch (error) {
       throw this.handleError(error);
@@ -109,4 +109,4 @@ class InventoryService {
   }
 }
 
-export default InventoryService.getInstance(); 
+export default InventoryService.getInstance();

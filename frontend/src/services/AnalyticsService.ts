@@ -1,12 +1,12 @@
 import { api } from '../features/api/apiSlice';
-import { CacheService } from './CacheService';
+import { CacheService } from './CacheService'; // Ensure this import is correct
 
 export class AnalyticsService {
   private static instance: AnalyticsService;
   private cache: CacheService;
 
   private constructor() {
-    this.cache = new CacheService();
+    this.cache = new CacheService(); // Ensure CacheService is properly instantiated
   }
 
   public static getInstance(): AnalyticsService {
@@ -20,7 +20,7 @@ export class AnalyticsService {
     const cached = await this.cache.get('dashboard:metrics');
     if (cached) return cached;
 
-    const response = await api.get('/analytics/dashboard');
+    const response = await api.fetchBaseQuery('/analytics/dashboard'); // Replace `get` with `fetchBaseQuery`
     await this.cache.set('dashboard:metrics', response.data, 300);
     return response.data;
   }
@@ -29,9 +29,24 @@ export class AnalyticsService {
     const processed = {
       kpis: this.calculateKPIs(data),
       trends: this.analyzeTrends(data),
-      predictions: await this.generatePredictions(data)
+      predictions: await this.generatePredictions(data),
     };
-    
+
     return processed;
+  }
+
+  private calculateKPIs(data: any) {
+    // Add implementation for KPI calculation
+    return {};
+  }
+
+  private analyzeTrends(data: any) {
+    // Add implementation for trend analysis
+    return {};
+  }
+
+  private async generatePredictions(data: any) {
+    // Add implementation for generating predictions
+    return {};
   }
 }

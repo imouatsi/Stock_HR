@@ -55,7 +55,7 @@ export const PerformanceInsights: React.FC = () => {
             </Typography>
             <LinearProgress
               variant="determinate"
-              value={performance.aiPredictions.nextMonthPerformance}
+              value={performance.aiPredictions?.nextMonthPerformance || 0} // Use optional chaining and fallback
               sx={{ height: 8, borderRadius: 4 }}
             />
           </Box>
@@ -65,21 +65,21 @@ export const PerformanceInsights: React.FC = () => {
               Burnout Risk
             </Typography>
             <Chip
-              label={performance.aiPredictions.burnoutRisk}
-              color={getBurnoutColor(performance.aiPredictions.burnoutRisk)}
+              label={performance.aiPredictions?.burnoutRisk || 'N/A'} // Use optional chaining and fallback
+              color={getBurnoutColor(performance.aiPredictions?.burnoutRisk || 'low')}
               icon={<Warning />}
             />
           </Box>
 
           <List>
-            {performance.aiPredictions.recommendedActions.map((action, index) => (
+            {performance.aiPredictions?.recommendedActions?.map((action, index) => (
               <ListItem key={index}>
                 <ListItemIcon>
                   <CheckCircle color="success" />
                 </ListItemIcon>
                 <ListItemText primary={action} />
               </ListItem>
-            ))}
+            )) || <Typography>No recommendations available</Typography>} // Fallback if undefined
           </List>
         </motion.div>
       </AnimatePresence>

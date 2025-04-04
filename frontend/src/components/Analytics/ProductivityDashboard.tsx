@@ -59,9 +59,9 @@ export const ProductivityDashboard: React.FC = () => {
                       Tasks Completed
                     </Typography>
                     <Typography variant="h4">
-                      {kpis.dailyTasks.completed}/{kpis.dailyTasks.total}
+                      {kpis?.dailyTasks?.completed || 0}/{kpis?.dailyTasks?.total || 0}
                     </Typography>
-                    {kpis.dailyTasks.efficiency > 80 ? (
+                    {kpis?.dailyTasks?.efficiency > 80 ? (
                       <TrendingUp color="success" />
                     ) : (
                       <TrendingDown color="error" />

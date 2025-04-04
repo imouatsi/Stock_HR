@@ -1,5 +1,42 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// filepath: c:\Stock_HR\frontend\src\features\slices\authSlice.ts
+interface User {
+    // ...existing code...
+    settings?: {
+        workspace?: {
+            analytics?: {
+                kpis?: {
+                    performance?: {
+                        skillMatrix?: {
+                            technical: Array<{ skill: string; level: number; growth: number }>;
+                        };
+                        aiPredictions?: {
+                            nextMonthPerformance: number;
+                            burnoutRisk: string;
+                            recommendedActions: string[];
+                        };
+                    };
+                    dailyTasks?: {
+                        completed: number;
+                        total: number;
+                        efficiency: number;
+                    };
+                };
+                gamification?: any;
+                mostUsedFeatures?: Array<{ feature: string; useCount: number }>;
+                productivityScore?: number;
+            };
+            collaboration?: {
+                teams: Array<{ id: string; role: string }>;
+            };
+        };
+    };
+    subscription?: {
+        features: string[];
+    };
+}
+
 
 interface User {
   id: string;
@@ -8,6 +45,38 @@ interface User {
   lastName: string;
   role: string;
   isActive: boolean;
+  settings?: {
+    workspace?: {
+      analytics?: {
+        kpis?: {
+          performance?: {
+            skillMatrix?: {
+              technical: Array<{ skill: string; level: number; growth: number }>;
+            };
+            aiPredictions?: {
+              nextMonthPerformance: number;
+              burnoutRisk: string;
+              recommendedActions: string[];
+            };
+          };
+          dailyTasks?: {
+            completed: number;
+            total: number;
+            efficiency: number;
+          };
+        };
+        gamification?: any;
+        mostUsedFeatures?: Array<{ feature: string; useCount: number }>;
+        productivityScore?: number;
+      };
+      collaboration?: {
+        teams: Array<{ id: string; role: string }>;
+      };
+    };
+  };
+  subscription?: {
+    features: string[];
+  };
 }
 
 interface AuthResponse {
@@ -149,4 +218,4 @@ const authSlice = createSlice({
 });
 
 export const { clearError } = authSlice.actions;
-export default authSlice.reducer; 
+export default authSlice.reducer;

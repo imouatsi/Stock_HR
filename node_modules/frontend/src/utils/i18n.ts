@@ -16,7 +16,7 @@ const loadLanguage = () => {
 };
 
 i18n
-  .use(LanguageDetector)
+  .use(LanguageDetector) // Use directly without `new`
   .use(initReactI18next)
   .init({
     lng: loadLanguage(),

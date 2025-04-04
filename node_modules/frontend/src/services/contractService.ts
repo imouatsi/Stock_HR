@@ -66,17 +66,6 @@ export interface ContractTemplate {
     contact: string;
     address: string;
   };
-  items?: {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    total: number;
-  }[];
-  payments?: {
-    scheduledDate: string;
-    amount: number;
-    method: 'cash' | 'bank_transfer' | 'check';
-  }[];
 }
 
 export interface LicenseValidation {

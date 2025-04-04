@@ -12,7 +12,7 @@ export const TeamSpace: React.FC = () => {
   return (
     <AnimatePresence>
       <List>
-        {teams.map((team, index) => (
+        {teams.map((team: { id: string; role: string }, index: number) => (
           <motion.div
             key={team.id}
             initial={{ opacity: 0, x: -20 }}
