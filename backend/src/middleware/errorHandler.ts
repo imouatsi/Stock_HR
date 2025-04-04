@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/appError';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const errorHandler = (
   err: Error | AppError,
   _req: Request,
@@ -10,7 +12,7 @@ export const errorHandler = (
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       status: err.status,
-      message: err.message,
+      message: isProduction ? 'An error occurred' : err.message, // Hide detailed messages in production
       code: err.code
     });
   }
@@ -52,10 +54,10 @@ export const errorHandler = (
   }
 
   // Default error
-  console.error('Error:', err);
+  console.error('Unexpected error:', err); // Log unexpected errors
   return res.status(500).json({
     status: 'error',
     message: 'Something went wrong!',
     code: 'INTERNAL_SERVER_ERROR'
   });
-}; 
+};

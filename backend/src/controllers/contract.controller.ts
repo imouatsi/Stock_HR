@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { jsPDF } from 'jspdf'; // Add this library for PDF generation
 
 export const getAllContracts = async (
   _req: Request,
@@ -108,4 +109,34 @@ export const deleteContract = async (
   } catch (error) {
     next(error);
   }
-}; 
+};
+
+export const generateContract = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { title, description, startDate, endDate, party } = req.body;
+
+    // Generate contract content
+    const contractContent = `
+      Contract Title: ${title}
+      Description: ${description}
+      Start Date: ${startDate}
+      End Date: ${endDate}
+      Party: ${party.name}, ${party.type}, ${party.contact}, ${party.address}
+    `;
+
+    // Generate PDF
+    const doc = new jsPDF();
+    doc.text(contractContent, 10, 10);
+    const pdfBuffer = doc.output('arraybuffer');
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=contract.pdf');
+    res.status(200).send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    next(error);
+  }
+};

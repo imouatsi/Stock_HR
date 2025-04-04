@@ -6,5 +6,6 @@ export const notFoundHandler = (
   _res: Response,
   next: NextFunction
 ) => {
+  console.warn(`Route not found: ${req.method} ${req.originalUrl}`); // Log missing route
   next(new AppError(`Route ${req.originalUrl} not found`, 404, 'NOT_FOUND'));
-}; 
+};

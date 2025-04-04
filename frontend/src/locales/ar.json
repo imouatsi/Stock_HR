@@ -1,0 +1,18 @@
+{
+  "contracts": {
+    "title": "العقود",
+    "generateButton": "إنشاء عقد"
+  },
+  "invoices": {
+    "title": "الفواتير"
+  },
+  "users": {
+    "title": "المستخدمون"
+  },
+  "settings": {
+    "title": "الإعدادات"
+  },
+  "common": {
+    "noData": "لا توجد بيانات"
+  }
+}

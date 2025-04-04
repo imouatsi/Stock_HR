@@ -16,10 +16,28 @@ export interface Contract {
   };
   terms: string;
   type: string;
-  party: string;
+  party: {
+    name: string;
+    type: 'individual' | 'company';
+    contact: string;
+    address: string;
+  };
   attachments: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ContractTemplate {
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  party: {
+    name: string;
+    type: 'individual' | 'company';
+    contact: string;
+    address: string;
+  };
 }
 
 interface ApiResponse<T> {
@@ -107,6 +125,17 @@ class ContractService {
     }
   }
 
+  public async generateContract(contract: ContractTemplate): Promise<Blob> {
+    try {
+      const response = await api.post('/contracts/generate', contract, {
+        responseType: 'blob',
+      });
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   private handleError(error: any): Error {
     if (error.response) {
       const message = error.response.data.message || 'An error occurred';
@@ -116,4 +145,4 @@ class ContractService {
   }
 }
 
-export default ContractService.getInstance(); 
+export default ContractService.getInstance();

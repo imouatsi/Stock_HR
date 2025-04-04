@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { store } from './features/store';
 import App from './App';
 import './index.css';
+import './i18n'; // Import i18n initialization
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

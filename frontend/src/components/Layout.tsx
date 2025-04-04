@@ -15,6 +15,8 @@ import {
   useTheme,
   useMediaQuery,
   CssBaseline,
+  Tooltip,
+  Zoom,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -38,7 +40,7 @@ const drawerWidth = 240;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
   { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory', roles: ['admin', 'superadmin', 'inventory_clerk'] },
-  { text: 'Contracts', icon: <ContractIcon />, path: '/contracts', roles: ['admin', 'superadmin', 'manager'] },
+  { text: 'Contracts', icon: <ContractIcon />, path: '/contracts', roles: ['superadmin'] }, // Restrict to superadmin
   { text: 'Invoices', icon: <InvoiceIcon />, path: '/invoices', roles: ['admin', 'superadmin', 'manager'] },
   { text: 'Proforma', icon: <ProformaIcon />, path: '/proforma', roles: ['admin', 'superadmin', 'manager'] },
   { text: 'Users', icon: <UserIcon />, path: '/users', roles: ['admin', 'superadmin'] },
@@ -105,26 +107,29 @@ const Layout = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh', backgroundColor: 'background.default' }}>
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          backgroundColor: 'primary.main',
         }}
       >
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Tooltip title="Open Menu" arrow TransitionComponent={Zoom}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Stock & HR Management System
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
@@ -152,6 +157,7 @@ const Layout = () => {
                 width: drawerWidth,
               },
             }}
+            {...(!mobileOpen && { inert: true })} // Add inert attribute when closed
           >
             {drawer}
           </Drawer>
@@ -188,4 +194,4 @@ const Layout = () => {
   );
 };
 
-export default Layout; 
+export default Layout;

@@ -16,6 +16,8 @@ import {
   DialogActions,
   TextField,
   IconButton,
+  Tooltip,
+  Zoom,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,23 +39,24 @@ const Proforma: React.FC = () => {
   const [proformas, setProformas] = useState<ProformaItem[]>([]);
   const [open, setOpen] = useState(false);
   const [selectedProforma, setSelectedProforma] = useState<ProformaItem | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<ProformaItem, 'id'>>({
     number: '',
     date: '',
     client: '',
     total: 0,
-    status: 'draft' as const,
+    status: 'draft',
   });
 
   const handleOpen = (proforma?: ProformaItem) => {
     if (proforma) {
       setSelectedProforma(proforma);
-      setFormData(proforma);
+      const { id, ...rest } = proforma;
+      setFormData(rest);
     } else {
       setSelectedProforma(null);
       setFormData({
         number: '',
-        date: '',
+        date: new Date().toISOString().split('T')[0], // Default to today's date
         client: '',
         total: 0,
         status: 'draft',
@@ -68,6 +71,11 @@ const Proforma: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    if (!formData.number || !formData.client || formData.total <= 0) {
+      alert('Please fill in all required fields and ensure total is greater than 0.');
+      return;
+    }
+
     if (selectedProforma) {
       setProformas(proformas.map(item =>
         item.id === selectedProforma.id ? { ...item, ...formData } : item
@@ -79,28 +87,41 @@ const Proforma: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    setProformas(proformas.filter(item => item.id !== id));
+    if (window.confirm('Are you sure you want to delete this proforma invoice?')) {
+      setProformas(proformas.filter(item => item.id !== id));
+    }
   };
 
   const handleExportPdf = (id: string) => {
-    // TODO: Implement PDF export
-    console.log('Export PDF for proforma:', id);
+    const proforma = proformas.find(item => item.id === id);
+    if (!proforma) return;
+
+    // Use jsPDF or react-pdf to generate the PDF
+    alert(`Exporting Proforma Invoice #${proforma.number} to PDF.`);
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
+    <Box p={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" color="primary">
           Proforma Invoices
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpen()}
-        >
-          New Proforma
-        </Button>
+        <Tooltip title="Create a new proforma invoice" arrow TransitionComponent={Zoom}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpen()}
+            sx={{
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.1)',
+              },
+            }}
+          >
+            New Proforma
+          </Button>
+        </Tooltip>
       </Box>
 
       <TableContainer component={Paper}>
@@ -124,15 +145,21 @@ const Proforma: React.FC = () => {
                 <TableCell align="right">${proforma.total.toFixed(2)}</TableCell>
                 <TableCell>{proforma.status}</TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => handleOpen(proforma)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(proforma.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleExportPdf(proforma.id)}>
-                    <PdfIcon />
-                  </IconButton>
+                  <Tooltip title="Edit" arrow TransitionComponent={Zoom}>
+                    <IconButton onClick={() => handleOpen(proforma)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete" arrow TransitionComponent={Zoom}>
+                    <IconButton onClick={() => handleDelete(proforma.id)} color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Export as PDF" arrow TransitionComponent={Zoom}>
+                    <IconButton onClick={() => handleExportPdf(proforma.id)} color="secondary">
+                      <PdfIcon />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
@@ -143,40 +170,50 @@ const Proforma: React.FC = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{selectedProforma ? 'Edit Proforma' : 'New Proforma'}</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-            <TextField
-              label="Number"
-              value={formData.number}
-              onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="Date"
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label="Client"
-              value={formData.client}
-              onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="Total"
-              type="number"
-              value={formData.total}
-              onChange={(e) => setFormData({ ...formData, total: Number(e.target.value) })}
-              fullWidth
-            />
-          </Box>
+          <TextField
+            label="Number"
+            fullWidth
+            margin="normal"
+            value={formData.number}
+            onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+          />
+          <TextField
+            label="Date"
+            type="date"
+            fullWidth
+            margin="normal"
+            value={formData.date}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+          />
+          <TextField
+            label="Client"
+            fullWidth
+            margin="normal"
+            value={formData.client}
+            onChange={(e) => setFormData({ ...formData, client: e.target.value })}
+          />
+          <TextField
+            label="Total"
+            type="number"
+            fullWidth
+            margin="normal"
+            value={formData.total}
+            onChange={(e) => setFormData({ ...formData, total: parseFloat(e.target.value) })}
+          />
+          <TextField
+            label="Status"
+            fullWidth
+            margin="normal"
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            {selectedProforma ? 'Update' : 'Create'}
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            Save
           </Button>
         </DialogActions>
       </Dialog>
@@ -184,4 +221,4 @@ const Proforma: React.FC = () => {
   );
 };
 
-export default Proforma; 
+export default Proforma;

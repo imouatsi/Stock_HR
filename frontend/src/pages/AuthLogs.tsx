@@ -18,9 +18,9 @@ import { RootState } from '../features/store';
 interface LogEntry {
   timestamp: string;
   event: string;
-  details: any;
+  details: Record<string, unknown>;
   path: string;
-  user: any;
+  user: { id: string; name: string; email?: string; role?: string };
 }
 
 const AuthLogs: React.FC = () => {
@@ -28,9 +28,13 @@ const AuthLogs: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   useEffect(() => {
-    const authLogs = localStorage.getItem('auth_logs');
-    if (authLogs) {
-      setLogs(JSON.parse(authLogs));
+    try {
+      const authLogs = localStorage.getItem('auth_logs');
+      if (authLogs) {
+        setLogs(JSON.parse(authLogs));
+      }
+    } catch (error) {
+      console.error('Failed to load authentication logs from localStorage:', error);
     }
   }, []);
 
@@ -86,7 +90,9 @@ const AuthLogs: React.FC = () => {
                 </TableCell>
                 <TableCell>{log.path}</TableCell>
                 <TableCell>
-                  {log.user ? `${log.user.email} (${log.user.role})` : 'No user'}
+                  {log.user
+                    ? `${log.user.email || 'Unknown Email'} (${log.user.role || 'Unknown Role'})`
+                    : 'No user'}
                 </TableCell>
                 <TableCell>
                   <pre style={{ margin: 0, fontSize: '0.875rem' }}>
@@ -102,4 +108,4 @@ const AuthLogs: React.FC = () => {
   );
 };
 
-export default AuthLogs; 
+export default AuthLogs;

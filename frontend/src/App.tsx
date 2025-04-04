@@ -15,16 +15,25 @@ import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
 import Layout from './components/Layout';
 import Proforma from './pages/Proforma';
+import Inventory from './pages/Inventory';
+import Contracts from './pages/Contracts';
+import Invoices from './pages/Invoices';
+import Users from './pages/Users';
+import Settings from './pages/Settings';
 
-// Create theme
+// Create dark theme with animations
 const theme = createTheme({
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
-      main: '#1976d2',
+      main: '#90caf9',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#f48fb1',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
     },
   },
   typography: {
@@ -35,6 +44,30 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           textTransform: 'none',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'scale(1.05)',
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          },
         },
       },
     },
@@ -43,7 +76,7 @@ const theme = createTheme({
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { token } = useSelector((state: RootState) => state.auth);
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  return token ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 function App() {
@@ -51,7 +84,7 @@ function App() {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -66,7 +99,11 @@ function App() {
               <Route index element={<Navigate to="/dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="proforma" element={<Proforma />} />
-              {/* Add other protected routes here */}
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="contracts" element={<Contracts />} />
+              <Route path="invoices" element={<Invoices />} />
+              <Route path="users" element={<Users />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
         </Router>
@@ -80,7 +117,7 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light"
+          theme="dark"
         />
       </ThemeProvider>
     </Provider>

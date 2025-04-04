@@ -4,7 +4,8 @@ import {
   getContractById,
   createContract,
   updateContract,
-  deleteContract
+  deleteContract,
+  generateContract
 } from '../controllers/contract.controller';
 
 const router = Router();
@@ -15,4 +16,7 @@ router.post('/', createContract);
 router.put('/:id', updateContract);
 router.delete('/:id', deleteContract);
 
-export default router; 
+// Generate and export contract as PDF
+router.post('/generate', generateContract);
+
+export default router;

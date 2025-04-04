@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Switch, FormControlLabel } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 const Settings: React.FC = () => {
@@ -10,11 +10,18 @@ const Settings: React.FC = () => {
       <Typography variant="h4" component="h1">
         {t('settings.title')}
       </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        {t('common.noData')}
-      </Typography>
+      <FormControlLabel
+        control={<Switch defaultChecked />}
+        label={t('settings.enableNotifications')}
+        sx={{ mt: 2 }}
+      />
+      <FormControlLabel
+        control={<Switch />}
+        label={t('settings.darkMode')}
+        sx={{ mt: 2 }}
+      />
     </Box>
   );
 };
 
-export default Settings; 
+export default Settings;

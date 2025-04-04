@@ -13,6 +13,8 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  Tooltip,
+  Zoom,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -78,32 +80,34 @@ const Dashboard: React.FC = () => {
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {stats.map((stat, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h6" component="div" color="text.secondary">
-                      {stat.title}
-                    </Typography>
-                    <Typography variant="h4" component="div" sx={{ mt: 1 }}>
-                      {stat.value}
-                    </Typography>
+            <Tooltip title={`View details for ${stat.title}`} arrow TransitionComponent={Zoom}>
+              <Card sx={{ height: '100%', transition: 'all 0.3s ease', '&:hover': { transform: 'scale(1.05)', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)' } }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="h6" component="div" color="text.secondary">
+                        {stat.title}
+                      </Typography>
+                      <Typography variant="h4" component="div" sx={{ mt: 1 }}>
+                        {stat.value}
+                      </Typography>
+                    </Box>
+                    <IconButton 
+                      sx={{ 
+                        backgroundColor: `${stat.color}15`,
+                        color: stat.color,
+                        p: 2,
+                        '&:hover': {
+                          backgroundColor: `${stat.color}25`,
+                        }
+                      }}
+                    >
+                      {stat.icon}
+                    </IconButton>
                   </Box>
-                  <IconButton 
-                    sx={{ 
-                      backgroundColor: `${stat.color}15`,
-                      color: stat.color,
-                      p: 2,
-                      '&:hover': {
-                        backgroundColor: `${stat.color}25`,
-                      }
-                    }}
-                  >
-                    {stat.icon}
-                  </IconButton>
-                </Box>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Tooltip>
           </Grid>
         ))}
       </Grid>
@@ -169,4 +173,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

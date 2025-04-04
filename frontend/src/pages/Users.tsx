@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 const Users: React.FC = () => {
@@ -10,6 +10,14 @@ const Users: React.FC = () => {
       <Typography variant="h4" component="h1">
         {t('users.title')}
       </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+        onClick={() => alert('Add User functionality coming soon!')}
+      >
+        {t('users.addButton')}
+      </Button>
       <Typography variant="body1" sx={{ mt: 2 }}>
         {t('common.noData')}
       </Typography>
@@ -17,4 +25,4 @@ const Users: React.FC = () => {
   );
 };
 
-export default Users; 
+export default Users;
