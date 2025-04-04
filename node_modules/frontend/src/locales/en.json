@@ -1,0 +1,17 @@
+{
+  "contracts": {
+    "title": "Contracts"
+  },
+  "invoices": {
+    "title": "Invoices"
+  },
+  "users": {
+    "title": "Users"
+  },
+  "settings": {
+    "title": "Settings"
+  },
+  "common": {
+    "noData": "No data available"
+  }
+}
