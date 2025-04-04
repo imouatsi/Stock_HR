@@ -14,6 +14,19 @@ interface JWTPayload {
   exp: number;
 }
 
+export const verifyToken = async (token: string): Promise<IUser> => {
+  try {
+    const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
+    const user = await UserModel.findById(decoded.id).select('-password');
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+};
+
 export const protect = async (req: AuthRequest, _res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];

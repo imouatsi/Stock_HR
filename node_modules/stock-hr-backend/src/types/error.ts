@@ -1,4 +1,6 @@
 export class ApiError extends Error {
+  public details?: any; // Add the `details` property
+
   constructor(
     public message: string,
     public status: number = 500,

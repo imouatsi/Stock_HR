@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, NextFunction, RequestHandler } from 'express';
 import { validationResult, ValidationChain } from 'express-validator';
 import { ApiError } from '../types/error';
 
-export const validate = (validations: ValidationChain[]) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+export const validate = (validations: ValidationChain[]): RequestHandler => {
+  return async (req: Request, _res: any, next: NextFunction) => {
     await Promise.all(validations.map(validation => validation.run(req)));
 
     const errors = validationResult(req);

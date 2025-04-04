@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 import { protect, authorize } from '../middleware/auth';
 import { validate } from '../middleware/validation';
 import * as userController from '../controllers/user.controller';
-import { ROLES } from '../../frontend/src/config';
+import { ROLES } from '../../../shared/config'; // Fix the import path
 
 const router = Router();
 

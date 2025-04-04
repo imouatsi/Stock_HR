@@ -1,11 +1,5 @@
 import { Router } from 'express';
-import {
-  getAllItems,
-  getItemById,
-  createItem,
-  updateItem,
-  deleteItem
-} from '../controllers/inventory.controller';
+import { getAllItems, getItemById, createItem, updateItem, deleteItem } from '../controllers/inventory.controller';
 
 const router = Router();
 
@@ -15,4 +9,4 @@ router.post('/', createItem);
 router.put('/:id', updateItem);
 router.delete('/:id', deleteItem);
 
-export default router; 
+export default router;
