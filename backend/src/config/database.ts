@@ -1,15 +1,24 @@
 import mongoose from 'mongoose';
-import { AppError } from '../utils/appError';
+import { config } from './index';
 
-const connectDB = async () => {
+export const connectDatabase = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stock-hr';
-    await mongoose.connect(mongoURI);
-    console.log('MongoDB Connected...');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-    throw new AppError('Database connection failed', 500);
+    await mongoose.connect(config.database.uri, {
+      autoIndex: true,
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
   }
 };
 
-export { connectDB }; 
+mongoose.connection.on('error', (error) => {
+  console.error('MongoDB error:', error);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected. Attempting to reconnect...');
+  connectDatabase();
+});

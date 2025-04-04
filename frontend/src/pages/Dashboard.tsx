@@ -29,10 +29,26 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../features/store';
 import { useNavigate } from 'react-router-dom';
+import { AnimatedCard } from '../components/common/AnimatedCard';
+import { ChartCard } from '../components/dashboard/ChartCard';
 
 const Dashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+  const analytics = AnalyticsService.getInstance();
+  const [metrics, setMetrics] = React.useState(null);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const data = await analytics.getDashboardMetrics();
+      const processed = await analytics.processMetrics(data);
+      setMetrics(processed);
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const stats = [
     { title: 'Total Users', value: '0', icon: <PeopleIcon fontSize="large" />, color: '#1976d2' },

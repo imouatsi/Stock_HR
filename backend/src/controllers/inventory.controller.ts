@@ -1,108 +1,47 @@
 import { Request, Response, NextFunction } from 'express';
+import { InventoryItem } from '../models/inventory.model';
+import { WebSocketService } from '../services/WebSocketService';
+import { CacheService } from '../services/CacheService';
 
-export const getAllItems = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    // TODO: Implement get all items logic
-    res.status(200).json({
-      status: 'success',
-      data: {
-        items: []
+export class InventoryController {
+  private wsService: WebSocketService;
+  private cache: CacheService;
+
+  constructor() {
+    this.wsService = WebSocketService.getInstance();
+    this.cache = CacheService.getInstance();
+  }
+
+  public getAll = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cached = await this.cache.get('inventory:all');
+      if (cached) {
+        return res.json(cached);
       }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
-export const getItemById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement get item by id logic
-    res.status(200).json({
-      status: 'success',
-      data: {
-        item: {
-          id,
-          name: 'Sample Item',
-          quantity: 0,
-          price: 0
-        }
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const items = await InventoryItem.find();
+      await this.cache.set('inventory:all', items, 300); // Cache for 5 minutes
+      res.json(items);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export const createItem = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { name, quantity, price } = req.body;
-    // TODO: Implement create item logic
-    res.status(201).json({
-      status: 'success',
-      data: {
-        item: {
-          id: '1',
-          name,
-          quantity,
-          price
-        }
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  public create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const item = new InventoryItem(req.body);
+      await item.save();
+      
+      this.wsService.broadcast('inventory:created', item);
+      await this.cache.delete('inventory:all');
+      
+      res.status(201).json(item);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export const updateItem = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { name, quantity, price } = req.body;
-    // TODO: Implement update item logic
-    res.status(200).json({
-      status: 'success',
-      data: {
-        item: {
-          id,
-          name,
-          quantity,
-          price
-        }
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  // ...additional methods
+}
 
-export const deleteItem = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    // TODO: Implement delete item logic
-    res.status(204).json({
-      status: 'success',
-      data: null
-    });
-  } catch (error) {
-    next(error);
-  }
-}; 
+export default new InventoryController();
