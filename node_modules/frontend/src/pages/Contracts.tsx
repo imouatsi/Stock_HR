@@ -37,6 +37,14 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { api } from '../utils/api';
 import GradientButton from '../components/ui/GradientButton';
+import {
+  gradientText,
+  pageContainer,
+  tableContainer,
+  tableHeader,
+  dialogTitle,
+  dialogPaper,
+} from '../theme/gradientStyles';
 
 interface Contract {
   _id: string;
@@ -243,91 +251,45 @@ const Contracts: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Slide direction="down" in={true} timeout={800}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          mb: 3,
-          flexDirection: isRTL ? 'row-reverse' : 'row'
-        }}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
+        <Slide direction="right" in={true} mountOnEnter unmountOnExit>
           <Typography 
             variant="h4" 
             component="h1"
-            sx={{
-              fontWeight: 600,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -4,
-                left: 0,
-                width: '60%',
-                height: 3,
-                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                borderRadius: 4,
-                transform: 'scaleX(0)',
-                transformOrigin: 'left',
-                animation: 'slideIn 0.8s ease-out forwards',
-              },
-              '@keyframes slideIn': {
-                to: { transform: 'scaleX(1)' },
-              },
-            }}
+            sx={gradientText}
           >
             {t('contracts.title')}
           </Typography>
-          <Grow in={true} timeout={1000}>
-            <GradientButton
-              startIcon={!isRTL && <AddIcon />}
-              endIcon={isRTL && <AddIcon />}
-              onClick={handleClickOpen}
-            >
-              {t('contracts.generateButton')}
-            </GradientButton>
-          </Grow>
-        </Box>
-      </Slide>
+        </Slide>
+        <Grow in={true} timeout={1000}>
+          <GradientButton
+            onClick={handleClickOpen}
+            startIcon={<AddIcon />}
+          >
+            {t('contracts.createNew')}
+          </GradientButton>
+        </Grow>
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+      )}
 
       <Fade in={true} timeout={1000}>
         <TableContainer 
           component={Paper}
-          sx={{
-            boxShadow: theme.shadows[2],
-            borderRadius: 2,
-            overflow: 'hidden',
-            '& .MuiTableCell-root': {
-              borderColor: theme.palette.divider,
-            },
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            },
-          }}
+          sx={tableContainer(theme)}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ 
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              }}>
-                <TableCell sx={{ width: 50, color: 'white' }}></TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.number')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.type')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.partyA')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.partyB')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.value')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('contracts.status')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('common.actions')}</TableCell>
+              <TableRow sx={tableHeader}>
+                <TableCell>{t('contracts.reference')}</TableCell>
+                <TableCell>{t('contracts.party')}</TableCell>
+                <TableCell>{t('contracts.startDate')}</TableCell>
+                <TableCell>{t('contracts.endDate')}</TableCell>
+                <TableCell>{t('contracts.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -350,29 +312,11 @@ const Contracts: React.FC = () => {
                       },
                     }}
                   >
-                    <TableCell>
-                      <IconButton size="small">
-                        {expandedRow === contract._id ? 
-                          <KeyboardArrowUpIcon /> : 
-                          <KeyboardArrowDownIcon />
-                        }
-                      </IconButton>
-                    </TableCell>
                     <TableCell>{contract.contractNumber}</TableCell>
-                    <TableCell>{contract.contractType}</TableCell>
-                    <TableCell>{contract.partyA.name}</TableCell>
-                    <TableCell>{contract.partyB.name}</TableCell>
-                    <TableCell align={isRTL ? 'left' : 'right'}>
-                      <Chip 
-                        label={`$${contract.value.toFixed(2)}`}
-                        sx={{
-                          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                          color: 'white',
-                          fontWeight: 'bold',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell align={isRTL ? 'left' : 'right'}>
+                    <TableCell>{contract.partyA.name} - {contract.partyB.name}</TableCell>
+                    <TableCell>{contract.startDate}</TableCell>
+                    <TableCell>{contract.endDate}</TableCell>
+                    <TableCell>
                       <Chip 
                         label={t(`contracts.${contract.status}`)}
                         sx={{
@@ -382,7 +326,7 @@ const Contracts: React.FC = () => {
                         }}
                       />
                     </TableCell>
-                    <TableCell align={isRTL ? 'left' : 'right'}>
+                    <TableCell>
                       <Box 
                         className="row-actions"
                         sx={{
@@ -562,23 +506,14 @@ const Contracts: React.FC = () => {
 
       <Dialog 
         open={open} 
-        onClose={handleClose} 
-        maxWidth="md" 
-        fullWidth
-        sx={{
-          '& .MuiDialog-paper': {
-            borderRadius: 2,
-          },
+        onClose={handleClose}
+        TransitionComponent={Zoom}
+        PaperProps={{
+          sx: dialogPaper
         }}
       >
-        <DialogTitle 
-          sx={{ 
-            bgcolor: 'primary.main', 
-            color: 'primary.contrastText',
-            textAlign: isRTL ? 'right' : 'left',
-          }}
-        >
-          {t('contracts.generateContract')}
+        <DialogTitle sx={dialogTitle}>
+          {t('contracts.createNew')}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           <Grid container spacing={3} sx={{ mt: 1 }}>

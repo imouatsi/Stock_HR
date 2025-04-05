@@ -12,6 +12,7 @@ import {
   Tooltip,
   Fade,
   Zoom,
+  useTheme,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
@@ -21,6 +22,11 @@ import {
   Palette as PaletteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../hooks/useTranslation';
+import {
+  gradientText,
+  pageContainer,
+  gradientBox,
+} from '../theme/gradientStyles';
 
 interface SettingOption {
   id: string;
@@ -32,6 +38,7 @@ interface SettingOption {
 
 const Settings: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [settings, setSettings] = useState<SettingOption[]>([
     {
       id: 'notifications',
@@ -79,22 +86,12 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 4 
-      }}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
         <Typography 
           variant="h4" 
           component="h1"
-          sx={{
-            fontWeight: 600,
-            background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-            backgroundClip: 'text',
-            textFillColor: 'transparent',
-          }}
+          sx={gradientText}
         >
           {t('settings.title')}
         </Typography>
@@ -114,15 +111,7 @@ const Settings: React.FC = () => {
                     transform: 'translateY(-4px)',
                     boxShadow: (theme) => theme.shadows[8],
                   },
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                  },
+                  ...gradientBox,
                 }}
               >
                 <CardContent>
@@ -140,6 +129,7 @@ const Settings: React.FC = () => {
                           '&:hover': {
                             backgroundColor: 'primary.main',
                             color: 'primary.contrastText',
+                            transform: 'rotate(180deg)',
                           },
                           transition: 'all 0.3s ease-in-out',
                         }}
@@ -166,9 +156,18 @@ const Settings: React.FC = () => {
                         sx={{
                           '& .MuiSwitch-switchBase.Mui-checked': {
                             color: 'primary.main',
+                            '&:hover': {
+                              backgroundColor: 'primary.light',
+                            },
                           },
                           '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
                             backgroundColor: 'primary.main',
+                          },
+                          '& .MuiSwitch-thumb': {
+                            transition: 'all 0.2s ease-in-out',
+                          },
+                          '&:hover .MuiSwitch-thumb': {
+                            transform: 'scale(1.1)',
                           },
                         }}
                       />

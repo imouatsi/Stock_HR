@@ -39,21 +39,40 @@ import {
 } from '@mui/icons-material';
 import GradientButton from '../components/ui/GradientButton';
 import { api } from '../utils/api';
+import {
+  gradientText,
+  pageContainer,
+  tableContainer,
+  tableHeader,
+  dialogTitle,
+  dialogPaper,
+} from '../theme/gradientStyles';
+
+interface InvoiceItem {
+  description: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
 
 interface Invoice {
   _id: string;
   invoiceNumber: string;
   customerName: string;
-  items: Array<{
-    description: string;
-    quantity: number;
-    price: number;
-    total: number;
-  }>;
+  items: InvoiceItem[];
   subtotal: number;
   tax: number;
   total: number;
-  status: string;
+  status: 'draft' | 'sent' | 'paid' | 'cancelled';
+  dueDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface InvoiceFormData {
+  customerName: string;
+  items: InvoiceItem[];
+  tax: number;
   dueDate: string;
 }
 
@@ -68,7 +87,7 @@ const Invoices: React.FC = () => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [invoiceData, setInvoiceData] = useState({
+  const [invoiceData, setInvoiceData] = useState<InvoiceFormData>({
     customerName: '',
     items: [{
       description: '',
@@ -86,11 +105,12 @@ const Invoices: React.FC = () => {
 
   const fetchInvoices = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/invoices');
       setInvoices(response.data.data.invoices);
-      setLoading(false);
     } catch (err) {
       setError('Failed to fetch invoices');
+    } finally {
       setLoading(false);
     }
   };
@@ -147,21 +167,41 @@ const Invoices: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
+      setError('');
+
+      // Validate form data
+      if (!invoiceData.customerName || invoiceData.items.length === 0) {
+        throw new Error(t('invoices.validation.required'));
+      }
+
+      // Validate items
+      for (const item of invoiceData.items) {
+        if (!item.description || item.quantity <= 0 || item.price <= 0) {
+          throw new Error(t('invoices.validation.itemsRequired'));
+        }
+      }
+
       await api.post('/invoices', invoiceData);
+      await fetchInvoices();
       handleClose();
-      fetchInvoices();
     } catch (err) {
-      setError('Failed to create invoice');
+      setError(err instanceof Error ? err.message : 'Failed to create invoice');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
+      setLoading(true);
       await api.delete(`/invoices/${id}`);
-      fetchInvoices();
+      await fetchInvoices();
       setDeleteConfirm(null);
     } catch (err) {
       setError('Failed to delete invoice');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -229,50 +269,23 @@ const Invoices: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 4 
-      }}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
         <Slide direction="right" in={true} mountOnEnter unmountOnExit>
           <Typography 
             variant="h4" 
             component="h1"
-            sx={{
-              fontWeight: 600,
-              background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -4,
-                left: 0,
-                width: '100%',
-                height: 2,
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-                transform: 'scaleX(0)',
-                transformOrigin: 'left',
-                transition: 'transform 0.3s ease-in-out',
-              },
-              '&:hover::after': {
-                transform: 'scaleX(1)',
-              },
-            }}
+            sx={gradientText}
           >
             {t('invoices.title')}
           </Typography>
         </Slide>
-        
         <Grow in={true} timeout={1000}>
           <GradientButton
-            startIcon={<AddIcon />}
             onClick={handleClickOpen}
+            startIcon={<AddIcon />}
           >
-            {t('invoices.addButton')}
+            {t('invoices.createNew')}
           </GradientButton>
         </Grow>
       </Box>
@@ -280,36 +293,17 @@ const Invoices: React.FC = () => {
       <Fade in={true} timeout={1000}>
         <TableContainer 
           component={Paper}
-          sx={{
-            boxShadow: (theme) => theme.shadows[2],
-            borderRadius: 2,
-            overflow: 'hidden',
-            '& .MuiTableCell-root': {
-              borderColor: (theme) => theme.palette.divider,
-            },
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            },
-          }}
+          sx={tableContainer(theme)}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ 
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              }}>
-                <TableCell sx={{ color: 'white', width: 50 }}></TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('invoices.number')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('invoices.customer')}</TableCell>
-                <TableCell sx={{ color: 'white' }} align="right">{t('invoices.total')}</TableCell>
-                <TableCell sx={{ color: 'white' }} align="right">{t('invoices.status')}</TableCell>
-                <TableCell sx={{ color: 'white' }} align="right">{t('common.actions')}</TableCell>
+              <TableRow sx={tableHeader}>
+                <TableCell>{t('invoices.number')}</TableCell>
+                <TableCell>{t('invoices.customer')}</TableCell>
+                <TableCell>{t('invoices.date')}</TableCell>
+                <TableCell>{t('invoices.amount')}</TableCell>
+                <TableCell>{t('invoices.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -335,17 +329,10 @@ const Invoices: React.FC = () => {
                       }),
                     }}
                   >
-                    <TableCell>
-                      <IconButton size="small">
-                        {expandedRow === invoice._id ? 
-                          <KeyboardArrowUpIcon /> : 
-                          <KeyboardArrowDownIcon />
-                        }
-                      </IconButton>
-                    </TableCell>
                     <TableCell>{invoice.invoiceNumber}</TableCell>
                     <TableCell>{invoice.customerName}</TableCell>
-                    <TableCell align="right">
+                    <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
                       <Chip 
                         label={`$${invoice.total.toFixed(2)}`}
                         sx={{
@@ -355,7 +342,7 @@ const Invoices: React.FC = () => {
                         }}
                       />
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell>
                       <Chip 
                         label={t(`invoices.${invoice.status.toLowerCase()}`)}
                         color={getStatusColor(invoice.status)}
@@ -526,20 +513,13 @@ const Invoices: React.FC = () => {
       <Dialog 
         open={open} 
         onClose={handleClose}
-        maxWidth="md"
-        fullWidth
+        TransitionComponent={Zoom}
         PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: (theme) => theme.shadows[10],
-          }
+          sx: dialogPaper
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-          color: 'white',
-        }}>
-          {t('invoices.addInvoice')}
+        <DialogTitle sx={dialogTitle}>
+          {t('invoices.createNew')}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           <TextField

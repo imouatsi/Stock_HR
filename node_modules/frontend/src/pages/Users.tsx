@@ -25,6 +25,7 @@ import {
   Grid,
   Grow,
   Slide,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -34,6 +35,14 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../hooks/useTranslation';
 import GradientButton from '../components/ui/GradientButton';
+import {
+  gradientText,
+  pageContainer,
+  tableContainer,
+  tableHeader,
+  dialogTitle,
+  dialogPaper,
+} from '../theme/gradientStyles';
 
 interface User {
   id: string;
@@ -45,6 +54,7 @@ interface User {
 
 const Users: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,18 +139,22 @@ const Users: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
         <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-          <Typography variant="h4" gutterBottom>
+          <Typography 
+            variant="h4" 
+            component="h1"
+            sx={gradientText}
+          >
             {t('users.title')}
           </Typography>
         </Slide>
 
         <Grow in={true} timeout={1000}>
           <GradientButton
-            startIcon={<AddIcon />}
             onClick={handleClickOpen}
+            startIcon={<AddIcon />}
           >
             {t('users.addButton')}
           </GradientButton>
@@ -154,35 +168,16 @@ const Users: React.FC = () => {
       <Fade in={true} timeout={1000}>
         <TableContainer 
           component={Paper}
-          sx={{
-            boxShadow: (theme) => theme.shadows[2],
-            borderRadius: 2,
-            overflow: 'hidden',
-            '& .MuiTableCell-root': {
-              borderColor: (theme) => theme.palette.divider,
-            },
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            },
-          }}
+          sx={tableContainer(theme)}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ 
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              }}>
-                <TableCell sx={{ color: 'white' }}>{t('users.name')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('users.email')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('users.role')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('users.status')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('common.actions')}</TableCell>
+              <TableRow sx={tableHeader}>
+                <TableCell>{t('users.name')}</TableCell>
+                <TableCell>{t('users.email')}</TableCell>
+                <TableCell>{t('users.role')}</TableCell>
+                <TableCell>{t('users.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -194,6 +189,10 @@ const Users: React.FC = () => {
                     '&:hover': {
                       backgroundColor: 'action.hover',
                       transform: 'scale(1.01)',
+                      '& .row-actions': {
+                        transform: 'translateX(0)',
+                        opacity: 1,
+                      },
                     },
                   }}
                 >
@@ -206,31 +205,40 @@ const Users: React.FC = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Chip 
-                      label={t(`roles.${user.role}`)}
-                      size="small"
-                      sx={{ 
-                        background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
+                      label={t(`users.roles.${user.role}`)}
+                      sx={{
+                        background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
                         color: 'white',
+                        fontWeight: 'medium',
                       }}
                     />
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={user.status}
+                    <Chip 
+                      label={t(`users.status.${user.status}`)}
                       color={getStatusColor(user.status)}
-                      size="small"
+                      variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box 
+                      className="row-actions"
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        transform: 'translateX(20px)',
+                        opacity: 0,
+                        transition: 'all 0.3s ease-in-out',
+                      }}
+                    >
                       <Tooltip title={t('common.edit')} arrow TransitionComponent={Zoom}>
-                        <IconButton 
+                        <IconButton
                           size="small"
                           sx={{
                             transition: 'all 0.2s ease-in-out',
                             '&:hover': {
-                              transform: 'scale(1.1)',
-                              color: 'primary.main',
+                              transform: 'scale(1.1) rotate(-8deg)',
+                              color: 'info.main',
                             },
                           }}
                         >
@@ -238,12 +246,12 @@ const Users: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t('common.delete')} arrow TransitionComponent={Zoom}>
-                        <IconButton 
+                        <IconButton
                           size="small"
                           sx={{
                             transition: 'all 0.2s ease-in-out',
                             '&:hover': {
-                              transform: 'scale(1.1)',
+                              transform: 'scale(1.1) rotate(8deg)',
                               color: 'error.main',
                             },
                           }}
@@ -260,8 +268,17 @@ const Users: React.FC = () => {
         </TableContainer>
       </Fade>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>{t('users.addUser')}</DialogTitle>
+      <Dialog 
+        open={open} 
+        onClose={handleClose}
+        TransitionComponent={Zoom}
+        PaperProps={{
+          sx: dialogPaper
+        }}
+      >
+        <DialogTitle sx={dialogTitle}>
+          {t('users.addUser')}
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ 
             pt: 2,
@@ -283,26 +300,27 @@ const Users: React.FC = () => {
               autoFocus
               name="name"
               label={t('users.name')}
-              type="text"
-              fullWidth
               value={userData.name}
               onChange={handleChange}
+              fullWidth
+              required
             />
             <TextField
               name="email"
               label={t('users.email')}
               type="email"
-              fullWidth
               value={userData.email}
               onChange={handleChange}
+              fullWidth
+              required
             />
             <TextField
               name="role"
               label={t('users.role')}
-              type="text"
-              fullWidth
               value={userData.role}
               onChange={handleChange}
+              fullWidth
+              required
             />
           </Box>
         </DialogContent>
@@ -319,11 +337,7 @@ const Users: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <GradientButton onClick={handleSubmit}>
-            {loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              t('common.submit')
-            )}
+            {t('common.submit')}
           </GradientButton>
         </DialogActions>
       </Dialog>

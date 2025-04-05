@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
-import User from '../models/user.model';
+import { User } from '../models/user.model';
 import { AppError } from '../utils/appError';
 
 export const login = async (_req: AuthRequest, res: Response, next: NextFunction) => {
@@ -67,7 +67,7 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return next(new AppError('Email already in use', 400));
+      return next(new AppError(400, 'Email already in use'));
     }
 
     const user = await User.create({ email, password, firstName, lastName, role });
@@ -81,7 +81,7 @@ export const enable2FA = async (req: AuthRequest, res: Response, next: NextFunct
   try {
     const user = req.user;
     if (!user) {
-      return next(new AppError('User not authenticated', 401));
+      return next(new AppError(401, 'User not authenticated'));
     }
 
     user.mfa.enabled = true;
@@ -96,7 +96,7 @@ export const verify2FA = async (req: AuthRequest, res: Response, next: NextFunct
   try {
     const user = req.user;
     if (!user || !user.mfa.secret) {
-      return next(new AppError('2FA not enabled for this user', 400));
+      return next(new AppError(400, '2FA not enabled for this user'));
     }
 
     // Add logic to verify the 2FA code
@@ -110,7 +110,7 @@ export const updatePreferences = async (req: AuthRequest, res: Response, next: N
   try {
     const user = req.user;
     if (!user) {
-      return next(new AppError('User not authenticated', 401));
+      return next(new AppError(401, 'User not authenticated'));
     }
 
     user.preferences = { ...user.preferences, ...req.body.preferences };
@@ -125,7 +125,7 @@ export const uploadAvatar = async (req: AuthRequest, res: Response, next: NextFu
   try {
     const user = req.user;
     if (!user) {
-      return next(new AppError('User not authenticated', 401));
+      return next(new AppError(401, 'User not authenticated'));
     }
 
     // Add logic to handle avatar upload

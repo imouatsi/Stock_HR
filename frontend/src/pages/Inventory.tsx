@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -25,6 +25,7 @@ import {
   Collapse,
   Grow,
   Slide,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,62 +37,71 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../hooks/useTranslation';
 import GradientButton from '../components/ui/GradientButton';
+import { api } from '../utils/api';
+import {
+  gradientText,
+  pageContainer,
+  tableContainer,
+  tableHeader,
+  dialogTitle,
+  dialogPaper,
+} from '../theme/gradientStyles';
 
 interface InventoryItem {
-  id: string;
+  _id: string;
   name: string;
+  description: string;
   quantity: number;
-  unit: string;
-  price: number;
-  status: 'in_stock' | 'low_stock' | 'out_of_stock';
-  description?: string;
-  lastUpdated?: string;
-  supplier?: string;
+  unitPrice: number;
+  category: string;
+  supplier: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface FormData {
+  name: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  category: string;
+  supplier: string;
 }
 
 const Inventory: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [items, setItems] = useState<InventoryItem[]>([
-    { 
-      id: '1', 
-      name: 'Item 1', 
-      quantity: 100, 
-      unit: 'pcs', 
-      price: 10.99, 
-      status: 'in_stock',
-      description: 'High-quality product with excellent durability',
-      lastUpdated: '2023-05-15',
-      supplier: 'Supplier A'
-    },
-    { 
-      id: '2', 
-      name: 'Item 2', 
-      quantity: 5, 
-      unit: 'pcs', 
-      price: 25.50, 
-      status: 'low_stock',
-      description: 'Premium grade material with extended warranty',
-      lastUpdated: '2023-05-10',
-      supplier: 'Supplier B'
-    },
-    { 
-      id: '3', 
-      name: 'Item 3', 
-      quantity: 0, 
-      unit: 'pcs', 
-      price: 15.75, 
-      status: 'out_of_stock',
-      description: 'Standard quality product for general use',
-      lastUpdated: '2023-05-05',
-      supplier: 'Supplier C'
-    },
-  ]);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    description: '',
+    quantity: 0,
+    unitPrice: 0,
+    category: '',
+    supplier: ''
+  });
+  const [items, setItems] = useState<InventoryItem[]>([]);
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const fetchItems = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/inventory');
+      setItems(response.data.data.items);
+    } catch (err) {
+      setError('Failed to fetch inventory items');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -101,18 +111,30 @@ const Inventory: React.FC = () => {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'quantity' || name === 'unitPrice' ? Number(value) : value
+    }));
+  };
+
+  const handleSubmit = async () => {
     try {
-      // TODO: Implement actual submission logic
       setLoading(true);
-      // Mock successful submission
-      setTimeout(() => {
-        setItems([...items]);
-        handleClose();
-        setLoading(false);
-      }, 1000);
+      setError(null);
+      
+      // Validate form data
+      if (!formData.name || !formData.quantity || !formData.unitPrice || !formData.category || !formData.supplier) {
+        throw new Error(t('inventory.validation.required'));
+      }
+
+      await api.post('/inventory', formData);
+      await fetchItems();
+      handleClose();
     } catch (err) {
-      setError('Failed to submit inventory item');
+      setError(err instanceof Error ? err.message : 'Failed to submit inventory item');
+    } finally {
       setLoading(false);
     }
   };
@@ -121,9 +143,17 @@ const Inventory: React.FC = () => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  const handleDeleteClick = (id: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setDeleteConfirm(deleteConfirm === id ? null : id);
+  const handleDelete = async (id: string) => {
+    try {
+      setLoading(true);
+      await api.delete(`/inventory/${id}`);
+      await fetchItems();
+      setDeleteConfirm(null);
+    } catch (err) {
+      setError('Failed to delete inventory item');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -171,39 +201,13 @@ const Inventory: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 3 
-      }}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
         <Slide direction="right" in={true} mountOnEnter unmountOnExit>
           <Typography 
             variant="h4" 
             component="h1"
-            sx={{
-              fontWeight: 600,
-              background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -4,
-                left: 0,
-                width: '100%',
-                height: 2,
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-                transform: 'scaleX(0)',
-                transformOrigin: 'left',
-                transition: 'transform 0.3s ease-in-out',
-              },
-              '&:hover::after': {
-                transform: 'scaleX(1)',
-              },
-            }}
+            sx={gradientText}
           >
             {t('inventory.title')}
           </Typography>
@@ -211,6 +215,7 @@ const Inventory: React.FC = () => {
         <Grow in={true} timeout={1000}>
           <GradientButton
             onClick={handleClickOpen}
+            startIcon={<AddIcon />}
           >
             {t('inventory.addItem')}
           </GradientButton>
@@ -224,44 +229,25 @@ const Inventory: React.FC = () => {
       <Fade in={true} timeout={1000}>
         <TableContainer 
           component={Paper}
-          sx={{
-            boxShadow: (theme) => theme.shadows[2],
-            borderRadius: 2,
-            overflow: 'hidden',
-            '& .MuiTableCell-root': {
-              borderColor: (theme) => theme.palette.divider,
-            },
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            },
-          }}
+          sx={tableContainer(theme)}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ 
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              }}>
-                <TableCell sx={{ color: 'white' }}>{t('inventory.name')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('inventory.quantity')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('inventory.unit')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('inventory.price')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('inventory.status')}</TableCell>
-                <TableCell sx={{ color: 'white' }}>{t('common.actions')}</TableCell>
+              <TableRow sx={tableHeader}>
+                <TableCell>{t('inventory.name')}</TableCell>
+                <TableCell>{t('inventory.quantity')}</TableCell>
+                <TableCell>{t('inventory.unit')}</TableCell>
+                <TableCell>{t('inventory.price')}</TableCell>
+                <TableCell>{t('inventory.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
-                <React.Fragment key={item.id}>
+                <React.Fragment key={item._id}>
                   <TableRow 
-                    onClick={() => handleRowClick(item.id)}
-                    onMouseEnter={() => setHoveredRow(item.id)}
+                    onClick={() => handleRowClick(item._id)}
+                    onMouseEnter={() => setHoveredRow(item._id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     sx={{
                       transition: 'all 0.2s ease-in-out',
@@ -274,7 +260,7 @@ const Inventory: React.FC = () => {
                           opacity: 1,
                         },
                       },
-                      ...(expandedRow === item.id && {
+                      ...(expandedRow === item._id && {
                         backgroundColor: 'action.selected',
                       }),
                     }}
@@ -283,7 +269,7 @@ const Inventory: React.FC = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <InventoryIcon color="primary" />
                         {item.name}
-                        {expandedRow === item.id ? (
+                        {expandedRow === item._id ? (
                           <ExpandLessIcon color="action" />
                         ) : (
                           <ExpandMoreIcon color="action" />
@@ -291,14 +277,14 @@ const Inventory: React.FC = () => {
                       </Box>
                     </TableCell>
                     <TableCell>{item.quantity}</TableCell>
-                    <TableCell>{item.unit}</TableCell>
-                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                    <TableCell>{item.unitPrice}</TableCell>
+                    <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
                     <TableCell>
                       <Chip 
-                        label={t(`inventory.${item.status}`)}
+                        label={t(`inventory.${item.category}`)}
                         sx={{
-                          backgroundColor: getStatusColor(item.status).bg,
-                          color: getStatusColor(item.status).color,
+                          backgroundColor: getStatusColor(item.category).bg,
+                          color: getStatusColor(item.category).color,
                           fontWeight: 'medium',
                         }}
                       />
@@ -335,7 +321,10 @@ const Inventory: React.FC = () => {
                         <Tooltip title={t('common.delete')} arrow TransitionComponent={Zoom}>
                           <IconButton
                             size="small"
-                            onClick={(e) => handleDeleteClick(item.id, e)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirm(item._id);
+                            }}
                             sx={{
                               transition: 'all 0.2s ease-in-out',
                               '&:hover': {
@@ -352,7 +341,7 @@ const Inventory: React.FC = () => {
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={6} sx={{ p: 0 }}>
-                      <Collapse in={expandedRow === item.id} timeout="auto" unmountOnExit>
+                      <Collapse in={expandedRow === item._id} timeout="auto" unmountOnExit>
                         <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
                           <Paper 
                             elevation={0}
@@ -391,7 +380,7 @@ const Inventory: React.FC = () => {
                                   {t('inventory.lastUpdated')}
                                 </Typography>
                                 <Typography variant="body1">
-                                  {item.lastUpdated}
+                                  {new Date(item.updatedAt).toLocaleDateString()}
                                 </Typography>
                               </Box>
                             </Box>
@@ -400,7 +389,7 @@ const Inventory: React.FC = () => {
                       </Collapse>
                     </TableCell>
                   </TableRow>
-                  {deleteConfirm === item.id && (
+                  {deleteConfirm === item._id && (
                     <TableRow>
                       <TableCell colSpan={6} sx={{ p: 0 }}>
                         <Collapse in={true} timeout="auto">
@@ -415,8 +404,7 @@ const Inventory: React.FC = () => {
                                 color="error"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // Handle delete confirmation
-                                  setDeleteConfirm(null);
+                                  handleDelete(item._id);
                                 }}
                                 sx={{
                                   animation: 'shake 0.5s ease-in-out',
@@ -456,26 +444,10 @@ const Inventory: React.FC = () => {
         onClose={handleClose}
         TransitionComponent={Zoom}
         PaperProps={{
-          sx: {
-            borderRadius: 2,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            },
-          }
+          sx: dialogPaper
         }}
       >
-        <DialogTitle sx={{
-          background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-          backgroundClip: 'text',
-          textFillColor: 'transparent',
-          fontWeight: 600,
-        }}>
+        <DialogTitle sx={dialogTitle}>
           {t('inventory.addItem')}
         </DialogTitle>
         <DialogContent>
@@ -497,32 +469,56 @@ const Inventory: React.FC = () => {
           }}>
             <TextField
               autoFocus
+              name="name"
               label={t('inventory.name')}
+              value={formData.name}
+              onChange={handleFormChange}
               fullWidth
+              required
             />
             <TextField
+              name="quantity"
               label={t('inventory.quantity')}
               type="number"
+              value={formData.quantity}
+              onChange={handleFormChange}
               fullWidth
+              required
             />
             <TextField
-              label={t('inventory.unit')}
+              name="category"
+              label={t('inventory.category')}
+              value={formData.category}
+              onChange={handleFormChange}
               fullWidth
+              required
             />
             <TextField
-              label={t('inventory.price')}
+              name="unitPrice"
+              label={t('inventory.unitPrice')}
               type="number"
+              value={formData.unitPrice}
+              onChange={handleFormChange}
               fullWidth
+              required
             />
             <TextField
+              name="description"
               label={t('inventory.description')}
+              value={formData.description}
+              onChange={handleFormChange}
               multiline
               rows={3}
               fullWidth
+              required
             />
             <TextField
+              name="supplier"
               label={t('inventory.supplier')}
+              value={formData.supplier}
+              onChange={handleFormChange}
               fullWidth
+              required
             />
           </Box>
         </DialogContent>

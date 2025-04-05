@@ -1,261 +1,169 @@
 # Contributing to Stock & HR Management System
 
-Thank you for considering contributing to the Stock & HR Management System! This document provides guidelines and instructions for contributing to the project.
+First off, thank you for considering contributing to our project! It's people like you that make this system such a great tool.
 
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [How Can I Contribute?](#how-can-i-contribute)
   - [Reporting Bugs](#reporting-bugs)
-  - [Suggesting Features](#suggesting-features)
+  - [Suggesting Enhancements](#suggesting-enhancements)
   - [Pull Requests](#pull-requests)
-- [Development Workflow](#development-workflow)
-  - [Setting Up Development Environment](#setting-up-development-environment)
-  - [Branching Strategy](#branching-strategy)
-  - [Commit Messages](#commit-messages)
-  - [Pull Request Process](#pull-request-process)
-- [Coding Standards](#coding-standards)
-  - [TypeScript Guidelines](#typescript-guidelines)
-  - [React Guidelines](#react-guidelines)
-  - [Backend Guidelines](#backend-guidelines)
-- [Testing Guidelines](#testing-guidelines)
-- [Documentation Guidelines](#documentation-guidelines)
-- [Release Process](#release-process)
-- [Getting Help](#getting-help)
+- [Development Process](#development-process)
+  - [Development Setup](#development-setup)
+- [Style Guide](#style-guide)
+  - [JavaScript/TypeScript](#javascript-typescript)
+  - [React](#react)
+  - [CSS](#css)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Questions?](#questions)
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before contributing.
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
-Before creating bug reports, please check existing issues to avoid duplicates. When creating a bug report, include as many details as possible:
+Before creating bug reports, please check the issue list as you might find out that you don't need to create one. When you are creating a bug report, please include as many details as possible:
 
-1. Use a clear and descriptive title
-2. Describe the exact steps to reproduce the problem
-3. Provide specific examples (e.g., screenshots or error logs)
-4. Describe the behavior you observed and what you expected
-5. Include details about your environment (browser, OS, app version)
+* Use a clear and descriptive title
+* Describe the exact steps which reproduce the problem
+* Provide specific examples to demonstrate the steps
+* Describe the behavior you observed after following the steps
+* Explain which behavior you expected to see instead and why
+* Include screenshots if possible
+* Include your environment details (OS, browser version, etc.)
 
-Use the bug report template when creating a new issue.
+### Suggesting Enhancements
 
-### Suggesting Features
+Enhancement suggestions are tracked as GitHub issues. When creating an enhancement suggestion, please include:
 
-Before creating feature suggestions, please check existing issues to avoid duplicates. When creating a feature request, include:
-
-1. Use a clear and descriptive title
-2. Provide a detailed description of the suggested feature
-3. Explain why this feature would be useful to most users
-4. Provide examples of how the feature would work
-5. Specify which part of the application the feature belongs to
-
-Use the feature request template when creating a new issue.
+* Use a clear and descriptive title
+* Provide a step-by-step description of the suggested enhancement
+* Provide specific examples to demonstrate the steps
+* Describe the current behavior and explain which behavior you expected to see instead
+* Explain why this enhancement would be useful
+* List some other applications where this enhancement exists, if applicable
 
 ### Pull Requests
 
-1. Follow all instructions in the [Pull Request Process](#pull-request-process)
-2. Follow the [Coding Standards](#coding-standards)
-3. After submitting your pull request, verify that all status checks are passing
+1. Fork the repo and create your branch from `main`
+2. If you've added code that should be tested, add tests
+3. If you've changed APIs, update the documentation
+4. Ensure the test suite passes
+5. Make sure your code lints
+6. Issue that pull request!
 
-## Development Workflow
+## Development Process
 
-### Setting Up Development Environment
-
-See the [Developer Guide](docs/DEVELOPER_GUIDE.md) for detailed instructions on setting up the development environment.
-
-### Branching Strategy
-
-We use a simplified Git Flow workflow:
-
-- `main` - Production code, always stable
-- `develop` - Development branch, contains approved changes for the next release
-- `feature/feature-name` - Feature branches, created from `develop`
-- `bugfix/bug-name` - Bugfix branches, created from `develop`
-- `release/vX.Y.Z` - Release branches, created from `develop`
-- `hotfix/issue-name` - Hotfix branches, created from `main`
-
-### Commit Messages
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
+1. Create a new branch:
+```bash
+git checkout -b feature/your-feature-name
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code changes that neither fix bugs nor add features
-- `perf`: Performance improvements
-- `test`: Adding or fixing tests
-- `chore`: Changes to build process, dependencies, etc.
-
-Example:
-```
-feat(auth): add password reset functionality
-
-- Add reset password API endpoint
-- Create password reset email template
-- Implement reset password UI form
-
-Closes #123
+2. Make your changes and commit them:
+```bash
+git add .
+git commit -m "feat: add some feature"
 ```
 
-### Pull Request Process
+Follow our commit message conventions:
+* `feat:` for new features
+* `fix:` for bug fixes
+* `docs:` for documentation changes
+* `style:` for formatting changes
+* `refactor:` for code refactoring
+* `test:` for adding tests
+* `chore:` for maintenance tasks
 
-1. Create a branch from `develop` using the naming convention above
-2. Make your changes following the coding standards
-3. Ensure all tests pass and add new tests for new functionality
-4. Update documentation as needed
-5. Push your branch to the repository
-6. Create a pull request to `develop` branch
-7. Fill out the pull request template
-8. Request a review from at least one maintainer
-9. Make any requested changes
-10. Once approved, your PR will be merged by a maintainer
-
-## Coding Standards
-
-### TypeScript Guidelines
-
-- Use strict typing (`"strict": true` in tsconfig.json)
-- Use interfaces for defining shapes of objects
-- Avoid `any` type, use more specific types
-- Use const assertions for literal values
-- Document public APIs with JSDoc comments
-- Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
-
-### React Guidelines
-
-- Use functional components with hooks
-- Keep components small and focused on a single responsibility
-- Use TypeScript interfaces for props and state
-- Use React.memo() for performance-critical components
-- Extract complex logic into custom hooks
-- Follow the folder structure outlined in the [Developer Guide](docs/DEVELOPER_GUIDE.md)
-
-### Backend Guidelines
-
-- Follow RESTful API design principles
-- Implement proper error handling for all routes
-- Use async/await for asynchronous operations
-- Implement input validation for all API endpoints
-- Document API endpoints with OpenAPI/Swagger
-- Use environment variables for configuration
-
-## Testing Guidelines
-
-### Frontend Testing
-
-- Write unit tests for components using React Testing Library
-- Write integration tests for complex interactions
-- Ensure tests are isolated and don't depend on each other
-- Mock external dependencies
-- Aim for high test coverage of critical functionality
-
-Example:
-```tsx
-// Button.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import Button from './Button';
-
-describe('Button', () => {
-  it('renders correctly', () => {
-    render(<Button>Click Me</Button>);
-    expect(screen.getByText('Click Me')).toBeInTheDocument();
-  });
-
-  it('calls onClick when clicked', () => {
-    const handleClick = jest.fn();
-    render(<Button onClick={handleClick}>Click Me</Button>);
-    fireEvent.click(screen.getByText('Click Me'));
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-});
+3. Push to your fork:
+```bash
+git push origin feature/your-feature-name
 ```
 
-### Backend Testing
+4. Open a Pull Request
 
-- Write unit tests for individual functions and utilities
-- Write integration tests for API endpoints
-- Use a test database for integration tests
-- Test both success and error cases
-- Mock external services
+## Development Setup
 
-Example:
-```typescript
-// users.controller.test.ts
-import request from 'supertest';
-import { app } from '../server';
-import { connectTestDB, disconnectTestDB, clearTestDB } from '../test-utils/db';
+1. Install dependencies:
+```bash
+# Root dependencies
+npm install
 
-describe('User API', () => {
-  beforeAll(async () => {
-    await connectTestDB();
-  });
+# Frontend dependencies
+cd frontend
+npm install
 
-  afterEach(async () => {
-    await clearTestDB();
-  });
-
-  afterAll(async () => {
-    await disconnectTestDB();
-  });
-
-  it('should create a new user', async () => {
-    const userData = {
-      email: 'test@example.com',
-      password: 'password123',
-      name: 'Test User',
-    };
-
-    const res = await request(app)
-      .post('/api/users')
-      .send(userData);
-
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body.email).toBe(userData.email);
-    expect(res.body).not.toHaveProperty('password');
-  });
-});
+# Backend dependencies
+cd ../backend
+npm install
 ```
 
-## Documentation Guidelines
+2. Set up environment variables:
+```bash
+# Copy environment files
+cp .env.example .env
+cd frontend && cp .env.example .env
+cd ../backend && cp .env.example .env
+```
 
-- Keep documentation up-to-date with code changes
-- Document APIs using OpenAPI/Swagger
-- Write clear and concise documentation
-- Include examples where appropriate
-- Use diagrams for complex workflows
-- Follow Markdown best practices
+3. Start development servers:
+```bash
+# Terminal 1: Backend
+cd backend
+npm run dev
 
-## Release Process
+# Terminal 2: Frontend
+cd frontend
+npm start
+```
 
-1. Create a release branch from `develop` named `release/vX.Y.Z`
-2. Update version number in package.json and other relevant files
-3. Update CHANGELOG.md with new version information
-4. Make any final adjustments and fixes
-5. Submit a pull request to `main`
-6. Once approved and merged, create a tag with the version number
-7. Merge changes back to `develop`
+## Style Guide
 
-## Getting Help
+### JavaScript/TypeScript
 
-If you need help with contributing, you can:
+* Use TypeScript for all new code
+* Follow the ESLint configuration
+* Use async/await instead of callbacks
+* Use meaningful variable names
+* Add JSDoc comments for functions
+* Keep functions small and focused
 
-- Join our [Discord server](#) (if applicable)
-- Open a discussion on GitHub
-- Email the maintainers at [maintainers@example.com](mailto:maintainers@example.com)
+### React
 
----
+* Use functional components with hooks
+* Keep components small and reusable
+* Use TypeScript interfaces for props
+* Follow the container/presenter pattern
+* Use Material-UI components when possible
 
-Thank you for contributing to the Stock & HR Management System! Your efforts help make this project better for everyone. 
+### CSS
+
+* Use Material-UI's styling solution
+* Follow BEM naming convention for custom CSS
+* Keep styles modular and scoped
+* Use theme variables for colors and spacing
+
+## Testing
+
+* Write unit tests for utilities and hooks
+* Write integration tests for components
+* Write end-to-end tests for critical paths
+* Maintain test coverage above 80%
+
+## Documentation
+
+* Keep README.md up to date
+* Document all new features
+* Update API documentation
+* Add comments for complex logic
+* Include TypeScript types
+
+## Questions?
+
+Feel free to open an issue with the tag `question` if you have any questions about contributing.
+
+Thank you for contributing to our project! 🎉 

@@ -1,60 +1,32 @@
-import express, { Application, RequestHandler } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import morgan from 'morgan';
+import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 import dotenv from 'dotenv';
-import routes from './routes';
-import { errorHandler } from './middleware/errorHandler';
-import { notFoundHandler } from './middleware/notFoundHandler';
-import './utils/validateEnv';
-import User from './models/user.model';
+import morgan from 'morgan';
+import { errorHandler } from './middleware/error.middleware';
+import { User } from './models/user.model';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
-import invoiceRoutes from './routes/invoice.routes';
-import contractRoutes from './routes/contract.routes';
-import proformaRoutes from './routes/proforma.routes';
+import companyRoutes from './routes/company.routes';
 
 // Load environment variables
 dotenv.config();
 
-const app: Application = express();
+// Create Express app
+const app = express();
 
-// Middleware with error handling
-const setupMiddleware = () => {
-  try {
-    app.use(express.static('public'));
-    app.use(helmet());
-    app.use(cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-      exposedHeaders: ['Content-Range', 'X-Content-Range']
-    }));
-    app.use(compression() as unknown as RequestHandler);
-    app.use(morgan('dev'));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-  } catch (error) {
-    console.error('Middleware setup failed:', error);
-    process.exit(1);
-  }
-};
-
-setupMiddleware();
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 // Routes
-app.use('/api', routes);
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/invoices', invoiceRoutes);
-app.use('/api/contracts', contractRoutes);
-app.use('/api/proformas', proformaRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/company', companyRoutes);
 
 // Error handling
-app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Initialize superadmin if not exists
@@ -87,27 +59,22 @@ const initializeSuperAdmin = async () => {
   }
 };
 
-// Connect to MongoDB with better error handling
-const connectDB = async () => {
-  const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stock-hr';
-  
-  try {
-    await mongoose.connect(MONGODB_URI);
+// Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stock-hr';
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
     console.log('Connected to MongoDB');
-    
     // Initialize superadmin after successful DB connection
-    await initializeSuperAdmin();
-    
+    initializeSuperAdmin();
+    // Start server
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Server is running on port ${PORT}`);
     });
-  } catch (error) {
-    console.error('MongoDB connection failed:', error);
-    process.exit(1);
-  }
-};
-
-connectDB();
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+  });
 
 export default app;

@@ -5,30 +5,31 @@ export interface IProformaItem {
   quantity: number;
   unitPrice: number;
   total: number;
+  barcode?: string;
 }
 
 export interface IProforma extends Document {
   invoiceNumber: string;
   date: Date;
-  seller: {
+  company: {
     name: string;
     address: string;
     nif: string;
-    rc: string;
-    ai: string;
-    iban: string;
-    bank: string;
   };
-  buyer: {
+  client: {
     name: string;
     address: string;
-    companyId?: string;
+    nif?: string;
   };
   items: IProformaItem[];
   subtotal: number;
-  vat: number;
+  vatRate: number;
+  vatAmount: number;
   totalAmount: number;
+  paymentTerms: string;
   status: 'draft' | 'finalized';
+  signature?: string;
+  qrCode?: string;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -46,46 +47,30 @@ const proformaSchema = new Schema<IProforma>(
       required: [true, 'Date is required'],
       default: Date.now,
     },
-    seller: {
+    company: {
       name: {
         type: String,
-        required: [true, 'Seller name is required'],
+        required: [true, 'Company name is required'],
       },
       address: {
         type: String,
-        required: [true, 'Seller address is required'],
+        required: [true, 'Company address is required'],
       },
       nif: {
         type: String,
-        required: [true, 'NIF is required'],
-      },
-      rc: {
-        type: String,
-        required: [true, 'RC is required'],
-      },
-      ai: {
-        type: String,
-        required: [true, 'AI is required'],
-      },
-      iban: {
-        type: String,
-        required: [true, 'IBAN is required'],
-      },
-      bank: {
-        type: String,
-        required: [true, 'Bank name is required'],
+        required: [true, 'Company NIF is required'],
       },
     },
-    buyer: {
+    client: {
       name: {
         type: String,
-        required: [true, 'Buyer name is required'],
+        required: [true, 'Client name is required'],
       },
       address: {
         type: String,
-        required: [true, 'Buyer address is required'],
+        required: [true, 'Client address is required'],
       },
-      companyId: {
+      nif: {
         type: String,
       },
     },
@@ -108,27 +93,44 @@ const proformaSchema = new Schema<IProforma>(
         type: Number,
         required: [true, 'Total is required'],
       },
+      barcode: {
+        type: String,
+      },
     }],
     subtotal: {
       type: Number,
       required: [true, 'Subtotal is required'],
       min: [0, 'Subtotal must be positive'],
     },
-    vat: {
+    vatRate: {
       type: Number,
-      required: [true, 'VAT is required'],
-      min: [0, 'VAT must be positive'],
-      default: 0,
+      required: [true, 'VAT rate is required'],
+      min: [0, 'VAT rate must be positive'],
+    },
+    vatAmount: {
+      type: Number,
+      required: [true, 'VAT amount is required'],
+      min: [0, 'VAT amount must be positive'],
     },
     totalAmount: {
       type: Number,
       required: [true, 'Total amount is required'],
       min: [0, 'Total amount must be positive'],
     },
+    paymentTerms: {
+      type: String,
+      required: [true, 'Payment terms are required'],
+    },
     status: {
       type: String,
       enum: ['draft', 'finalized'],
       default: 'draft',
+    },
+    signature: {
+      type: String,
+    },
+    qrCode: {
+      type: String,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -151,8 +153,11 @@ proformaSchema.pre('save', function(next) {
   // Calculate subtotal
   this.subtotal = this.items.reduce((sum, item) => sum + item.total, 0);
 
+  // Calculate VAT amount
+  this.vatAmount = this.subtotal * (this.vatRate / 100);
+
   // Calculate total amount with VAT
-  this.totalAmount = this.subtotal + this.vat;
+  this.totalAmount = this.subtotal + this.vatAmount;
 
   next();
 });

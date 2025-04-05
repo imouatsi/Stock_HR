@@ -1,30 +1,41 @@
-import { Router } from 'express';
-import { body } from 'express-validator';
-import { protect, authorize } from '../middleware/auth';
-import { validate } from '../middleware/validation';
+import express from 'express';
 import * as userController from '../controllers/user.controller';
-import { ROLES } from '../../../shared/config'; // Fix the import path
+import { protect, restrictTo } from '../middleware/auth';
+import { validate } from '../middleware/validation';
+import { body } from 'express-validator';
 
-const router = Router();
+const router = express.Router();
 
 const userValidation = [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 8 }).optional(),
-  body('firstName').trim().notEmpty(),
-  body('lastName').trim().notEmpty(),
-  body('role').isIn(Object.keys(ROLES)),
-  body('phoneNumber').optional().matches(/^\+?[\d\s-]{8,}$/),
-  body('preferences.language').optional().isIn(['en', 'fr', 'ar']),
-  body('preferences.theme').optional().isIn(['light', 'dark']),
+  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+  body('firstName').notEmpty().withMessage('First name is required'),
+  body('lastName').notEmpty().withMessage('Last name is required'),
+  body('role').isIn(['USER', 'ADMIN', 'SUPERADMIN']).withMessage('Invalid role')
 ];
 
-router.get('/', protect, authorize('admin', 'superadmin'), userController.getUsers);
-router.post('/', protect, authorize('admin', 'superadmin'), validate(userValidation), userController.createUser);
-router.get('/profile', protect, userController.getProfile);
-router.put('/profile', protect, validate(userValidation), userController.updateProfile);
-router.post('/2fa/enable', protect, userController.enable2FA);
-router.post('/2fa/verify', protect, userController.verify2FA);
-router.put('/preferences', protect, userController.updatePreferences);
-router.post('/avatar', protect, userController.uploadAvatar);
+// Public routes
+router.post('/register', validate(userValidation), userController.register);
+router.post('/login', userController.login);
+
+// Protected routes
+router.use(protect);
+
+// User profile routes
+router.get('/profile', userController.getProfile);
+router.put('/profile', validate(userValidation), userController.updateProfile);
+router.patch('/preferences', userController.updatePreferences);
+router.post('/avatar', userController.uploadAvatar);
+
+// 2FA routes
+router.post('/2fa/enable', userController.enable2FA);
+router.post('/2fa/verify', userController.verify2FA);
+
+// Admin routes
+router.use(restrictTo('ADMIN', 'SUPERADMIN'));
+
+router.route('/')
+  .get(userController.getUsers)
+  .post(validate(userValidation), userController.createUser);
 
 export default router;

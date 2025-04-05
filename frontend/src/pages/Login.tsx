@@ -34,6 +34,7 @@ import { login } from '../features/auth/authSlice';
 import { AppDispatch, RootState } from '../features/store';
 import { updateLanguage, toggleTheme } from '../features/slices/settingsSlice';
 import GradientButton from '../components/ui/GradientButton';
+import { gradientText } from '../theme/gradientStyles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 400,
@@ -48,6 +49,18 @@ const StyledCard = styled(Card)(({ theme }) => ({
   '&:hover': {
     transform: 'translateY(-5px)',
   },
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -57,6 +70,11 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     transition: 'all 0.3s ease',
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      transform: 'translateX(4px)',
+      '& fieldset': {
+        borderColor: theme.palette.primary.main,
+        borderWidth: '2px',
+      },
     },
     '&.Mui-focused': {
       backgroundColor: 'rgba(255, 255, 255, 1)',
@@ -134,7 +152,10 @@ const Login: React.FC = () => {
                 color="primary"
                 onClick={handleThemeToggle}
                 sx={{
-                  animation: settings.theme === 'light' ? 'sun-rotate 10s linear infinite' : 'none',
+                  transition: 'all 0.3s ease-in-out',
+                  '&:hover': {
+                    transform: 'rotate(180deg)',
+                  },
                 }}
               >
                 {settings.theme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
@@ -145,6 +166,12 @@ const Login: React.FC = () => {
               <IconButton
                 color="primary"
                 onClick={handleLanguageMenuOpen}
+                sx={{
+                  transition: 'all 0.3s ease-in-out',
+                  '&:hover': {
+                    transform: 'rotate(180deg)',
+                  },
+                }}
               >
                 <LanguageIcon />
               </IconButton>
@@ -167,6 +194,14 @@ const Login: React.FC = () => {
             key={lang.code}
             onClick={() => handleLanguageSelect(lang.code)}
             selected={settings.language === lang.code}
+            sx={{
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateX(4px)',
+                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                color: 'white',
+              },
+            }}
           >
             {lang.name}
           </MenuItem>
@@ -192,93 +227,70 @@ const Login: React.FC = () => {
                 component="h1"
                 gutterBottom
                 align="center"
-                sx={{
-                  fontWeight: 600,
-                  background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 4,
-                }}
+                sx={gradientText}
               >
                 {t('login.title')}
               </Typography>
 
-              <form onSubmit={handleSubmit} noValidate>
-                <StyledTextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label={t('login.email')}
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={!!error}
-                  disabled={loading}
-                />
-
-                <StyledTextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label={t('login.password')}
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  error={!!error}
-                  disabled={loading}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+              <form onSubmit={handleSubmit}>
+                <Box sx={{ mt: 3 }}>
+                  <StyledTextField
+                    fullWidth
+                    label={t('login.email')}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    margin="normal"
+                    required
+                  />
+                  <StyledTextField
+                    fullWidth
+                    label={t('login.password')}
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    margin="normal"
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{
+                              transition: 'all 0.2s ease-in-out',
+                              '&:hover': {
+                                transform: 'scale(1.1)',
+                              },
+                            }}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
 
                 {error && (
-                  <Fade in={true}>
-                    <Alert severity="error" sx={{ mt: 2 }}>
-                      {error}
-                    </Alert>
-                  </Fade>
+                  <Alert severity="error" sx={{ mt: 2 }}>
+                    {error}
+                  </Alert>
                 )}
 
-                <GradientButton
-                  type="submit"
-                  fullWidth
-                  sx={{ mt: 3, mb: 2 }}
-                  disabled={loading}
-                  startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
-                >
-                  {loading ? t('login.signingIn') : t('login.signIn')}
-                </GradientButton>
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                  <GradientButton
+                    type="submit"
+                    disabled={loading}
+                    startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
+                  >
+                    {t('login.submit')}
+                  </GradientButton>
+                </Box>
               </form>
             </CardContent>
           </StyledCard>
         </Fade>
       </Box>
-
-      <style>
-        {`
-          @keyframes sun-rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </Box>
   );
 };

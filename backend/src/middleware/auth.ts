@@ -1,23 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
-import UserModel, { IUser } from '../models/user.model';
+import { User, IUser } from '../models/user.model';
+import { AppError } from '../utils/appError';
+
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IUser;
+    }
+  }
+}
 
 export interface AuthRequest extends Request {
   user?: IUser;
 }
 
-interface JWTPayload {
-  id: string;
-  role: string;
-  iat: number;
-  exp: number;
-}
-
 export const verifyToken = async (token: string): Promise<IUser> => {
   try {
     const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
-    const user = await UserModel.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.id).select('-password');
     if (!user) {
       throw new Error('User not found');
     }
@@ -27,38 +30,45 @@ export const verifyToken = async (token: string): Promise<IUser> => {
   }
 };
 
-export const protect = async (req: AuthRequest, _res: Response, next: NextFunction) => {
+export const protect = async (req: Request, _res: Response, next: NextFunction) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return next(new AppError(401, 'You are not logged in! Please log in to get access.'));
+  }
+
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
 
-    if (!token) {
-      throw new Error('No token provided');
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next(new AppError(401, 'The user belonging to this token no longer exists.'));
     }
 
-    const decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
-    const user = await UserModel.findById(decoded.id).select('-password');
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    req.user = user;
+    // Grant access to protected route
+    req.user = currentUser;
     next();
   } catch (error) {
-    next(error);
+    return next(new AppError(401, 'Invalid token. Please log in again.'));
   }
 };
 
-export const authorize = (...roles: string[]) => {
-  return (req: AuthRequest, _res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return next(new Error('Unauthorized'));
+export const restrictTo = (...roles: string[]) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(new AppError(403, 'You do not have permission to perform this action'));
     }
-
-    if (!roles.includes(req.user.role as string)) {
-      return next(new Error('Insufficient permissions'));
-    }
-
     next();
   };
 };
+
+// Export protect as authMiddleware for backward compatibility
+export const authMiddleware = protect;

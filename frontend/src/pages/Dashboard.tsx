@@ -15,6 +15,7 @@ import {
   Alert,
   Grow,
   Slide,
+  useTheme,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -26,6 +27,11 @@ import {
   ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../hooks/useTranslation';
+import {
+  gradientText,
+  pageContainer,
+  gradientBox,
+} from '../theme/gradientStyles';
 
 interface StatCard {
   id: string;
@@ -38,6 +44,7 @@ interface StatCard {
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -108,39 +115,13 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 4 
-      }}>
+    <Box sx={pageContainer}>
+      <Box className="page-title">
         <Slide direction="right" in={true} mountOnEnter unmountOnExit>
           <Typography 
             variant="h4" 
             component="h1"
-            sx={{
-              fontWeight: 600,
-              background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -4,
-                left: 0,
-                width: '100%',
-                height: 2,
-                background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-                transform: 'scaleX(0)',
-                transformOrigin: 'left',
-                transition: 'transform 0.3s ease-in-out',
-              },
-              '&:hover::after': {
-                transform: 'scaleX(1)',
-              },
-            }}
+            sx={gradientText}
           >
             {t('dashboard.title')}
           </Typography>
@@ -166,13 +147,9 @@ const Dashboard: React.FC = () => {
                       transform: 'translateY(-4px)',
                       boxShadow: (theme) => theme.shadows[8],
                     },
+                    ...gradientBox,
                     '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 4,
+                      ...gradientBox['&::before'],
                       background: `linear-gradient(45deg, ${stat.color} 30%, ${stat.color}99 90%)`,
                     },
                   }}
@@ -180,7 +157,15 @@ const Dashboard: React.FC = () => {
                   <CardHeader
                     action={
                       <Tooltip title={t('common.more')} arrow TransitionComponent={Zoom}>
-                        <IconButton aria-label="settings">
+                        <IconButton 
+                          aria-label="settings"
+                          sx={{
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                              transform: 'rotate(180deg)',
+                            },
+                          }}
+                        >
                           <MoreVertIcon />
                         </IconButton>
                       </Tooltip>
@@ -197,31 +182,43 @@ const Dashboard: React.FC = () => {
                             borderRadius: '50%',
                             backgroundColor: `${stat.color}20`,
                             color: stat.color,
+                            transition: 'all 0.3s ease-in-out',
+                            '&:hover': {
+                              transform: 'scale(1.1) rotate(10deg)',
+                            },
                           }}
                         >
                           {stat.icon}
                         </Box>
-                        <Typography variant="h6" component="div">
+                        <Typography variant="h6" color="text.primary">
                           {stat.title}
                         </Typography>
                       </Box>
                     }
                   />
                   <CardContent>
-                    <Typography variant="h4" component="div" gutterBottom>
+                    <Typography variant="h4" sx={{ mb: 1 }}>
                       {stat.value}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stat.change >= 0 ? (
-                        <ArrowUpwardIcon sx={{ color: 'success.main' }} />
-                      ) : (
-                        <ArrowDownwardIcon sx={{ color: 'error.main' }} />
-                      )}
-                      <Typography
-                        variant="body2"
-                        color={stat.change >= 0 ? 'success.main' : 'error.main'}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: stat.change >= 0 ? 'success.main' : 'error.main',
+                        }}
                       >
-                        {Math.abs(stat.change)}% {t('dashboard.fromLastMonth')}
+                        {stat.change >= 0 ? (
+                          <ArrowUpwardIcon fontSize="small" />
+                        ) : (
+                          <ArrowDownwardIcon fontSize="small" />
+                        )}
+                        <Typography variant="body2" sx={{ ml: 0.5 }}>
+                          {Math.abs(stat.change)}%
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary">
+                        vs last month
                       </Typography>
                     </Box>
                   </CardContent>

@@ -2,18 +2,33 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IInvoice extends Document {
   invoiceNumber: string;
-  customerName: string;
+  type: 'proforma' | 'final';
+  company: {
+    name: string;
+    address: string;
+    nif: string;
+  };
+  client: {
+    name: string;
+    address: string;
+    nif?: string;
+  };
   items: Array<{
     description: string;
     quantity: number;
-    price: number;
+    unitPrice: number;
     total: number;
+    barcode?: string;
   }>;
   subtotal: number;
-  tax: number;
+  vatRate: number;
+  vatAmount: number;
   total: number;
-  status: 'draft' | 'sent' | 'paid' | 'cancelled';
+  paymentTerms: string;
+  status: 'draft' | 'validated' | 'cancelled';
   dueDate: Date;
+  signature?: string;
+  qrCode?: string;
   createdAt: Date;
   updatedAt: Date;
   createdBy: mongoose.Types.ObjectId;
@@ -26,9 +41,37 @@ const invoiceSchema = new Schema<IInvoice>(
       required: true,
       unique: true,
     },
-    customerName: {
+    type: {
       type: String,
+      enum: ['proforma', 'final'],
       required: true,
+    },
+    company: {
+      name: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      nif: {
+        type: String,
+        required: true,
+      },
+    },
+    client: {
+      name: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      nif: {
+        type: String,
+      },
     },
     items: [{
       description: {
@@ -40,7 +83,7 @@ const invoiceSchema = new Schema<IInvoice>(
         required: true,
         min: 0,
       },
-      price: {
+      unitPrice: {
         type: Number,
         required: true,
         min: 0,
@@ -50,13 +93,21 @@ const invoiceSchema = new Schema<IInvoice>(
         required: true,
         min: 0,
       },
+      barcode: {
+        type: String,
+      },
     }],
     subtotal: {
       type: Number,
       required: true,
       min: 0,
     },
-    tax: {
+    vatRate: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    vatAmount: {
       type: Number,
       required: true,
       min: 0,
@@ -66,14 +117,24 @@ const invoiceSchema = new Schema<IInvoice>(
       required: true,
       min: 0,
     },
+    paymentTerms: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
-      enum: ['draft', 'sent', 'paid', 'cancelled'],
+      enum: ['draft', 'validated', 'cancelled'],
       default: 'draft',
     },
     dueDate: {
       type: Date,
       required: true,
+    },
+    signature: {
+      type: String,
+    },
+    qrCode: {
+      type: String,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -88,8 +149,20 @@ const invoiceSchema = new Schema<IInvoice>(
 
 // Pre-save middleware to calculate totals
 invoiceSchema.pre('save', function(next) {
+  // Calculate item totals
+  this.items.forEach(item => {
+    item.total = item.quantity * item.unitPrice;
+  });
+
+  // Calculate subtotal
   this.subtotal = this.items.reduce((sum, item) => sum + item.total, 0);
-  this.total = this.subtotal + this.tax;
+
+  // Calculate VAT amount
+  this.vatAmount = this.subtotal * (this.vatRate / 100);
+
+  // Calculate total with VAT
+  this.total = this.subtotal + this.vatAmount;
+
   next();
 });
 
