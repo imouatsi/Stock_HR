@@ -4,10 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 
 export const SystemStatus: React.FC = () => {
-  const { data: health, isLoading } = useQuery(['systemHealth'], 
-    () => fetch('/api/system/health').then(res => res.json()),
-    { refetchInterval: 30000 } // Refresh every 30 seconds
-  );
+  const { data: health, isLoading } = useQuery({
+    queryKey: ['systemHealth'], // Correct usage
+    queryFn: () => fetch('/api/system/health').then(res => res.json()),
+  });
 
   const renderServiceStatus = (service: any) => {
     return (
@@ -34,4 +34,9 @@ export const SystemStatus: React.FC = () => {
   };
 
   // ... implementation of rendering logic
+  return (
+    <div>
+      {/* ...existing JSX... */}
+    </div>
+  );
 };

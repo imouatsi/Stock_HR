@@ -95,7 +95,15 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null,
+  user: (() => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error('Failed to parse user from localStorage:', error);
+      return null;
+    }
+  })(),
   token: localStorage.getItem('token'),
   loading: false,
   error: null,

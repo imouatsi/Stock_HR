@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Box, Typography, IconButton } from '@mui/material';
-import { motion, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Info as InfoIcon } from '@mui/icons-material';
 
 interface StatCardProps {
@@ -18,11 +18,23 @@ export const StatCard: React.FC<StatCardProps> = ({
   color,
   percentage
 }) => {
-  const animatedValue = useSpring(0);
-
-  React.useEffect(() => {
-    animatedValue.set(value);
-  }, [value, animatedValue]);
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest: number) => Math.round(latest));
+  const [displayValue, setDisplayValue] = useState(0);
+  
+  useEffect(() => {
+    const animation = animate(count, value, { duration: 2 });
+    
+    // Update the display value when the animation progresses
+    const unsubscribe = rounded.on('change', (latest: number) => {
+      setDisplayValue(latest);
+    });
+    
+    return () => {
+      animation.stop();
+      unsubscribe();
+    };
+  }, [count, rounded, value]);
 
   return (
     <motion.div
@@ -47,9 +59,16 @@ export const StatCard: React.FC<StatCardProps> = ({
           </IconButton>
         </Box>
 
-        <motion.div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-          {animatedValue}
-        </motion.div>
+        <Typography 
+          variant="h3" 
+          component="div" 
+          sx={{ 
+            fontWeight: 'bold',
+            mb: 1
+          }}
+        >
+          {displayValue}
+        </Typography>
 
         {percentage && (
           <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>

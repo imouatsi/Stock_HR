@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { useSelector } from 'react-redux';
 import { RootState } from '../../features/store';
 import { motion } from 'framer-motion';
+import { useAnimation } from 'framer-motion';
 
 export const WorkspaceStats: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -11,10 +12,10 @@ export const WorkspaceStats: React.FC = () => {
 
   if (!stats) return null;
 
-  const chartData = stats.mostUsedFeatures.map(feature => ({
+  const chartData = stats?.mostUsedFeatures?.map(feature => ({
     name: feature.feature,
-    count: feature.useCount
-  }));
+    count: feature.useCount,
+  })) || []; // Add fallback value
 
   return (
     <motion.div

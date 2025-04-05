@@ -82,7 +82,10 @@ class InventoryService {
 
   public async deleteItem(id: string): Promise<void> {
     try {
-      await api.delete(`/inventory/${id}`);
+      const response = await api.delete(`/inventory/${id}`);
+      if (!response.data.success) {
+        throw new Error('Failed to delete item');
+      }
     } catch (error) {
       throw this.handleError(error);
     }

@@ -50,7 +50,7 @@ export const useAuditTrail = () => {
     const failedEvents = JSON.parse(localStorage.getItem('failedAuditEvents') || '[]');
     if (failedEvents.length === 0) return;
 
-    const successfulRetries = [];
+    const successfulRetries: AuditEvent[] = []; // Explicitly type
     for (const event of failedEvents) {
       try {
         await logEvent(event);

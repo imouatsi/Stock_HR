@@ -29,14 +29,16 @@ const validationSchema = Yup.object({
 });
 
 const roles = [
-  { value: 'user', label: 'User' },
   { value: 'admin', label: 'Admin' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'seller', label: 'Seller' },
+  { value: 'stock_clerk', label: 'Stock Clerk' },
 ];
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     return () => {

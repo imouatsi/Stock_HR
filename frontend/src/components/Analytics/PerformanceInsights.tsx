@@ -18,7 +18,9 @@ import {
   Psychology,
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion'; // Fix incorrect import
+import { useAnimation } from 'framer-motion'; // Fix incorrect import
+import { AnimatePresence } from 'framer-motion';
 import { RootState } from '../../features/store';
 
 export const PerformanceInsights: React.FC = () => {
@@ -55,7 +57,7 @@ export const PerformanceInsights: React.FC = () => {
             </Typography>
             <LinearProgress
               variant="determinate"
-              value={performance.aiPredictions?.nextMonthPerformance || 0} // Use optional chaining and fallback
+              value={performance?.aiPredictions?.nextMonthPerformance || 0} // Use optional chaining
               sx={{ height: 8, borderRadius: 4 }}
             />
           </Box>
@@ -65,8 +67,8 @@ export const PerformanceInsights: React.FC = () => {
               Burnout Risk
             </Typography>
             <Chip
-              label={performance.aiPredictions?.burnoutRisk || 'N/A'} // Use optional chaining and fallback
-              color={getBurnoutColor(performance.aiPredictions?.burnoutRisk || 'low')}
+              label={performance?.aiPredictions?.burnoutRisk || 'N/A'} // Use optional chaining
+              color={getBurnoutColor(performance?.aiPredictions?.burnoutRisk || 'low')}
               icon={<Warning />}
             />
           </Box>

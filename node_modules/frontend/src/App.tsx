@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  Navigate
+} from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Provider } from 'react-redux';
@@ -9,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
 import { RootState } from './features/store';
 import { LanguageThemeBar } from './components/LanguageThemeBar';
+import { LanguageProvider } from './hooks/useTranslation';
 
 // Pages
 import Login from './pages/Login';
@@ -41,8 +47,8 @@ function App() {
         main: '#f48fb1',
       },
       background: {
-        default: '#121212',
-        paper: '#1e1e1e',
+        default: settings.theme === 'dark' ? '#121212' : '#f5f5f5',
+        paper: settings.theme === 'dark' ? '#1e1e1e' : '#ffffff',
       },
     },
     typography: {
@@ -86,45 +92,50 @@ function App() {
 
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <LanguageThemeBar />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/"
-              element={
+      <LanguageProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <LanguageThemeBar />
+            <Routes>
+              {/* Redirect root path to login */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Layout with nested routes */}
+              <Route path="/" element={
                 <PrivateRoute>
                   <Layout />
                 </PrivateRoute>
-              }
-            >
-              <Route index element={<Navigate to="/dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="proforma" element={<Proforma />} />
-              <Route path="inventory" element={<Inventory />} />
-              <Route path="contracts" element={<Contracts />} />
-              <Route path="invoices" element={<Invoices />} />
-              <Route path="users" element={<Users />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Routes>
-        </Router>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={settings.language === 'ar'}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme={settings.theme}
-        />
-      </ThemeProvider>
+              }>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="proforma" element={<Proforma />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="contracts" element={<Contracts />} />
+                <Route path="invoices" element={<Invoices />} />
+                <Route path="users" element={<Users />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+
+              {/* Catch all unknown routes */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </Router>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={settings.language === 'ar'}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme={settings.theme}
+          />
+        </ThemeProvider>
+      </LanguageProvider>
     </Provider>
   );
 }

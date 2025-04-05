@@ -19,5 +19,9 @@ export const PerformanceMonitor: React.FC = () => {
     return () => socketRef.current?.close();
   }, []);
 
-  // Component implementation
+  return (
+    <div>
+      {/* ...existing JSX... */}
+    </div>
+  );
 };

@@ -1,0 +1,3 @@
+import { motion } from 'framer-motion'; // Fix incorrect import
+import { useAnimation } from 'framer-motion'; // Fix incorrect import
+// ...existing code...

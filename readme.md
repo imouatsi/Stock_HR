@@ -1,504 +1,353 @@
 # Stock & HR Management System
 
-A comprehensive management system for handling inventory, human resources, and business operations in compliance with Algerian regulations.
+A comprehensive Stock and HR Management System built with React, Node.js, and TypeScript.
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
 
-- 📦 Inventory Management
-- 👥 Human Resources Management
-- 📄 Contract Management
-- 💰 Invoice Management
+## 📋 Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Detailed Installation Guide](#detailed-installation-guide)
+  - [Prerequisites](#prerequisites)
+  - [Step-by-Step Setup](#step-by-step-setup)
+  - [Configuration](#configuration)
+- [Usage Guide](#usage-guide)
+  - [Dashboard](#dashboard)
+  - [Inventory Management](#inventory-management)
+  - [Contract Management](#contract-management)
+  - [Invoice Management](#invoice-management)
+  - [User Management](#user-management)
+  - [Settings](#settings)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+## ✨ Features
+
+- 📊 Dashboard with analytics and charts
+- 👥 User Management
+- 📝 Contract Management
+- 📄 Invoice Generation
 - 🌐 Multi-language Support (English, French, Arabic)
-- 📱 Responsive Design
+- 🎨 Modern UI with Material-UI
 - 🔒 Secure Authentication
-- 📊 Dashboard Analytics
-- 🎯 Performance Analytics & AI Insights
-- 🏆 Gamification & Team Engagement
-- 📈 Advanced KPI Tracking
-- 🤝 Team Collaboration Tools
-- 📱 Progressive Web App (PWA)
-- 🔄 Real-time Updates
-- 🎨 Customizable Dashboards
-- 🤖 Automated Reporting
+- 📱 Responsive Design
 
-## System Architecture
+## 🛠️ Tech Stack
 
-```mermaid
-graph TB
-    FE[Frontend React App] --> API[API Gateway]
-    API --> Auth[Auth Service]
-    API --> IM[Inventory Management]
-    API --> HR[HR Management]
-    API --> AN[Analytics Engine]
-    API --> RE[Reporting Engine]
-    
-    IM --> DB[(MongoDB)]
-    HR --> DB
-    Auth --> DB
-    AN --> DB
-    RE --> DB
-    
-    Cache[(Redis Cache)] --> API
-    MQ[Message Queue] --> API
+### Frontend
+- React 18
+- TypeScript
+- Material-UI
+- Redux Toolkit
+- React Query
+- i18n for translations
+- Chart.js/Recharts for visualizations
+- Formik & Yup for form validation
+- React Router for navigation
+
+### Backend
+- Node.js
+- Express
+- TypeScript
+- MongoDB
+- JWT Authentication
+- Socket.IO for real-time updates
+- Winston for logging
+
+## 🚀 Quick Start
+
+For experienced developers who want to get started quickly:
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/stock-hr.git
+cd stock-hr
+
+# Install dependencies
+npm install
+cd frontend && npm install
+cd ../backend && npm install
+
+# Set up environment variables
+cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env
+
+# Start development servers
+# Terminal 1: Start backend
+cd backend && npm run dev
+
+# Terminal 2: Start frontend
+cd frontend && npm start
 ```
 
-## Prerequisites
+## 📚 Detailed Installation Guide
 
-Before you begin, ensure you have the following installed:
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-- MongoDB (v4.4 or higher)
-- Git
+### Prerequisites
 
-## Complete Installation Guide
+Before you begin, ensure you have the following installed on your system:
 
-### Prerequisites Setup
+1. **Node.js** (v14 or higher)
+   - Windows: [Download installer from nodejs.org](https://nodejs.org/)
+   - macOS: `brew install node` or [download installer](https://nodejs.org/)
+   - Linux: `sudo apt install nodejs npm` or equivalent
 
-1. Install Node.js:
-   ```bash
-   # Using nvm (recommended)
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-   nvm install 14
-   nvm use 14
-   
-   # Verify installation
-   node --version
-   npm --version
-   ```
+2. **MongoDB** (v4.4 or higher)
+   - Windows: [Download MongoDB Community Server](https://www.mongodb.com/try/download/community)
+   - macOS: `brew install mongodb-community`
+   - Linux: [Follow MongoDB installation guide](https://docs.mongodb.com/manual/administration/install-on-linux/)
 
-2. Install MongoDB:
-   ```bash
-   # Ubuntu
-   wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-   echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-   sudo apt-get update
-   sudo apt-get install -y mongodb-org
-   
-   # Start MongoDB
-   sudo systemctl start mongod
-   sudo systemctl enable mongod
-   
-   # Verify MongoDB
-   mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-   ```
+3. **Git** (Optional, for cloning the repository)
+   - Windows: [Download Git for Windows](https://gitforwindows.org/)
+   - macOS: `brew install git` or comes with Xcode Command Line Tools
+   - Linux: `sudo apt install git` or equivalent
 
-3. Install Redis (Optional - for caching):
-   ```bash
-   sudo apt-get install redis-server
-   sudo systemctl start redis
-   sudo systemctl enable redis
-   
-   # Verify Redis
-   redis-cli ping
-   ```
+### Step-by-Step Setup
 
-### Project Setup
+#### 1. Get the Code
 
-1. Create project directory:
-   ```bash
-   mkdir /opt/stockhr
-   cd /opt/stockhr
-   ```
+**Option A: Clone with Git**
+```bash
+git clone https://github.com/yourusername/stock-hr.git
+cd stock-hr
+```
 
-2. Clone and setup repository:
-   ```bash
-   # Clone repository
-   git clone https://github.com/yourusername/stock-hr-management.git .
-   
-   # Create necessary directories
-   mkdir -p storage/uploads
-   mkdir -p logs
-   ```
+**Option B: Download ZIP**
+1. Download the ZIP file from the repository
+2. Extract it to your preferred location
+3. Open a terminal/command prompt in the extracted folder
 
-### Backend Configuration
+#### 2. Install Root Dependencies
 
-1. Backend setup:
-   ```bash
-   cd backend
-   
-   # Install dependencies
-   npm install
-   
-   # Setup environment
-   cp .env.example .env
-   
-   # Generate secure keys
-   echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
-   echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
-   
-   # Configure database
-   echo "MONGODB_URI=mongodb://localhost:27017/stockhr" >> .env
-   
-   # Build TypeScript
-   npm run build
-   ```
+```bash
+npm install
+```
 
-2. Initialize database:
-   ```bash
-   # Create superadmin
-   npm run create-admin
-   
-   # Seed initial data
-   npm run seed
-   ```
+This will install the dependencies required for the root project.
 
-### Frontend Configuration
+#### 3. Set Up Frontend
 
-1. Frontend setup:
-   ```bash
-   cd ../frontend
-   
-   # Install dependencies
-   npm install
-   
-   # Setup environment
-   cp .env.example .env
-   
-   # Configure API URL
-   echo "REACT_APP_API_URL=http://localhost:5000/api" >> .env
-   
-   # Build production assets
-   npm run build
-   ```
+```bash
+# Navigate to frontend directory
+cd frontend
 
-### System Configuration
+# Install frontend dependencies
+npm install
 
-1. Configure Nginx:
-   ```bash
-   sudo apt-get install nginx
-   sudo cp deployment/nginx/stockhr.conf /etc/nginx/sites-available/
-   sudo ln -s /etc/nginx/sites-available/stockhr.conf /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl restart nginx
-   ```
+# Create environment file
+cp .env.example .env
+```
 
-2. Setup PM2 process manager:
-   ```bash
-   npm install -g pm2
-   
-   # Start backend
-   cd backend
-   pm2 start ecosystem.config.js
-   
-   # Save PM2 configuration
-   pm2 save
-   pm2 startup
-   ```
+> 💡 **Tip for Beginners**: The `cd` command changes your current directory. The `npm install` command downloads all the necessary packages for the application.
 
-### Verification Steps
+#### 4. Set Up Backend
 
-1. Check services:
-   ```bash
-   # Check MongoDB
-   sudo systemctl status mongod
-   
-   # Check Redis
-   sudo systemctl status redis
-   
-   # Check API
-   curl http://localhost:5000/api/health
-   
-   # Check PM2 processes
-   pm2 status
-   ```
+```bash
+# Navigate to backend directory
+cd ../backend
 
-2. Access application:
-   - Frontend: http://localhost:3000
-   - API: http://localhost:5000/api
-   - Swagger docs: http://localhost:5000/api-docs
+# Install backend dependencies
+npm install
 
-### Troubleshooting
+# Create environment file
+cp .env.example .env
+```
 
-1. Service issues:
-   ```bash
-   # Check logs
-   pm2 logs
-   sudo journalctl -u mongod
-   sudo journalctl -u redis
-   
-   # Reset services
-   pm2 restart all
-   sudo systemctl restart mongod
-   sudo systemctl restart redis
-   ```
+#### 5. Configure Environment Variables
 
-2. Permission issues:
-   ```bash
-   # Fix uploads directory
-   sudo chown -R nodejs:nodejs /opt/stockhr/storage
-   sudo chmod 755 /opt/stockhr/storage
-   ```
+Edit the `.env` files in both frontend and backend directories to match your environment:
 
-3. Database issues:
-   ```bash
-   # Reset database
-   mongo stockhr --eval "db.dropDatabase()"
-   npm run seed
-   ```
+**Frontend (.env)**
+```
+REACT_APP_API_URL=http://localhost:5000/api
+```
 
-## Complete Installation Guide for Beginners
+**Backend (.env)**
+```
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/stockhr
+JWT_SECRET=your_jwt_secret_key
+NODE_ENV=development
+```
 
-### Windows Setup
+> 💡 **Tip for Beginners**: Environment variables are like configuration settings for your application. They keep sensitive information separate from your code.
 
-1. Install Node.js:
-   - Visit https://nodejs.org
-   - Download the LTS (Long Term Support) version
-   - Run the installer
-   - Check "Automatically install necessary tools"
-   - Click through the installer (Next > Next > Install)
-   - To verify installation:
-     - Open Command Prompt (Win + R, type "cmd", press Enter)
-     - Type: `node --version`
-     - Type: `npm --version`
-   - Add to PATH if needed:
-     - Open System Properties (Win + R, type "sysdm.cpl", press Enter)
-     - Click "Environment Variables"
-     - Under "System variables", find "Path"
-     - Click "Edit" > "New"
-     - Add: `C:\Program Files\nodejs`
-     - Click OK on all windows
+#### 6. Start MongoDB
 
-2. Install Git:
-   - Visit https://git-scm.com/download/win
-   - Download Windows version
-   - Run installer
-   - Use default options (Next > Next > Install)
-   - To verify:
-     - Open new Command Prompt
-     - Type: `git --version`
+Ensure MongoDB is running on your system:
 
-3. Install MongoDB:
-   - Visit https://www.mongodb.com/try/download/community
-   - Download MSI installer
-   - Run installer
-   - Choose "Complete" installation
-   - Check "Install MongoDB as a Service"
-   - Check "Run service as Network Service user"
-   - Click Install
-   - To verify:
-     - Open new Command Prompt
-     - Type: `mongod --version`
+**Windows**
+1. MongoDB should be running as a service if you used the installer
+2. If not, open Command Prompt as Administrator and run: `net start MongoDB`
 
-4. Install Visual Studio Code (Recommended):
-   - Visit https://code.visualstudio.com
-   - Download Windows version
-   - Run installer
-   - Check all options during installation
-   - Recommended extensions:
-     - ESLint
-     - Prettier
-     - GitLens
-     - MongoDB for VS Code
+**macOS/Linux**
+```bash
+sudo systemctl start mongod
+# Or for macOS with brew:
+brew services start mongodb-community
+```
 
-### Project Setup (Windows)
+#### 7. Start Development Servers
 
-1. Create Project Directory:
-   - Open Command Prompt as Administrator
-   - Run these commands:
-   ```bash
-   cd C:\
-   mkdir Stock_HR
-   cd Stock_HR
-   ```
-
-2. Clone Project:
-   ```bash
-   git clone https://github.com/yourusername/stock-hr-management.git .
-   ```
-
-3. Configure Backend:
-   ```bash
-   cd backend
-   npm install
-
-   # Create .env file
-   echo PORT=5000 > .env
-   echo MONGODB_URI=mongodb://localhost:27017/stockhr >> .env
-   echo JWT_SECRET=your_secret_key >> .env
-   ```
-
-4. Configure Frontend:
-   ```bash
-   cd ../frontend
-   npm install
-
-   # Create .env file
-   echo REACT_APP_API_URL=http://localhost:5000/api > .env
-   ```
-
-### First Time Setup
-
-1. Initialize Database:
-   - Open Command Prompt as Administrator
-   - Start MongoDB:
-   ```bash
-   net start MongoDB
-   ```
-   
-2. Create Admin User:
-   ```bash
-   cd C:\Stock_HR\backend
-   npm run create-admin
-   ```
-   - Default login:
-     - Email: admin@stockhr.com
-     - Password: Admin123!
-
-3. Start Development Servers:
-   - Open two Command Prompt windows
-   - In first window:
-   ```bash
-   cd C:\Stock_HR\backend
-   npm run dev
-   ```
-   - In second window:
-   ```bash
-   cd C:\Stock_HR\frontend
-   npm start
-   ```
-
-4. Access Application:
-   - Open Chrome or Firefox
-   - Visit: http://localhost:3000
-   - Login with admin credentials
-
-### Common Issues & Solutions
-
-1. Node.js "not recognized":
-   - Restart Command Prompt after installation
-   - Check PATH variables
-   - Try running as Administrator
-
-2. MongoDB won't start:
-   - Check Services (Win + R, type "services.msc")
-   - Find MongoDB
-   - Right-click > Start
-   - If error, check logs in:
-     `C:\Program Files\MongoDB\Server\4.4\log\`
-
-3. Port Already in Use:
-   - Open Command Prompt as Administrator
-   - Find process:
-   ```bash
-   netstat -ano | findstr :5000
-   ```
-   - Kill process:
-   ```bash
-   taskkill /PID <process_id> /F
-   ```
-
-## Usage
-
-1. Open your browser and navigate to `http://localhost:3000`
-2. Log in with your credentials
-3. Navigate through the dashboard and various modules
-
-## Language Support
-
-The application supports three languages:
-- English (en)
-- French (fr)
-- Arabic (ar)
-
-To change the language:
-1. Click on the language selector in the top navigation bar
-2. Select your preferred language
-3. The interface will update automatically, including RTL support for Arabic
-
-## Development
-
-### Backend Development
+**Terminal 1: Start Backend Server**
 ```bash
 cd backend
 npm run dev
 ```
 
-### Frontend Development
+You should see output indicating the server is running on port 5000.
+
+**Terminal 2: Start Frontend Server**
 ```bash
 cd frontend
 npm start
 ```
 
-### Running Tests
-```bash
-# Backend tests
-cd backend
-npm test
+Your default browser should automatically open to http://localhost:3000
 
-# Frontend tests
-cd frontend
-npm test
+## 🧭 Usage Guide
+
+### Dashboard
+
+The dashboard provides a quick overview of your business metrics:
+
+1. Log in using your credentials
+2. View key performance indicators:
+   - Total Users
+   - Inventory Items
+   - Active Contracts
+   - Total Invoices
+3. Access quick actions for common tasks
+4. View recent activity feed
+
+### Inventory Management
+
+To manage your inventory:
+
+1. Navigate to the Inventory page from the sidebar
+2. View existing inventory items in a tabular format
+3. Add new inventory items using the "Add Item" button
+4. Edit or delete items using the action buttons
+5. Filter and search for specific items
+
+### Contract Management
+
+To manage contracts:
+
+1. Navigate to the Contracts page
+2. View existing contracts
+3. Generate a new contract using the "Generate Contract" button
+4. Fill in contract details in the form
+5. Preview and finalize the contract
+6. Download the contract as PDF
+
+### Invoice Management
+
+To create and manage invoices:
+
+1. Navigate to the Invoices page
+2. View existing invoices
+3. Create a new invoice using the "Add Invoice" button
+4. Select client and add line items
+5. Set payment terms and dates
+6. Generate and send invoice
+
+### User Management
+
+To manage system users:
+
+1. Navigate to Users page (admin access required)
+2. View existing users
+3. Add new users with "Add User" button
+4. Set roles and permissions
+5. Edit or deactivate user accounts
+
+### Settings
+
+To configure your application:
+
+1. Navigate to Settings page
+2. Toggle dark/light mode
+3. Enable/disable notifications
+4. Select preferred language (English, French, or Arabic)
+
+## 📂 Project Structure
+
 ```
-
-## Project Structure
-
-```
-stock-hr-management/
-├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   └── utils/
-│   └── package.json
+stock-hr/
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── features/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── locales/
-│   └── package.json
-└── README.md
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── features/       # Feature-specific components
+│   │   ├── services/       # API services
+│   │   ├── store/          # Redux store
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── utils/          # Utility functions
+│   │   ├── i18n/           # Internationalization
+│   │   └── types/          # TypeScript types
+│   └── public/             # Static assets
+├── backend/
+│   ├── src/
+│   │   ├── api/            # API routes
+│   │   ├── controllers/    # Route controllers
+│   │   ├── models/         # Database models
+│   │   ├── services/       # Business logic
+│   │   ├── middleware/     # Express middleware
+│   │   └── utils/          # Utility functions
+│   └── tests/              # Backend tests
+└── docs/                   # Documentation
 ```
 
-## Advanced Features
+## 📝 API Documentation
 
-### Analytics Engine
-- AI-powered performance predictions
-- Burnout risk assessment
-- Team productivity analytics
-- Skill matrix tracking
-- Learning path recommendations
+Our API follows RESTful principles. Base URL: `http://localhost:5000/api`
 
-### Security Features
-- Hardware key authentication
-- Multi-factor authentication
-- Session management
-- Activity monitoring
-- Automated security audits
+| Endpoint               | Method | Description                       | Auth Required |
+|------------------------|--------|-----------------------------------|---------------|
+| /auth/login            | POST   | User login                        | No            |
+| /auth/register         | POST   | User registration                 | No            |
+| /users                 | GET    | Get all users                     | Yes           |
+| /users/:id             | GET    | Get user by ID                    | Yes           |
+| /inventory             | GET    | Get all inventory items           | Yes           |
+| /inventory             | POST   | Create inventory item             | Yes           |
+| /contracts             | GET    | Get all contracts                 | Yes           |
+| /contracts/:id         | GET    | Get contract by ID                | Yes           |
+| /invoices              | GET    | Get all invoices                  | Yes           |
+| /invoices/:id          | GET    | Get invoice by ID                 | Yes           |
 
-### Integration Options
-- REST API
-- WebSocket real-time updates
-- Webhook support
-- CSV/Excel import/export
-- PDF generation
+## ❓ Troubleshooting
 
-## Roadmap
+### Common Issues
 
-### Q2 2024
-- [ ] AI-powered analytics dashboard
-- [ ] Mobile app release
-- [ ] Advanced reporting engine
-- [ ] Team collaboration features
+**Backend fails to start**
+- Check MongoDB is running: `systemctl status mongod`
+- Verify .env configuration is correct
+- Check port 5000 is not in use by another application
 
-### Q3 2024
-- [ ] Automated workflow engine
-- [ ] Enhanced security features
-- [ ] Integration marketplace
-- [ ] Custom plugin support
+**Frontend fails to start**
+- Ensure Node.js version is 14+: `node -v`
+- Verify all dependencies are installed: `npm install`
+- Check .env configuration points to correct API URL
 
-### Q4 2024
-- [ ] Machine learning predictions
-- [ ] Advanced visualization tools
-- [ ] Blockchain integration
-- [ ] IoT device support
+**Authentication issues**
+- Clear browser cookies and local storage
+- Verify JWT_SECRET is consistent
+- Check token expiration settings
 
-## Contributing
+### Get Help
+
+If you encounter issues not covered here:
+1. Check the issue tracker on GitHub
+2. Submit a new issue with detailed information about your problem
+3. Contact support at support@stockhr.example.com
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -506,10 +355,10 @@ stock-hr-management/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+---
 
-For support, please contact the development team or create an issue in the repository.
+Made with ❤️ by Your Company Name

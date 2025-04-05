@@ -1,15 +1,20 @@
 {
   "contracts": {
-    "title": "Contracts"
+    "title": "Contracts",
+    "generateButton": "Generate Contract"
   },
   "invoices": {
-    "title": "Invoices"
+    "title": "Invoices",
+    "addButton": "Add Invoice"
   },
   "users": {
-    "title": "Users"
+    "title": "Users",
+    "addButton": "Add User"
   },
   "settings": {
-    "title": "Settings"
+    "title": "Settings",
+    "darkMode": "Dark Mode",
+    "enableNotifications": "Enable Notifications"
   },
   "common": {
     "noData": "No data available"

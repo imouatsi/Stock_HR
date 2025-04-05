@@ -1,8 +1,28 @@
 import React from 'react';
 import { Card, Box, Typography, IconButton, Tooltip } from '@mui/material';
 import { MoreVert, Fullscreen } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ResponsiveLine } from '@nivo/line';
+import { motion } from 'framer-motion';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend
+);
 
 interface ChartCardProps {
   title: string;
@@ -15,6 +35,52 @@ interface ChartCardProps {
 
 export const ChartCard: React.FC<ChartCardProps> = ({ title, data, height = 300 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const chartData = React.useMemo(() => {
+    if (!data.length) return { labels: [], datasets: [] };
+
+    // Get all unique x values
+    const xValues = new Set<string | number>();
+    data.forEach(series => {
+      series.data.forEach(point => xValues.add(point.x));
+    });
+    const labels = Array.from(xValues);
+
+    // Create datasets
+    const datasets = data.map((series, index) => ({
+      label: series.id,
+      data: labels.map(x => {
+        const point = series.data.find(p => p.x === x);
+        return point ? point.y : null;
+      }),
+      borderColor: `hsl(${index * 45}, 70%, 50%)`,
+      backgroundColor: `hsla(${index * 45}, 70%, 50%, 0.5)`,
+      tension: 0.4,
+    }));
+
+    return {
+      labels,
+      datasets,
+    };
+  }, [data]);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
 
   return (
     <motion.div
@@ -47,32 +113,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({ title, data, height = 300 
         </Box>
 
         <Box sx={{ height: 'calc(100% - 48px)' }}>
-          <ResponsiveLine
-            data={data}
-            margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
-            xScale={{ type: 'point' }}
-            yScale={{ type: 'linear', stacked: false }}
-            curve="natural"
-            axisTop={null}
-            axisRight={null}
-            enablePoints
-            pointSize={8}
-            pointColor={{ theme: 'background' }}
-            pointBorderWidth={2}
-            pointBorderColor={{ from: 'serieColor' }}
-            enableSlices="x"
-            crosshairType="cross"
-            motionConfig="stiff"
-            theme={{
-              crosshair: {
-                line: {
-                  strokeWidth: 1,
-                  stroke: 'rgba(0, 0, 0, 0.2)',
-                  strokeDasharray: '4 4',
-                },
-              },
-            }}
-          />
+          <Line data={chartData} options={options} />
         </Box>
       </Card>
     </motion.div>

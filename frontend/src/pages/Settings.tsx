@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Typography, Switch, FormControlLabel } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { Box, Typography, FormControlLabel, Switch } from '@mui/material';
+import { useTranslation } from '../hooks/useTranslation';
 
 const Settings: React.FC = () => {
   const { t } = useTranslation();

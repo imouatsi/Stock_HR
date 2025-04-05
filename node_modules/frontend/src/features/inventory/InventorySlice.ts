@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { api } from '../api/apiSlice';
 
 export interface InventoryItem {
@@ -11,9 +11,6 @@ export interface InventoryItem {
 }
 
 interface InventoryState {
-  items: InventoryItem[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
   filters: {
     category: string | null;
     search: string;
@@ -23,9 +20,6 @@ interface InventoryState {
 }
 
 const initialState: InventoryState = {
-  items: [],
-  status: 'idle',
-  error: null,
   filters: {
     category: null,
     search: '',
@@ -34,23 +28,18 @@ const initialState: InventoryState = {
   }
 };
 
-export const fetchInventory = createAsyncThunk(
-  'inventory/fetchItems',
-  async () => {
-    const response = await api.get('/inventory');
-    return response.data;
-  }
-);
-
 export const inventorySlice = createSlice({
   name: 'inventory',
   initialState,
   reducers: {
-    // Reducer implementations
-  },
-  extraReducers: (builder) => {
-    // Extra reducer implementations
+    setFilters: (state, action) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    resetFilters: (state) => {
+      state.filters = initialState.filters;
+    }
   }
 });
 
+export const { setFilters, resetFilters } = inventorySlice.actions;
 export default inventorySlice.reducer;

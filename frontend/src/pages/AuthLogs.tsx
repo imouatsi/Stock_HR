@@ -43,7 +43,7 @@ const AuthLogs: React.FC = () => {
     setLogs([]);
   };
 
-  const getStatusColor = (event: string) => {
+  const getStatusColor = (event: string): 'success' | 'error' | 'info' | 'default' => {
     switch (event) {
       case 'API Response Success':
         return 'success';

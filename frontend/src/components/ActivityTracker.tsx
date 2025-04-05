@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Badge } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../features/store';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion'; // Fix incorrect import
+import { useAnimation } from 'framer-motion'; // Fix incorrect import
 
 export const ActivityTracker: React.FC = () => {
   const [lastActivity, setLastActivity] = useState<Date>(new Date());

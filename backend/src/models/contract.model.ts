@@ -1,97 +1,139 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IContract extends Document {
-  title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-  status: string;
-  client: {
+  contractNumber: string;
+  contractType: string;
+  partyA: {
     name: string;
+    address: string;
+    contactPerson: string;
     email: string;
     phone: string;
+  };
+  partyB: {
+    name: string;
     address: string;
-    taxNumber?: string;
+    contactPerson: string;
+    email: string;
+    phone: string;
   };
   terms: string;
-  type: string;
-  party: {
+  startDate: Date;
+  endDate: Date;
+  value: number;
+  status: 'draft' | 'active' | 'expired' | 'terminated';
+  attachments: Array<{
     name: string;
+    url: string;
     type: string;
-    contact: string;
-    address: string;
-  };
-  items: Array<{
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    total: number;
   }>;
-  attachments: string[];
-  signature?: {
-    date: Date;
-    signedBy: string;
-    digitalSignature: string;
-  };
+  createdAt: Date;
+  updatedAt: Date;
   createdBy: mongoose.Types.ObjectId;
-  updatedBy: mongoose.Types.ObjectId;
 }
 
 const contractSchema = new Schema<IContract>(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
+    contractNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    contractType: {
+      type: String,
+      required: true,
+    },
+    partyA: {
+      name: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      contactPerson: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+    },
+    partyB: {
+      name: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      contactPerson: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+    },
+    terms: {
+      type: String,
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    value: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     status: {
       type: String,
       enum: ['draft', 'active', 'expired', 'terminated'],
-      default: 'draft'
+      default: 'draft',
     },
-    client: {
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      phone: { type: String, required: true },
-      address: { type: String, required: true },
-      taxNumber: String
-    },
-    terms: { type: String, required: true },
-    type: {
-      type: String,
-      enum: ['sale', 'purchase', 'service', 'maintenance'],
-      required: true
-    },
-    party: {
-      name: { type: String, required: true },
+    attachments: [{
+      name: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
       type: {
         type: String,
-        enum: ['individual', 'company'],
-        required: true
+        required: true,
       },
-      contact: { type: String, required: true },
-      address: { type: String, required: true }
-    },
-    items: [{
-      description: String,
-      quantity: Number,
-      unitPrice: Number,
-      total: Number
     }],
-    attachments: [String],
-    signature: {
-      date: Date,
-      signedBy: String,
-      digitalSignature: String
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-contractSchema.index({ title: 'text', description: 'text' });
-contractSchema.index({ 'client.name': 1, 'party.name': 1 });
-contractSchema.index({ startDate: 1, endDate: 1 });
-contractSchema.index({ status: 1 });
+const Contract = mongoose.model<IContract>('Contract', contractSchema);
 
-export default mongoose.model<IContract>('Contract', contractSchema);
+export default Contract;

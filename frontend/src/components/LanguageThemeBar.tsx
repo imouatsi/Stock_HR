@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../hooks/useTranslation';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { DarkMode, LightMode } from '@mui/icons-material';
@@ -22,7 +22,6 @@ export const LanguageThemeBar: React.FC = () => {
     if (newLang) {
       dispatch(updateLanguage(newLang));
       i18n.changeLanguage(newLang);
-      document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
     }
   };
 
@@ -31,54 +30,36 @@ export const LanguageThemeBar: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          zIndex: 1200,
-          display: 'flex',
-          gap: 1,
-          p: 1,
-          bgcolor: 'background.paper',
-          borderBottomLeftRadius: 8,
-          boxShadow: 2,
-        }}
-      >
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, gap: 2 }}>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <ToggleButtonGroup
           value={language}
           exclusive
           onChange={handleLanguageChange}
+          aria-label="language selector"
           size="small"
         >
           {languages.map((lang) => (
-            <ToggleButton
-              key={lang.code}
-              value={lang.code}
-              aria-label={lang.code}
-              sx={{ px: 2 }}
-            >
+            <ToggleButton key={lang.code} value={lang.code} aria-label={lang.code}>
               {lang.label}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
-
-        <Tooltip title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
+      </motion.div>
+      
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <Tooltip title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
           <ToggleButton
-            value={theme}
+            value="check"
             selected={theme === 'dark'}
             onChange={handleThemeToggle}
+            aria-label="theme toggle"
             size="small"
           >
-            {theme === 'light' ? <DarkMode /> : <LightMode />}
+            {theme === 'dark' ? <LightMode /> : <DarkMode />}
           </ToggleButton>
         </Tooltip>
-      </Box>
-    </motion.div>
+      </motion.div>
+    </Box>
   );
 };

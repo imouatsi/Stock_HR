@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { User } from '../models/user.model';
+import User from '../models/user.model';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,15 +17,23 @@ const createSuperAdmin = async () => {
 
     // Create superadmin user
     const superAdmin = await User.create({
-      email: 'superadmin@stockhr.com',
-      password: 'SuperAdmin123!',
+      email: 'admin@stockhr.com',  // Common admin email
+      password: 'admin123',       // Simple password for testing
       firstName: 'Super',
       lastName: 'Admin',
       role: 'superadmin',
-      isActive: true,
+      active: true,               // Make sure the field name matches the model
+      preferences: {
+        language: 'en',
+        theme: 'light',
+        notifications: true,
+        twoFactorEnabled: false
+      }
     });
 
     console.log('Superadmin created successfully:', superAdmin.email);
+    console.log('Email: admin@stockhr.com');
+    console.log('Password: admin123');
     process.exit(0);
   } catch (error) {
     console.error('Error creating superadmin:', error);

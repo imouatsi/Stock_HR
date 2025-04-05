@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Box, Paper, Typography, Card, Grid } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface KanbanItem {
@@ -31,72 +30,49 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, onDragEnd }) 
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columns.length}, 1fr)`,
-          gap: 2,
-          p: 2,
-          minHeight: 400
-        }}
-      >
+    <Box sx={{ p: 2, minHeight: 400 }}>
+      <Grid container spacing={2}>
         {columns.map(column => (
-          <Droppable key={column.id} droppableId={column.id}>
-            {(provided, snapshot) => (
-              <Paper
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                sx={{
-                  p: 2,
-                  backgroundColor: snapshot.isDraggingOver ? 'action.hover' : 'background.paper',
-                  transition: 'background-color 0.2s ease',
-                  minHeight: 200
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  {column.title} ({column.items.length})
-                </Typography>
-                <AnimatePresence>
-                  {column.items.map((item, index) => (
-                    <Draggable key={item.id} draggableId={item.id} index={index}>
-                      {(provided, snapshot) => (
-                        <motion.div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.5 }}
-                          style={provided.draggableProps.style}
-                        >
-                          <Paper
-                            sx={{
-                              p: 2,
-                              mb: 1,
-                              backgroundColor: snapshot.isDragging ? 'action.selected' : 'background.paper',
-                              borderLeft: `4px solid ${getPriorityColor(item.priority)}`,
-                              transform: snapshot.isDragging ? 'rotate(3deg)' : 'none',
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: 3
-                              }
-                            }}
-                          >
-                            {item.content}
-                          </Paper>
-                        </motion.div>
-                      )}
-                    </Draggable>
-                  ))}
-                </AnimatePresence>
-                {provided.placeholder}
-              </Paper>
-            )}
-          </Droppable>
+          <Grid item xs={12} md={4} key={column.id}>
+            <Paper
+              sx={{
+                p: 2,
+                backgroundColor: 'background.paper',
+                minHeight: 200
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                {column.title} ({column.items.length})
+              </Typography>
+              <AnimatePresence>
+                {column.items.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card
+                      sx={{
+                        p: 2,
+                        mb: 1,
+                        backgroundColor: 'background.paper',
+                        borderLeft: `4px solid ${getPriorityColor(item.priority)}`,
+                        '&:hover': {
+                          boxShadow: 3
+                        }
+                      }}
+                    >
+                      <Typography>{item.content}</Typography>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </Paper>
+          </Grid>
         ))}
-      </Box>
-    </DragDropContext>
+      </Grid>
+    </Box>
   );
 };

@@ -1,35 +1,8 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+// Simple utility file to make TypeScript treat this as a module
+// This fixes the TS1208 error under --isolatedModules
 
-const loadLanguage = () => {
-  try {
-    const settings = localStorage.getItem('settings');
-    if (settings) {
-      const { language } = JSON.parse(settings);
-      return language;
-    }
-  } catch (error) {
-    console.error('Failed to load language setting:', error);
-  }
-  return 'en';
-};
+// You can export any i18n-related utilities here if needed
+export const supportedLanguages = ['en', 'fr', 'ar'];
 
-i18n
-  .use(LanguageDetector) // Use directly without `new`
-  .use(initReactI18next)
-  .init({
-    lng: loadLanguage(),
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-    react: {
-      useSuspense: false,
-    }
-  });
-
-// Set initial direction
-document.dir = loadLanguage() === 'ar' ? 'rtl' : 'ltr';
-
-export default i18n;
+// Export an empty object to make this a module
+export {};

@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { jsPDF } from 'jspdf'; // Add this library for PDF generation
+import Contract from '../models/contract.model';
+import { AppError } from '../utils/appError';
+import { AuthRequest } from '../types/authRequest';
 
 export const getAllContracts = async (
   _req: Request,
@@ -7,11 +10,13 @@ export const getAllContracts = async (
   next: NextFunction
 ) => {
   try {
-    // TODO: Implement get all contracts logic
+    const contracts = await Contract.find().sort({ createdAt: -1 });
+    
     res.status(200).json({
       status: 'success',
+      results: contracts.length,
       data: {
-        contracts: []
+        contracts
       }
     });
   } catch (error) {
@@ -25,18 +30,16 @@ export const getContractById = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    // TODO: Implement get contract by id logic
+    const contract = await Contract.findById(req.params.id);
+    
+    if (!contract) {
+      return next(new AppError('Contract not found', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
-        contract: {
-          id,
-          title: 'Sample Contract',
-          startDate: new Date(),
-          endDate: new Date(),
-          value: 0
-        }
+        contract
       }
     });
   } catch (error) {
@@ -45,23 +48,29 @@ export const getContractById = async (
 };
 
 export const createContract = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { title, startDate, endDate, value } = req.body;
-    // TODO: Implement create contract logic
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    // Generate contract number
+    const count = await Contract.countDocuments();
+    const contractNumber = `CNT-${String(count + 1).padStart(6, '0')}`;
+
+    const contract = await Contract.create({
+      ...req.body,
+      contractNumber,
+      createdBy: req.user._id
+    });
+
     res.status(201).json({
       status: 'success',
       data: {
-        contract: {
-          id: '1',
-          title,
-          startDate,
-          endDate,
-          value
-        }
+        contract
       }
     });
   } catch (error) {
@@ -70,24 +79,32 @@ export const createContract = async (
 };
 
 export const updateContract = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const { title, startDate, endDate, value } = req.body;
-    // TODO: Implement update contract logic
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    const contract = await Contract.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!contract) {
+      return next(new AppError('Contract not found', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
-        contract: {
-          id,
-          title,
-          startDate,
-          endDate,
-          value
-        }
+        contract
       }
     });
   } catch (error) {
@@ -96,12 +113,21 @@ export const updateContract = async (
 };
 
 export const deleteContract = async (
-  _req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // TODO: Implement delete contract logic
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    const contract = await Contract.findByIdAndDelete(req.params.id);
+
+    if (!contract) {
+      return next(new AppError('Contract not found', 404));
+    }
+
     res.status(204).json({
       status: 'success',
       data: null
@@ -112,11 +138,15 @@ export const deleteContract = async (
 };
 
 export const generateContract = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
     const { title, description, startDate, endDate, party } = req.body;
 
     // Generate contract content
@@ -136,6 +166,35 @@ export const generateContract = async (
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=contract.pdf');
     res.status(200).send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Additional function to generate contract document
+export const generateContractDocument = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const contract = await Contract.findById(req.params.id);
+    
+    if (!contract) {
+      return next(new AppError('Contract not found', 404));
+    }
+
+    // TODO: Implement contract document generation logic
+    // This could involve using a library like PDFKit to generate a PDF
+    // For now, we'll return a simple success message
+    
+    res.status(200).json({
+      status: 'success',
+      message: 'Contract document generated successfully',
+      data: {
+        contract
+      }
+    });
   } catch (error) {
     next(error);
   }

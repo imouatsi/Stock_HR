@@ -16,7 +16,7 @@ interface Activity {
 export const ActivityFeed: React.FC<{ activities: Activity[] }> = ({ activities }) => {
   return (
     <Box>
-      <AnimatePresence initial={false}>
+      <AnimatePresence>
         {activities.map((activity) => (
           <motion.div
             key={activity.id}

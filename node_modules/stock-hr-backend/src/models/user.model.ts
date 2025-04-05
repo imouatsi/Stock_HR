@@ -4,7 +4,7 @@ import { ROLES, PERMISSIONS } from '../../../shared/config';
 
 export interface IUser extends Document {
   email: string;
-  password: string;
+  password: string | undefined;
   firstName: string;
   lastName: string;
   role: keyof typeof ROLES;
@@ -712,8 +712,11 @@ userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
+    if (!this.password) {
+      throw new Error('Password is required');
+    }
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password as string, salt);
     next();
   } catch (error: any) {
     next(error);

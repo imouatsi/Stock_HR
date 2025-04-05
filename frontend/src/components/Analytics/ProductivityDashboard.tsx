@@ -61,7 +61,7 @@ export const ProductivityDashboard: React.FC = () => {
                     <Typography variant="h4">
                       {kpis?.dailyTasks?.completed || 0}/{kpis?.dailyTasks?.total || 0}
                     </Typography>
-                    {kpis?.dailyTasks?.efficiency > 80 ? (
+                    {(kpis?.dailyTasks?.efficiency || 0) > 80 ? ( // Add fallback value
                       <TrendingUp color="success" />
                     ) : (
                       <TrendingDown color="error" />

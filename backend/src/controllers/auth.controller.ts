@@ -65,7 +65,23 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       expiresIn: '1h',
     });
 
-    res.status(200).json({ token });
+    // Remove password from response
+    user.password = undefined;
+
+    res.status(200).json({
+      status: 'success',
+      token,
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          isActive: user.active
+        }
+      }
+    });
   } catch (error) {
     next(error);
   }

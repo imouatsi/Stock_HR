@@ -4,13 +4,17 @@
     "generateButton": "إنشاء عقد"
   },
   "invoices": {
-    "title": "الفواتير"
+    "title": "الفواتير",
+    "addButton": "إضافة فاتورة"
   },
   "users": {
-    "title": "المستخدمون"
+    "title": "المستخدمون",
+    "addButton": "إضافة مستخدم"
   },
   "settings": {
-    "title": "الإعدادات"
+    "title": "الإعدادات",
+    "darkMode": "الوضع الداكن",
+    "enableNotifications": "تفعيل الإشعارات"
   },
   "common": {
     "noData": "لا توجد بيانات"

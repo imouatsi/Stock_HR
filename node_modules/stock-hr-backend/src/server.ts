@@ -9,6 +9,12 @@ import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import './utils/validateEnv';
+import User from './models/user.model';
+import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
+import invoiceRoutes from './routes/invoice.routes';
+import contractRoutes from './routes/contract.routes';
+import proformaRoutes from './routes/proforma.routes';
 
 // Load environment variables
 dotenv.config();
@@ -34,10 +40,45 @@ setupMiddleware();
 
 // Routes
 app.use('/api', routes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/contracts', contractRoutes);
+app.use('/api/proformas', proformaRoutes);
 
 // Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+// Initialize superadmin if not exists
+const initializeSuperAdmin = async () => {
+  try {
+    const existingSuperAdmin = await User.findOne({ role: 'superadmin' });
+    if (!existingSuperAdmin) {
+      const superAdmin = await User.create({
+        email: 'admin@stockhr.com',
+        password: 'admin123',
+        firstName: 'Super',
+        lastName: 'Admin',
+        role: 'superadmin',
+        active: true,
+        preferences: {
+          language: 'en',
+          theme: 'light',
+          notifications: true,
+          twoFactorEnabled: false
+        }
+      });
+      console.log('Superadmin created successfully:', superAdmin.email);
+      console.log('Email: admin@stockhr.com');
+      console.log('Password: admin123');
+    } else {
+      console.log('Superadmin already exists:', existingSuperAdmin.email);
+    }
+  } catch (error) {
+    console.error('Failed to initialize superadmin:', error);
+  }
+};
 
 // Connect to MongoDB with better error handling
 const connectDB = async () => {
@@ -46,6 +87,9 @@ const connectDB = async () => {
   try {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
+    
+    // Initialize superadmin after successful DB connection
+    await initializeSuperAdmin();
     
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {

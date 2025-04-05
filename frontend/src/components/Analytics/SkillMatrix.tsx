@@ -16,7 +16,9 @@ import {
   ThumbUp,
 } from '@mui/icons-material';
 import { ResponsiveRadar } from '@nivo/radar';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion'; // Fix incorrect import
+import { useAnimation } from 'framer-motion'; // Fix incorrect import
+import { AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../features/store';
 
@@ -58,13 +60,11 @@ export const SkillMatrix: React.FC = () => {
               dotSize={8}
               dotColor={{ theme: 'background' }}
               dotBorderWidth={2}
-              motionConfig="gentle"
               theme={{
                 background: 'transparent',
                 text: {
                   fill: '#333333',
                 },
-                fontSize: 11,
               }}
             />
           </Box>

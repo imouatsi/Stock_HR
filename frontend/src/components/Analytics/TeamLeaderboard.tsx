@@ -17,7 +17,8 @@ import {
   TrendingUp,
   AddCircleOutline
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Fix import
+import { useAnimation } from 'framer-motion'; // Fix incorrect import
 
 interface TeamMember {
   id: string;
@@ -87,7 +88,7 @@ export const TeamLeaderboard: React.FC = () => {
                           <Chip
                             size="small"
                             label={`#${index + 1}`}
-                            color={['primary', 'secondary', 'default'][index]}
+                            color={['primary', 'secondary', 'default'][index] as 'primary' | 'secondary' | 'default'} // Correct type
                             sx={{ ml: 1 }}
                           />
                         )}
