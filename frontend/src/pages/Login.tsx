@@ -1,137 +1,285 @@
-import { useEffect } from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { AppDispatch, RootState } from '../features/store';
-import { login, clearError } from '../features/slices/authSlice';
 import {
   Box,
-  Button,
-  Container,
+  Card,
+  CardContent,
   TextField,
+  Button,
   Typography,
-  Paper,
+  IconButton,
+  InputAdornment,
+  Alert,
+  Fade,
+  styled,
+  CircularProgress,
+  AppBar,
+  Toolbar,
+  Tooltip,
+  Menu,
+  MenuItem,
+  Zoom,
 } from '@mui/material';
+import {
+  Visibility,
+  VisibilityOff,
+  Login as LoginIcon,
+  Language as LanguageIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+} from '@mui/icons-material';
+import { useTranslation } from '../hooks/useTranslation';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../features/auth/authSlice';
+import { AppDispatch, RootState } from '../features/store';
+import { updateLanguage, toggleTheme } from '../features/slices/settingsSlice';
+import GradientButton from '../components/ui/GradientButton';
 
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-});
+const StyledCard = styled(Card)(({ theme }) => ({
+  maxWidth: 400,
+  width: '100%',
+  padding: theme.spacing(3),
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+  borderRadius: 16,
+  background: 'rgba(255, 255, 255, 0.9)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  transition: 'transform 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-5px)',
+  },
+}));
 
-const Login = () => {
-  const navigate = useNavigate();
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'rgba(255, 255, 255, 1)',
+      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.2)',
+    },
+  },
+}));
+
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'Français' },
+  { code: 'ar', name: 'العربية' },
+];
+
+const Login: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [languageMenu, setLanguageMenu] = useState<null | HTMLElement>(null);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { settings } = useSelector((state: RootState) => state.settings);
 
-  const formik = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-    },
-    validationSchema,
-    onSubmit: async (values) => {
-      try {
-        await dispatch(login(values)).unwrap();
-        toast.success('Login successful!');
+  const handleLanguageMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setLanguageMenu(event.currentTarget);
+  };
+
+  const handleLanguageMenuClose = () => {
+    setLanguageMenu(null);
+  };
+
+  const handleLanguageSelect = (langCode: string) => {
+    dispatch(updateLanguage(langCode));
+    i18n.changeLanguage(langCode);
+    document.dir = langCode === 'ar' ? 'rtl' : 'ltr';
+    handleLanguageMenuClose();
+  };
+
+  const handleThemeToggle = () => {
+    dispatch(toggleTheme());
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      // Show error for missing fields
+      return;
+    }
+
+    try {
+      const result = await dispatch(login({ email, password })).unwrap();
+      if (result.token) {
         navigate('/dashboard');
-      } catch (err) {
-        if (err instanceof Error) {
-          toast.error(err.message);
-        } else if (typeof err === 'string') {
-          toast.error(err);
-        } else {
-          toast.error('Login failed');
-        }
       }
-    },
-  });
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
+  };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <AppBar position="static" sx={{ background: 'transparent', boxShadow: 'none' }}>
+        <Toolbar sx={{ justifyContent: 'flex-end' }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip 
+              title={t(settings.theme === 'light' ? 'common.darkMode' : 'common.lightMode')}
+              arrow
+              TransitionComponent={Zoom}
+            >
+              <IconButton
+                color="primary"
+                onClick={handleThemeToggle}
+                sx={{
+                  animation: settings.theme === 'light' ? 'sun-rotate 10s linear infinite' : 'none',
+                }}
+              >
+                {settings.theme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+              </IconButton>
+            </Tooltip>
+
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton
+                color="primary"
+                onClick={handleLanguageMenuOpen}
+              >
+                <LanguageIcon />
+              </IconButton>
+              <Typography variant="body2" color="primary" sx={{ ml: 1 }}>
+                {languages.find(lang => lang.code === settings.language)?.name}
+              </Typography>
+            </Box>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <Menu
+        anchorEl={languageMenu}
+        open={Boolean(languageMenu)}
+        onClose={handleLanguageMenuClose}
+        TransitionComponent={Zoom}
+      >
+        {languages.map((lang) => (
+          <MenuItem
+            key={lang.code}
+            onClick={() => handleLanguageSelect(lang.code)}
+            selected={settings.language === lang.code}
+          >
+            {lang.name}
+          </MenuItem>
+        ))}
+      </Menu>
+
       <Box
         sx={{
-          marginTop: 8,
+          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)',
+          padding: 3,
         }}
       >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={formik.handleSubmit}
-            sx={{ mt: 1, width: '100%' }}
-          >
-            <TextField
-              margin="normal"
-              fullWidth
-              id="email"
-              name="email"
-              label="Email Address"
-              autoComplete="email"
-              autoFocus
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              id="password"
-              name="password"
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              error={formik.touched.password && Boolean(formik.errors.password)}
-              helperText={formik.touched.password && formik.errors.password}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-            <Button
-              fullWidth
-              variant="text"
-              onClick={() => navigate('/register')}
-            >
-              Don't have an account? Sign up
-            </Button>
-          </Box>
-        </Paper>
+        <Fade in={true} timeout={1000}>
+          <StyledCard>
+            <CardContent>
+              <Typography
+                variant="h4"
+                component="h1"
+                gutterBottom
+                align="center"
+                sx={{
+                  fontWeight: 600,
+                  background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 4,
+                }}
+              >
+                {t('login.title')}
+              </Typography>
+
+              <form onSubmit={handleSubmit} noValidate>
+                <StyledTextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label={t('login.email')}
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!error}
+                  disabled={loading}
+                />
+
+                <StyledTextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label={t('login.password')}
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={!!error}
+                  disabled={loading}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                {error && (
+                  <Fade in={true}>
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                      {error}
+                    </Alert>
+                  </Fade>
+                )}
+
+                <GradientButton
+                  type="submit"
+                  fullWidth
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
+                >
+                  {loading ? t('login.signingIn') : t('login.signIn')}
+                </GradientButton>
+              </form>
+            </CardContent>
+          </StyledCard>
+        </Fade>
       </Box>
-    </Container>
+
+      <style>
+        {`
+          @keyframes sun-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+    </Box>
   );
 };
 

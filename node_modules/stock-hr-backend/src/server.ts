@@ -24,8 +24,15 @@ const app: Application = express();
 // Middleware with error handling
 const setupMiddleware = () => {
   try {
+    app.use(express.static('public'));
     app.use(helmet());
-    app.use(cors());
+    app.use(cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+      exposedHeaders: ['Content-Range', 'X-Content-Range']
+    }));
     app.use(compression() as unknown as RequestHandler);
     app.use(morgan('dev'));
     app.use(express.json());

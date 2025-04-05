@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { AppDispatch, RootState } from '../features/store';
-import { register, clearError } from '../features/slices/authSlice';
+import { register, clearError } from '../features/auth/authSlice';
 import {
   Box,
   Button,

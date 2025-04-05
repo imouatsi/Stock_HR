@@ -23,9 +23,23 @@ import { useAnimation } from 'framer-motion'; // Fix incorrect import
 import { AnimatePresence } from 'framer-motion';
 import { RootState } from '../../features/store';
 
-export const PerformanceInsights: React.FC = () => {
+interface Action {
+  text: string;
+  priority?: 'high' | 'medium' | 'low';
+}
+
+interface AIPredictions {
+  recommendedActions?: Action[];
+  nextMonthPerformance?: number;
+  burnoutRisk?: 'high' | 'medium' | 'low';
+}
+
+interface Performance {
+  aiPredictions?: AIPredictions;
+}
+
+export const PerformanceInsights: React.FC<{ performance: Performance }> = ({ performance }) => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const performance = user?.settings?.workspace?.analytics?.kpis?.performance;
 
   if (!performance) return null;
 
@@ -74,12 +88,12 @@ export const PerformanceInsights: React.FC = () => {
           </Box>
 
           <List>
-            {performance.aiPredictions?.recommendedActions?.map((action, index) => (
+            {performance.aiPredictions?.recommendedActions?.map((action: Action, index: number) => (
               <ListItem key={index}>
                 <ListItemIcon>
                   <CheckCircle color="success" />
                 </ListItemIcon>
-                <ListItemText primary={action} />
+                <ListItemText primary={action.text} />
               </ListItem>
             )) || <Typography>No recommendations available</Typography>} // Fallback if undefined
           </List>
@@ -88,3 +102,5 @@ export const PerformanceInsights: React.FC = () => {
     </Card>
   );
 };
+
+export default PerformanceInsights;

@@ -6,16 +6,23 @@ import { RootState } from '../../features/store';
 import { motion } from 'framer-motion';
 import { useAnimation } from 'framer-motion';
 
-export const WorkspaceStats: React.FC = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  const stats = user?.settings?.workspace?.analytics;
+interface Feature {
+  feature: string;
+  useCount: number;
+}
 
+interface Stats {
+  mostUsedFeatures?: Feature[];
+  productivityScore: number;
+}
+
+const WorkspaceStats: React.FC<{ stats: Stats }> = ({ stats }) => {
   if (!stats) return null;
 
-  const chartData = stats?.mostUsedFeatures?.map(feature => ({
+  const chartData = stats?.mostUsedFeatures?.map((feature: Feature) => ({
     name: feature.feature,
     count: feature.useCount,
-  })) || []; // Add fallback value
+  })) || [];
 
   return (
     <motion.div
@@ -69,3 +76,5 @@ export const WorkspaceStats: React.FC = () => {
     </motion.div>
   );
 };
+
+export default WorkspaceStats;

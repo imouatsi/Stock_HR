@@ -48,17 +48,25 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return next(new AppError('Please provide email and password', 400));
+      res.status(400).json({
+        status: 'error',
+        message: 'Please provide email and password'
+      });
+      return;
     }
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password))) {
-      return next(new AppError('Invalid credentials', 401));
+      res.status(401).json({
+        status: 'error',
+        message: 'Invalid credentials'
+      });
+      return;
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET as string, {

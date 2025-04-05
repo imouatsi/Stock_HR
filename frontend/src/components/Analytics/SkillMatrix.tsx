@@ -22,15 +22,26 @@ import { AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../features/store';
 
+interface Skill {
+  skill: string;
+  level: number;
+  growth: number;
+}
+
+interface SkillMatrix {
+  technical: Skill[];
+  soft: Skill[];
+}
+
 export const SkillMatrix: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const skillMatrix = user?.settings?.workspace?.analytics?.kpis?.performance?.skillMatrix;
 
-  const radarData = skillMatrix?.technical.map(skill => ({
+  const radarData = skillMatrix?.technical.map((skill: Skill) => ({
     skill: skill.skill,
     level: skill.level,
     growth: skill.growth,
-  }));
+  })) || [];
 
   return (
     <Card sx={{ p: 3 }}>
@@ -46,7 +57,7 @@ export const SkillMatrix: React.FC = () => {
         >
           <Box height={300}>
             <ResponsiveRadar
-              data={radarData || []}
+              data={radarData}
               keys={['level']}
               indexBy="skill"
               maxValue={10}
@@ -73,3 +84,5 @@ export const SkillMatrix: React.FC = () => {
     </Card>
   );
 };
+
+export default SkillMatrix;
