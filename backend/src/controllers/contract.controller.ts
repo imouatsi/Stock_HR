@@ -33,7 +33,7 @@ export const getContractById = async (
     const contract = await Contract.findById(req.params.id);
     
     if (!contract) {
-      return next(new AppError('Contract not found', 404));
+      return next(new AppError(404, 'Contract not found'));
     }
 
     res.status(200).json({
@@ -54,7 +54,7 @@ export const createContract = async (
 ) => {
   try {
     if (!req.user) {
-      return next(new AppError('Authentication required', 401));
+      return next(new AppError(401, 'Authentication required'));
     }
 
     // Generate contract number
@@ -85,7 +85,7 @@ export const updateContract = async (
 ) => {
   try {
     if (!req.user) {
-      return next(new AppError('Authentication required', 401));
+      return next(new AppError(401, 'Authentication required'));
     }
 
     const contract = await Contract.findByIdAndUpdate(
@@ -98,7 +98,7 @@ export const updateContract = async (
     );
 
     if (!contract) {
-      return next(new AppError('Contract not found', 404));
+      return next(new AppError(404, 'Contract not found'));
     }
 
     res.status(200).json({
@@ -119,13 +119,13 @@ export const deleteContract = async (
 ) => {
   try {
     if (!req.user) {
-      return next(new AppError('Authentication required', 401));
+      return next(new AppError(401, 'Authentication required'));
     }
 
     const contract = await Contract.findByIdAndDelete(req.params.id);
 
     if (!contract) {
-      return next(new AppError('Contract not found', 404));
+      return next(new AppError(404, 'Contract not found'));
     }
 
     res.status(204).json({
@@ -144,7 +144,7 @@ export const generateContract = async (
 ) => {
   try {
     if (!req.user) {
-      return next(new AppError('Authentication required', 401));
+      return next(new AppError(401, 'Authentication required'));
     }
 
     const { title, description, startDate, endDate, party } = req.body;
@@ -181,7 +181,7 @@ export const generateContractDocument = async (
     const contract = await Contract.findById(req.params.id);
     
     if (!contract) {
-      return next(new AppError('Contract not found', 404));
+      return next(new AppError(404, 'Contract not found'));
     }
 
     // TODO: Implement contract document generation logic

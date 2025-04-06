@@ -1,9 +1,9 @@
 export const ROLES = {
-  SUPERADMIN: 'superadmin',
-  ADMIN: 'admin',
-  MANAGER: 'manager',
-  SELLER: 'seller',
-  STOCK_CLERK: 'stock_clerk',
+  SUPERADMIN: 'SUPERADMIN',
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  SELLER: 'SELLER',
+  STOCK_CLERK: 'STOCK_CLERK',
 } as const;
 
 export const PERMISSIONS = {

@@ -1,43 +1,36 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
 import { validateRequest } from '../middleware/validateRequest';
-import { login, register, forgotPassword, resetPassword } from '../controllers/auth.controller';
+import {
+  login,
+  register,
+  logout,
+  forgotPassword,
+  resetPassword,
+  changePassword,
+  updateProfile,
+} from '../controllers/auth.controller';
+import {
+  loginValidator,
+  registerValidator,
+  forgotPasswordValidator,
+  resetPasswordValidator,
+  changePasswordValidator,
+  updateProfileValidator,
+} from '../validators/auth.validator';
+import { protect } from '../middleware/auth';
 
 const router = Router();
 
-// Validation middleware
-const registerValidation = [
-  body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long'),
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
-  body('role')
-    .isIn(['admin', 'manager', 'seller', 'stock_clerk'])
-    .withMessage('Invalid role'),
-];
+// Public routes
+router.post('/register', registerValidator, validateRequest, register);
+router.post('/login', loginValidator, validateRequest, login);
+router.post('/forgot-password', forgotPasswordValidator, validateRequest, forgotPassword);
+router.post('/reset-password/:token', resetPasswordValidator, validateRequest, resetPassword);
 
-const loginValidation = [
-  body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password').notEmpty().withMessage('Password is required'),
-];
-
-const forgotPasswordValidation = [
-  body('email').isEmail().withMessage('Please enter a valid email'),
-];
-
-const resetPasswordValidation = [
-  body('token').notEmpty().withMessage('Reset token is required'),
-  body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long'),
-];
-
-// Routes
-router.post('/register', registerValidation, validateRequest, register);
-router.post('/login', loginValidation, validateRequest, login);
-router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);
-router.post('/reset-password', resetPasswordValidation, validateRequest, resetPassword);
+// Protected routes
+router.use(protect); // All routes below this line require authentication
+router.post('/logout', logout);
+router.patch('/change-password', changePasswordValidator, validateRequest, changePassword);
+router.patch('/profile', updateProfileValidator, validateRequest, updateProfile);
 
 export default router; 

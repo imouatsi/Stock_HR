@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import Joi from 'joi';
+import { validationResult } from 'express-validator';
 import { AppError } from '../utils/appError';
 
-export const validateRequest = (schema: Joi.ObjectSchema) => {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      const errorMessage = error.details.map(detail => detail.message).join(', ');
-      return next(new AppError(400, 'Invalid request body: ' + errorMessage));
-    }
-    next();
-  };
+export const validateRequest = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorMessage = errors.array().map(err => err.msg).join(', ');
+    return next(new AppError(400, 'Invalid request body: ' + errorMessage));
+  }
+  next();
 };

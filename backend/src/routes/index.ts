@@ -6,6 +6,7 @@ import inventoryRoutes from './inventory.routes';
 import contractRoutes from './contract.routes';
 import invoiceRoutes from './invoice.routes';
 import licenseRoutes from './license.routes';
+import stockRoutes from '../modules/stock/routes/stock.routes';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/inventory', protect, inventoryRoutes);
 router.use('/contracts', protect, contractRoutes);
 router.use('/invoices', protect, invoiceRoutes);
 router.use('/licenses', protect, licenseRoutes);
+router.use('/stock', stockRoutes);
 
 export default router; 

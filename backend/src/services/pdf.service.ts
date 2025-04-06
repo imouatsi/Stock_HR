@@ -1,5 +1,4 @@
 import PDFDocument from 'pdfkit';
-import QRCode from 'qrcode';
 import { IInvoice } from '../models/invoice.model';
 import { IProforma } from '../models/proforma.model';
 import { ICompany } from '../models/company.model';
@@ -7,15 +6,6 @@ import fs from 'fs';
 import path from 'path';
 
 export class PDFService {
-  private static async generateQRCode(data: string): Promise<string> {
-    try {
-      return await QRCode.toDataURL(data);
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-      return '';
-    }
-  }
-
   private static async addCompanyHeader(doc: PDFKit.PDFDocument, company: ICompany) {
     // Add company logo if exists
     if (company.logo) {
@@ -55,13 +45,15 @@ export class PDFService {
   private static async addInvoiceDetails(doc: PDFKit.PDFDocument, invoice: IInvoice | IProforma) {
     const isProforma = 'type' in invoice && invoice.type === 'proforma';
     const title = isProforma ? 'Facture Proforma' : 'Facture Définitive';
+    const date = 'date' in invoice ? invoice.date : invoice.createdAt;
+    const dueDate = 'dueDate' in invoice ? invoice.dueDate : new Date(date.getTime() + 30 * 24 * 60 * 60 * 1000); // Default 30 days
 
     doc.fontSize(20)
        .text(title, 50, 180)
        .fontSize(12)
        .text(`Numéro: ${invoice.invoiceNumber}`, 50, 210)
-       .text(`Date: ${invoice.date.toLocaleDateString('fr-FR')}`, 50, 225)
-       .text(`Échéance: ${invoice.dueDate.toLocaleDateString('fr-FR')}`, 50, 240)
+       .text(`Date: ${date.toLocaleDateString('fr-FR')}`, 50, 225)
+       .text(`Échéance: ${dueDate.toLocaleDateString('fr-FR')}`, 50, 240)
        .text(`Conditions de paiement: ${invoice.paymentTerms}`, 50, 255);
   }
 
@@ -108,7 +100,7 @@ export class PDFService {
        .text(invoice.vatAmount.toFixed(2), valueX, totalsY + 20)
        .fontSize(12)
        .text('Total TTC:', labelX, totalsY + 40)
-       .text(invoice.total.toFixed(2), valueX, totalsY + 40);
+       .text(('totalAmount' in invoice ? invoice.totalAmount : invoice.total).toFixed(2), valueX, totalsY + 40);
   }
 
   private static async addSignature(doc: PDFKit.PDFDocument, signature?: string) {
@@ -129,7 +121,8 @@ export class PDFService {
     return new Promise(async (resolve, reject) => {
       try {
         const doc = new PDFDocument({ size: 'A4', margin: 50 });
-        const fileName = `Facture_${invoice.invoiceNumber}_${invoice.client.name}_${invoice.date.toISOString().split('T')[0]}.pdf`;
+        const date = 'date' in invoice ? invoice.date : invoice.createdAt;
+        const fileName = `Facture_${invoice.invoiceNumber}_${invoice.client.name}_${date.toISOString().split('T')[0]}.pdf`;
         const filePath = path.join(__dirname, '../../uploads/invoices', fileName);
 
         // Create directory if it doesn't exist

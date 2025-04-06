@@ -1,4 +1,5 @@
 import api from './api';
+import { AxiosResponse } from 'axios';
 
 export interface LoginCredentials {
   email: string;
@@ -33,8 +34,10 @@ export interface UserProfile {
   lastName: string;
   role: string;
   permissions: string[];
-  createdAt: string;
-  updatedAt: string;
+  isActive: boolean;
+  lastLogin?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface User {
@@ -50,7 +53,7 @@ export interface AuthResponse {
   status: string;
   token: string;
   data: {
-    user: User;
+    user: UserProfile;
   };
 }
 
@@ -58,7 +61,32 @@ class AuthService {
   private static instance: AuthService;
   private baseUrl = '/auth';
 
-  private constructor() {}
+  private constructor() {
+    // Initialize axios interceptors
+    api.interceptors.request.use(
+      (config) => {
+        const token = this.getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response?.status === 401) {
+          this.clearAuth();
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
 
   public static getInstance(): AuthService {
     if (!AuthService.instance) {
@@ -67,27 +95,66 @@ class AuthService {
     return AuthService.instance;
   }
 
+  private getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  private setToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
+  private setUser(user: UserProfile): void {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  private clearAuth(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
   public async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(`${this.baseUrl}/login`, {
-      email,
-      password,
-    });
-    return response.data;
+    try {
+      const response = await api.post<AuthResponse>(`${this.baseUrl}/login`, {
+        email,
+        password,
+      });
+      
+      if (response.data.token && response.data.data.user) {
+        this.setToken(response.data.token);
+        this.setUser(response.data.data.user);
+      }
+      
+      return response.data;
+    } catch (error) {
+      this.clearAuth();
+      throw error;
+    }
   }
 
   public async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(`${this.baseUrl}/register`, data);
-    return response.data;
+    try {
+      const response = await api.post<AuthResponse>(`${this.baseUrl}/register`, data);
+      
+      if (response.data.token && response.data.data.user) {
+        this.setToken(response.data.token);
+        this.setUser(response.data.data.user);
+      }
+      
+      return response.data;
+    } catch (error) {
+      this.clearAuth();
+      throw error;
+    }
   }
 
   public async getCurrentUser(): Promise<UserProfile> {
-    const response = await api.get<UserProfile>(`${this.baseUrl}/me`);
-    return response.data;
+    const response = await api.get<{ data: { user: UserProfile } }>(`${this.baseUrl}/me`);
+    return response.data.data.user;
   }
 
   public async updateProfile(data: Partial<UserProfile>): Promise<UserProfile> {
-    const response = await api.patch<UserProfile>(`${this.baseUrl}/profile`, data);
-    return response.data;
+    const response = await api.patch<{ data: { user: UserProfile } }>(`${this.baseUrl}/profile`, data);
+    return response.data.data.user;
   }
 
   public async changePassword(oldPassword: string, newPassword: string): Promise<void> {
@@ -98,25 +165,28 @@ class AuthService {
   }
 
   public async forgotPassword(email: string): Promise<{ status: string; message: string }> {
-    const response = await api.post(`${this.baseUrl}/forgot-password`, { email });
+    const response = await api.post<{ status: string; message: string }>(`${this.baseUrl}/forgot-password`, { email });
     return response.data;
   }
 
   public async resetPassword(token: string, password: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(`${this.baseUrl}/reset-password`, {
-      token,
+    const response = await api.post<AuthResponse>(`${this.baseUrl}/reset-password/${token}`, {
       password,
     });
     return response.data;
   }
 
   public logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    this.clearAuth();
   }
 
   public isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    return !!this.getToken();
+  }
+
+  public getStoredUser(): UserProfile | null {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
   }
 }
 

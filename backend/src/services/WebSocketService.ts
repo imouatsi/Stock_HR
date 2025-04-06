@@ -5,6 +5,11 @@ import { IUser } from '../models/user.model';
 // Extend the Socket type to include a user property
 interface SocketWithUser extends Socket {
   user?: IUser;
+  handshake: Socket['handshake'] & {
+    auth?: {
+      token?: string;
+    };
+  };
 }
 
 export class WebSocketService {
@@ -20,17 +25,17 @@ export class WebSocketService {
       },
     });
 
-    this.io.use(async (socket: SocketWithUser, next) => {
+    this.io.use(async (socket: SocketWithUser, next: (err?: Error) => void) => {
       try {
         const token = socket.handshake.auth?.token;
         if (!token) {
           throw new Error('Authentication token is missing');
         }
         const user = await verifyToken(token);
-        socket.user = user; // Assign the user to the custom property
+        socket.user = user;
         next();
       } catch (error) {
-        next(error);
+        next(error instanceof Error ? error : new Error('Unknown error'));
       }
     });
 

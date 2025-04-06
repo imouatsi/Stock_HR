@@ -1,170 +1,74 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  isActive: boolean;
-  settings?: {
-    workspace?: {
-      analytics?: {
-        kpis?: {
-          performance?: {
-            skillMatrix?: {
-              technical: Array<{ skill: string; level: number; growth: number }>;
-            };
-            aiPredictions?: {
-              nextMonthPerformance: number;
-              burnoutRisk: string;
-              recommendedActions: string[];
-            };
-          };
-          dailyTasks?: {
-            completed: number;
-            total: number;
-            efficiency: number;
-          };
-        };
-        gamification?: any;
-        mostUsedFeatures?: Array<{ feature: string; useCount: number }>;
-        productivityScore?: number;
-      };
-      collaboration?: {
-        teams: Array<{ id: string; role: string }>;
-      };
-    };
-  };
-  subscription?: {
-    features: string[];
-  };
-}
-
-interface AuthResponse {
-  status: string;
-  token: string;
-  data: {
-    user: User;
-  };
-}
+import authService, { UserProfile, LoginCredentials, RegisterData } from '../../services/authService';
+import { AxiosError } from 'axios';
 
 interface AuthState {
-  user: User | null;
+  user: UserProfile | null;
   token: string | null;
+  isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
 }
 
-const loadState = (): AuthState => {
-  try {
-    const token = localStorage.getItem('token') || null;
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    
-    return {
-      token,
-      user,
-      loading: false,
-      error: null,
-    };
-  } catch (error) {
-    console.error('Failed to load auth state:', error);
-    return {
-      token: null,
-      user: null,
-      loading: false,
-      error: null,
-    };
-  }
+const initialState: AuthState = {
+  user: authService.getStoredUser(),
+  token: localStorage.getItem('token'),
+  isAuthenticated: !!localStorage.getItem('token'),
+  loading: false,
+  error: null,
 };
 
-const initialState: AuthState = loadState();
-
 export const login = createAsyncThunk<
-  AuthResponse,
-  { email: string; password: string },
+  { token: string; data: { user: UserProfile } },
+  LoginCredentials,
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(credentials),
-      credentials: 'include'
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      return rejectWithValue(error.message || 'Login failed');
+    const response = await authService.login(credentials.email, credentials.password);
+    return response;
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      return rejectWithValue(err.response.data.message);
     }
-    
-    const data = await response.json();
-    try {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.data.user));
-    } catch (error) {
-      console.error('Failed to save auth data to localStorage:', error);
-    }
-    return data;
-  } catch (error) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue('An unexpected error occurred');
+    return rejectWithValue('An unexpected error occurred during login');
   }
 });
 
 export const register = createAsyncThunk<
-  AuthResponse,
-  {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-  },
+  { token: string; data: { user: UserProfile } },
+  RegisterData,
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      return rejectWithValue(error.message || 'Registration failed');
+    const response = await authService.register(userData);
+    return response;
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      return rejectWithValue(err.response.data.message);
     }
-    
-    const data = await response.json();
-    try {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.data.user));
-    } catch (error) {
-      console.error('Failed to save auth data to localStorage:', error);
-    }
-    return data;
-  } catch (error) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue('An unexpected error occurred');
+    return rejectWithValue('An unexpected error occurred during registration');
   }
 });
 
-export const logout = createAsyncThunk('auth/logout', async () => {
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async () => {
+    authService.logout();
+  }
+);
+
+export const getCurrentUser = createAsyncThunk<
+  UserProfile,
+  void,
+  { rejectValue: string }
+>('auth/getCurrentUser', async (_, { rejectWithValue }) => {
   try {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  } catch (error) {
-    console.error('Failed to clear auth data from localStorage:', error);
+    return await authService.getCurrentUser();
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      return rejectWithValue(err.response.data.message);
+    }
+    return rejectWithValue('Failed to fetch current user');
   }
 });
 
@@ -178,6 +82,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -186,6 +91,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.data.user;
         state.token = action.payload.token;
+        state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
@@ -193,7 +99,9 @@ const authSlice = createSlice({
         state.error = action.payload || 'Login failed';
         state.token = null;
         state.user = null;
+        state.isAuthenticated = false;
       })
+      // Register
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -202,17 +110,37 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.data.user;
         state.token = action.payload.token;
+        state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Registration failed';
+        state.isAuthenticated = false;
       })
+      // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
         state.token = null;
+        state.isAuthenticated = false;
         state.loading = false;
         state.error = null;
+      })
+      // Get Current User
+      .addCase(getCurrentUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(getCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to fetch user data';
+        state.isAuthenticated = false;
       });
   },
 });

@@ -20,9 +20,12 @@ export interface AuthRequest extends Request {
 export const verifyToken = async (token: string): Promise<IUser> => {
   try {
     const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.id).select('-password +active');
     if (!user) {
       throw new Error('User not found');
+    }
+    if (!user.active) {
+      throw new Error('User is inactive');
     }
     return user;
   } catch (error) {
@@ -46,11 +49,15 @@ export const protect = async (req: Request, _res: Response, next: NextFunction) 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
+    const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
 
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await User.findById(decoded.id).select('+active');
     if (!currentUser) {
       return next(new AppError(401, 'The user belonging to this token no longer exists.'));
+    }
+
+    if (!currentUser.active) {
+      return next(new AppError(401, 'Your account is inactive. Please contact support.'));
     }
 
     // Grant access to protected route

@@ -1,42 +1,34 @@
 import mongoose from 'mongoose';
-import User from '../models/user.model';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { User } from '../models/user.model';
+import { config } from '../config';
 
 const createSuperAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/stockhr');
+    await mongoose.connect(config.database.uri);
+    console.log('Connected to MongoDB');
+
+    const superAdmin = await User.findOne({ email: 'superadmin@stockhr.com' });
     
-    // Check if superadmin already exists
-    const existingSuperAdmin = await User.findOne({ role: 'superadmin' });
-    if (existingSuperAdmin) {
-      console.log('Superadmin already exists');
-      process.exit(0);
+    if (!superAdmin) {
+      console.log('Creating superadmin user...');
+      await User.create({
+        email: 'superadmin@stockhr.com',
+        password: 'SuperAdmin123!',
+        firstName: 'Super',
+        lastName: 'Admin',
+        role: 'SUPERADMIN',
+        permissions: ['ALL'],
+        active: true
+      });
+      console.log('Superadmin user created successfully');
+    } else {
+      console.log('Superadmin user already exists');
     }
 
-    // Create superadmin user
-    const superAdmin = await User.create({
-      email: 'admin@stockhr.com',  // Common admin email
-      password: 'admin123',       // Simple password for testing
-      firstName: 'Super',
-      lastName: 'Admin',
-      role: 'superadmin',
-      active: true,               // Make sure the field name matches the model
-      preferences: {
-        language: 'en',
-        theme: 'light',
-        notifications: true,
-        twoFactorEnabled: false
-      }
-    });
-
-    console.log('Superadmin created successfully:', superAdmin.email);
-    console.log('Email: admin@stockhr.com');
-    console.log('Password: admin123');
-    process.exit(0);
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
   } catch (error) {
-    console.error('Error creating superadmin:', error);
+    console.error('Error:', error);
     process.exit(1);
   }
 };

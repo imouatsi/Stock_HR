@@ -1,80 +1,53 @@
-import express from 'express';
-import mongoose from 'mongoose';
+import express, { Express, RequestHandler } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import { config } from './config';
 import { errorHandler } from './middleware/error.middleware';
-import { User } from './models/user.model';
-import authRoutes from './routes/auth.routes';
-import userRoutes from './routes/user.routes';
-import companyRoutes from './routes/company.routes';
-
-// Load environment variables
-dotenv.config();
+import routes from './routes';
+import { connectDatabase } from './config/database';
 
 // Create Express app
-const app = express();
+const app: Express = express();
+
+// CORS configuration - must be before other middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['set-cookie']
+}));
 
 // Middleware
-app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(cookieParser as unknown as () => RequestHandler);
+
+// Add request logging middleware
+app.use((req, _res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  next();
+});
 
 // Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/company', companyRoutes);
+app.use('/api', routes);
 
 // Error handling
 app.use(errorHandler);
 
-// Initialize superadmin if not exists
-const initializeSuperAdmin = async () => {
-  try {
-    const existingSuperAdmin = await User.findOne({ role: 'superadmin' });
-    if (!existingSuperAdmin) {
-      const superAdmin = await User.create({
-        email: 'admin@stockhr.com',
-        password: 'admin123',
-        firstName: 'Super',
-        lastName: 'Admin',
-        role: 'superadmin',
-        active: true,
-        preferences: {
-          language: 'en',
-          theme: 'light',
-          notifications: true,
-          twoFactorEnabled: false
-        }
-      });
-      console.log('Superadmin created successfully:', superAdmin.email);
-      console.log('Email: admin@stockhr.com');
-      console.log('Password: admin123');
-    } else {
-      console.log('Superadmin already exists:', existingSuperAdmin.email);
-    }
-  } catch (error) {
-    console.error('Failed to initialize superadmin:', error);
-  }
-};
-
 // Connect to MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stock-hr';
-mongoose
-  .connect(MONGODB_URI)
+connectDatabase()
   .then(() => {
-    console.log('Connected to MongoDB');
-    // Initialize superadmin after successful DB connection
-    initializeSuperAdmin();
-    // Start server
-    const PORT = process.env.PORT || 5000;
+    // Start server only after successful database connection
+    const PORT = config.port || 5000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('MongoDB connection error:', error);
+    console.error('Failed to start server:', error);
+    process.exit(1);
   });
 
 export default app;
