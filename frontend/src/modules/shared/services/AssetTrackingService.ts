@@ -1,30 +1,51 @@
-import { api } from '../../../services/api';
+import { api } from '../../services/api';
 import { eventService, EventType } from './EventService';
+import { statusManagementService } from './StatusManagementService';
 
-export interface AssetAssignment {
-  _id: string;
-  assetId: string;
-  employeeId: string;
-  assignedBy: string;
-  assignedDate: Date;
-  returnDate?: Date;
-  status: 'assigned' | 'returned' | 'lost';
-  notes?: string;
+export enum AssetStatus {
+  AVAILABLE = 'available',
+  ASSIGNED = 'assigned',
+  MAINTENANCE = 'maintenance',
+  RETIRED = 'retired',
+  DAMAGED = 'damaged'
+}
+
+export enum AssetType {
+  LAPTOP = 'laptop',
+  DESKTOP = 'desktop',
+  MOBILE = 'mobile',
+  TABLET = 'tablet',
+  PRINTER = 'printer',
+  SERVER = 'server',
+  NETWORK = 'network',
+  OTHER = 'other'
 }
 
 export interface Asset {
-  _id: string;
+  id: string;
   name: string;
-  type: string;
-  serialNumber?: string;
-  purchaseDate: Date;
+  type: AssetType;
+  model: string;
+  manufacturer: string;
+  serialNumber: string;
+  purchaseDate: string;
   purchasePrice: number;
-  currentValue: number;
-  status: 'available' | 'assigned' | 'maintenance' | 'retired';
-  location?: string;
+  status: AssetStatus;
+  location: string;
+  notes?: string;
   assignedTo?: string;
-  lastMaintenanceDate?: Date;
-  nextMaintenanceDate?: Date;
+  lastMaintenanceDate?: string;
+  nextMaintenanceDate?: string;
+}
+
+export interface AssetAssignment {
+  id: string;
+  assetId: string;
+  employeeId: string;
+  assignedBy: string;
+  assignedDate: string;
+  returnedDate?: string;
+  notes?: string;
 }
 
 class AssetTrackingService {
@@ -32,8 +53,7 @@ class AssetTrackingService {
 
   private constructor() {
     // Listen for relevant events
-    eventService.on(EventType.EMPLOYEE_DELETED, this.handleEmployeeDeleted);
-    eventService.on(EventType.STOCK_ITEM_OUT, this.handleStockItemOut);
+    eventService.on(EventType.EMPLOYEE_TERMINATED, this.handleEmployeeTermination);
   }
 
   public static getInstance(): AssetTrackingService {
@@ -43,133 +63,90 @@ class AssetTrackingService {
     return AssetTrackingService.instance;
   }
 
-  // Asset Management
-  async getAllAssets(): Promise<Asset[]> {
-    try {
-      const response = await api.get('/assets');
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to fetch assets:', error);
-      throw error;
-    }
+  async getAssets(): Promise<Asset[]> {
+    const response = await api.get('/assets');
+    return response.data;
   }
 
-  async getAssetById(id: string): Promise<Asset> {
-    try {
-      const response = await api.get(`/assets/${id}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to fetch asset:', error);
-      throw error;
-    }
+  async getAsset(id: string): Promise<Asset> {
+    const response = await api.get(`/assets/${id}`);
+    return response.data;
   }
 
-  async createAsset(data: Partial<Asset>): Promise<Asset> {
-    try {
-      const response = await api.post('/assets', data);
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to create asset:', error);
-      throw error;
-    }
+  async createAsset(data: Omit<Asset, 'id' | 'status' | 'assignedTo'>): Promise<Asset> {
+    const response = await api.post('/assets', data);
+    return response.data;
   }
 
   async updateAsset(id: string, data: Partial<Asset>): Promise<Asset> {
-    try {
-      const response = await api.patch(`/assets/${id}`, data);
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to update asset:', error);
-      throw error;
-    }
+    const response = await api.put(`/assets/${id}`, data);
+    return response.data;
   }
 
-  // Asset Assignment
-  async assignAsset(assignment: Partial<AssetAssignment>): Promise<AssetAssignment> {
+  async deleteAsset(id: string): Promise<void> {
+    await api.delete(`/assets/${id}`);
+  }
+
+  async getAssignments(): Promise<AssetAssignment[]> {
+    const response = await api.get('/assets/assignments');
+    return response.data;
+  }
+
+  async getAssignment(id: string): Promise<AssetAssignment> {
+    const response = await api.get(`/assets/assignments/${id}`);
+    return response.data;
+  }
+
+  async assignAsset(data: Omit<AssetAssignment, 'id' | 'returnedDate'>): Promise<AssetAssignment> {
+    const response = await api.post('/assets/assignments', data);
+    return response.data;
+  }
+
+  async returnAsset(id: string, notes?: string): Promise<AssetAssignment> {
+    const response = await api.patch(`/assets/assignments/${id}/return`, { notes });
+    return response.data;
+  }
+
+  async updateAssetStatus(
+    id: string,
+    newStatus: AssetStatus,
+    reason: string,
+    userId: string
+  ): Promise<void> {
     try {
-      const response = await api.post('/assets/assign', assignment);
-      const result = response.data.data;
-      
-      // Emit event for cross-module communication
-      eventService.emit(EventType.ASSET_ASSIGNED, {
-        assetId: result.assetId,
-        employeeId: result.employeeId,
-        assignedBy: result.assignedBy,
-        assignedDate: result.assignedDate
+      await statusManagementService.changeStatus(
+        id,
+        'asset',
+        newStatus,
+        `ASSET_${newStatus.toUpperCase()}`,
+        reason,
+        userId
+      );
+
+      await api.patch(`/assets/${id}`, {
+        status: newStatus,
+        reason
       });
-      
-      return result;
     } catch (error) {
-      console.error('Failed to assign asset:', error);
+      console.error('Failed to update asset status:', error);
       throw error;
     }
   }
 
-  async returnAsset(assignmentId: string, notes?: string): Promise<AssetAssignment> {
+  private async handleEmployeeTermination(data: { employeeId: string; terminationDate: string }): Promise<void> {
     try {
-      const response = await api.post(`/assets/return/${assignmentId}`, { notes });
-      const result = response.data.data;
-      
-      // Emit event for cross-module communication
-      eventService.emit(EventType.ASSET_RETURNED, {
-        assetId: result.assetId,
-        employeeId: result.employeeId,
-        assignedBy: result.assignedBy,
-        assignedDate: result.assignedDate
-      });
-      
-      return result;
-    } catch (error) {
-      console.error('Failed to return asset:', error);
-      throw error;
-    }
-  }
-
-  async getAssetAssignments(filters?: {
-    assetId?: string;
-    employeeId?: string;
-    status?: 'assigned' | 'returned' | 'lost';
-  }): Promise<AssetAssignment[]> {
-    try {
-      const response = await api.get('/assets/assignments', { params: filters });
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to fetch asset assignments:', error);
-      throw error;
-    }
-  }
-
-  // Event Handlers
-  private async handleEmployeeDeleted(data: { employeeId: string }): Promise<void> {
-    try {
-      // Find all assets assigned to the deleted employee
-      const assignments = await this.getAssetAssignments({
-        employeeId: data.employeeId,
-        status: 'assigned'
-      });
+      // Get all assets assigned to the terminated employee
+      const assignments = await this.getAssignments();
+      const employeeAssignments = assignments.filter(
+        assignment => assignment.employeeId === data.employeeId && !assignment.returnedDate
+      );
 
       // Return all assigned assets
-      for (const assignment of assignments) {
-        await this.returnAsset(assignment._id, 'Employee deleted');
+      for (const assignment of employeeAssignments) {
+        await this.returnAsset(assignment.id, 'Asset returned due to employee termination');
       }
     } catch (error) {
-      console.error('Failed to handle employee deletion:', error);
-    }
-  }
-
-  private async handleStockItemOut(data: { itemId: string; quantity: number }): Promise<void> {
-    try {
-      // Check if the item is an asset
-      const asset = await this.getAssetById(data.itemId);
-      if (asset) {
-        // Update asset status
-        await this.updateAsset(data.itemId, {
-          status: 'assigned',
-          currentValue: asset.currentValue * (1 - 0.1) // Depreciate by 10%
-        });
-      }
-    } catch (error) {
-      console.error('Failed to handle stock item out:', error);
+      console.error('Failed to handle employee termination:', error);
     }
   }
 }

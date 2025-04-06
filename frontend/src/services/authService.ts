@@ -1,51 +1,80 @@
-import api from './api';
-import { User } from '../types/user';
+import { api } from './api';
+import { UserRole } from '../types/user';
 
-interface LoginCredentials {
+export interface LoginCredentials {
   username: string;
   password: string;
+  role: UserRole;
 }
 
-interface AuthResponse {
-  token: string;
-  user: User;
-}
-
-interface ResetPasswordRequest {
-  targetUsername: string;
-  newPassword: string;
+export interface UserProfile {
+  id: string;
+  username: string;
+  role: UserRole;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  department?: string;
+  position?: string;
+  settings?: {
+    workspace?: {
+      analytics?: {
+        kpis?: {
+          performance?: {
+            skillMatrix?: {
+              technical: Array<{ skill: string; level: number }>;
+              soft: Array<{ skill: string; level: number }>;
+            };
+          };
+        };
+        gamification?: {
+          enabled: boolean;
+          points: number;
+        };
+      };
+      collaboration?: {
+        teams: Array<{
+          id: string;
+          name: string;
+          members: string[];
+        }>;
+      };
+    };
+  };
+  subscription?: {
+    features: string[];
+  };
 }
 
 class AuthService {
-  private baseUrl = '/api/v1/auth';
+  private static instance: AuthService;
 
-  public async login(username: string, password: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(`${this.baseUrl}/login`, {
-      username,
-      password
-    });
+  private constructor() {}
+
+  public static getInstance(): AuthService {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
+    }
+    return AuthService.instance;
+  }
+
+  async login(credentials: LoginCredentials): Promise<UserProfile> {
+    const response = await api.post('/auth/login', credentials);
     return response.data;
   }
 
-  public async resetPassword(request: ResetPasswordRequest): Promise<void> {
-    await api.post(`${this.baseUrl}/reset-password`, request);
-  }
-
-  public async changePassword(currentPassword: string, newPassword: string): Promise<void> {
-    await api.post(`${this.baseUrl}/change-password`, {
-      currentPassword,
-      newPassword
-    });
-  }
-
-  public async updateProfile(profileData: Partial<User>): Promise<User> {
-    const response = await api.patch<User>(`${this.baseUrl}/profile`, profileData);
+  async getProfile(): Promise<UserProfile> {
+    const response = await api.get('/auth/profile');
     return response.data;
   }
 
-  public async logout(): Promise<void> {
-    await api.post(`${this.baseUrl}/logout`);
+  async logout(): Promise<void> {
+    await api.post('/auth/logout');
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    await api.post('/auth/reset-password', { email });
   }
 }
 
-export default new AuthService(); 
+export const authService = AuthService.getInstance(); 

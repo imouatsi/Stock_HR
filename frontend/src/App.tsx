@@ -9,6 +9,7 @@ import { createAppTheme } from './theme';
 import Layout from './components/Layout';
 import ProtectedRoute from './modules/shared/components/ProtectedRoute';
 import { publicRoutes, protectedRoutes } from './modules/shared/config/routes';
+import { HRRoutes } from './modules/hr/routes';
 
 const App: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -93,6 +94,7 @@ const App: React.FC = () => {
             }
           >
             {renderRoutes(protectedRoutes)}
+            <Route path="/hr/*" element={<HRRoutes />} />
           </Route>
 
           {/* Catch all route */}

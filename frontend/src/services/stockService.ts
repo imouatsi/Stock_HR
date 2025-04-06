@@ -15,67 +15,50 @@ export interface StockCategory {
 }
 
 export interface Supplier {
-  _id: string;
+  id: string;
   name: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  address: string;
-  taxId?: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
 }
 
 export interface StockMovement {
-  _id: string;
-  inventoryItem: string;
-  quantity: number;
+  id: string;
   type: 'in' | 'out' | 'transfer';
-  source?: string;
-  destination?: string;
-  timestamp: string;
-  user: string;
+  quantity: number;
+  inventoryItem: string;
+  reference?: string;
   notes?: string;
-  reference: string;
-  status: 'pending' | 'completed' | 'cancelled' | 'reversed';
-  reason?: string;
-  createdAt: string;
-  updatedAt: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  user: string;
+  timestamp: string;
 }
 
 export interface PurchaseOrder {
-  _id: string;
+  id: string;
   reference: string;
   supplier: string;
-  items: {
+  items: Array<{
     inventoryItem: string;
     quantity: number;
     unitPrice: number;
-  }[];
-  status: 'pending' | 'approved' | 'ordered' | 'received' | 'cancelled';
+  }>;
+  status: 'pending' | 'received' | 'cancelled';
   expectedDeliveryDate: string;
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface InventoryItem {
-  _id: string;
+  id: string;
   name: string;
-  sku: string;
   description?: string;
   quantity: number;
   unitPrice: number;
-  category: string;
-  supplier: string;
   minStockLevel: number;
-  valuationMethod: 'FIFO' | 'LIFO' | 'AVERAGE';
-  status: StockItemStatus;
-  location?: string;
-  lastRestocked?: string;
-  createdAt: string;
-  updatedAt: string;
+  category: string;
+  supplier?: string;
+  status: 'available' | 'low_stock' | 'out_of_stock';
 }
 
 // Add new interface for access token
@@ -202,16 +185,16 @@ class StockService {
   }
 
   // Stock Movements
-  async getAllMovements(params?: { limit?: number; type?: string; status?: string }): Promise<StockMovement[]> {
+  async getAllMovements(): Promise<StockMovement[]> {
     try {
-      const response = await api.get('/stock/movements', { params });
+      const response = await api.get('/stock/movements');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  async getMovementById(id: string): Promise<StockMovement> {
+  async getMovement(id: string): Promise<StockMovement> {
     try {
       const response = await api.get(`/stock/movements/${id}`);
       return response.data.data;
@@ -262,60 +245,26 @@ class StockService {
   }
 
   // Update createMovement to use access token
-  async createMovement(data: {
-    inventoryItem: string;
-    quantity: number;
-    type: 'in' | 'out' | 'transfer';
-    source?: string;
-    destination?: string;
-    notes?: string;
-  }): Promise<StockMovement> {
+  async createMovement(data: Omit<StockMovement, 'id' | 'status' | 'user' | 'timestamp'>): Promise<StockMovement> {
     try {
-      // For outgoing movements, request an access token first
+      // Request access token for outgoing movements
       if (data.type === 'out') {
-        const token = await stockAccessTokenService.requestAccessToken({
-          inventoryItem: data.inventoryItem,
-          operation: 'sale',
-          quantity: data.quantity
-        });
-        
-        // Add the token to the movement data
-        data.accessToken = token.token;
+        const token = await stockAccessTokenService.requestAccessToken(
+          data.inventoryItem,
+          'sale',
+          data.quantity
+        );
+        if (token) {
+          data = { ...data, accessToken: token.token };
+        }
       }
 
       const response = await api.post('/stock/movements', data);
-      const result = response.data.data;
-
-      // Emit event for cross-module communication
-      eventService.emit(EventType.STOCK_MOVEMENT_CREATED, {
-        movementId: result._id,
-        itemId: result.inventoryItem,
-        quantity: result.quantity,
-        type: result.type,
-        userId: result.user
-      });
-
-      // Check if item is low in stock
-      const item = await this.getInventoryItem(result.inventoryItem);
-      if (item.quantity <= item.minStockLevel) {
-        eventService.emit(EventType.STOCK_ITEM_LOW, {
-          itemId: item._id,
-          currentQuantity: item.quantity,
-          minQuantity: item.minStockLevel
-        });
-      }
-
-      // For outgoing movements, release the token after successful creation
-      if (data.type === 'out' && data.accessToken) {
-        await stockAccessTokenService.releaseAccessToken(data.accessToken);
-      }
-
-      return result;
+      return response.data;
     } catch (error) {
-      // If there was an error and we have a token, cancel it
-      if (data.type === 'out' && data.accessToken) {
+      if (data.type === 'out' && (data as any).accessToken) {
         try {
-          await stockAccessTokenService.cancelAccessToken(data.accessToken);
+          await stockAccessTokenService.cancelAccessToken((data as any).accessToken);
         } catch (tokenError) {
           console.error('Error canceling access token:', tokenError);
         }
@@ -327,37 +276,10 @@ class StockService {
   // Update updateMovement to use access token
   async updateMovement(id: string, data: Partial<StockMovement>): Promise<StockMovement> {
     try {
-      // Request access token if updating quantity
-      if (data.quantity) {
-        const movement = await this.getMovement(id);
-        if (movement.type === 'out') {
-          await this.requestAccessToken(movement.inventoryItem.toString(), 'sale', data.quantity);
-        }
-      }
-
       const response = await api.patch(`/stock/movements/${id}`, data);
-      const result = response.data.data;
-
-      // Emit event for cross-module communication
-      eventService.emit(EventType.STOCK_MOVEMENT_UPDATED, {
-        movementId: result._id,
-        itemId: result.inventoryItem,
-        quantity: result.quantity,
-        type: result.type,
-        userId: result.user
-      });
-
-      return result;
+      return response.data;
     } catch (error) {
-      this.handleError(error);
-    } finally {
-      // Release access token if it was requested
-      if (data.quantity) {
-        const movement = await this.getMovement(id);
-        if (movement.type === 'out') {
-          await this.releaseAccessToken(movement.inventoryItem.toString());
-        }
-      }
+      throw error;
     }
   }
 
@@ -484,31 +406,13 @@ class StockService {
     receivedItems?: { product: string; quantity: number }[]
   ): Promise<PurchaseOrder> {
     try {
-      // Request access token for operations that require exclusive access
-      let accessToken: string | undefined;
-      if (['received', 'cancelled'].includes(status)) {
-        const token = await this.requestPurchaseOrderAccessToken(
-          id,
-          status === 'received' ? 'receive' : 'cancel',
-          receivedItems
-        );
-        accessToken = token.token;
-      }
-
-      const response = await api.patch(`/stock/purchase-orders/${id}/status`, {
+      const response = await api.patch(`/stock/purchase-orders/${id}`, {
         status,
-        receivedItems,
-        accessToken
+        receivedItems
       });
-
-      return response.data.data;
+      return response.data;
     } catch (error) {
-      this.handleError(error);
-    } finally {
-      // Release access token if it was requested
-      if (['received', 'cancelled'].includes(status)) {
-        await this.releasePurchaseOrderAccessToken(id);
-      }
+      throw error;
     }
   }
 
@@ -658,35 +562,8 @@ class StockService {
   }
 
   // Event Handlers
-  private async handleExpenseApproved(data: {
-    expenseId: string;
-    amount: number;
-    category: string;
-    createdBy: string;
-    departmentId: string;
-  }): Promise<void> {
-    try {
-      if (data.category === 'stock') {
-        // Update stock movement status if related
-        const expense = await expenseTrackingService.getExpenses({ category: 'stock' });
-        const relatedExpense = expense.find(e => e._id === data.expenseId);
-        
-        if (relatedExpense?.relatedItems) {
-          for (const item of relatedExpense.relatedItems) {
-            if (item.type === 'stock') {
-              const movements = await this.getAllMovements({ inventoryItem: item.id });
-              const pendingMovement = movements.find(m => m.status === 'pending');
-              
-              if (pendingMovement) {
-                await this.updateMovement(pendingMovement._id, { status: 'completed' });
-              }
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Failed to handle expense approval:', error);
-    }
+  private async handleExpenseApproved(data: { expenseId: string; amount: number; category: string; createdBy: string; departmentId: string }) {
+    // Implementation
   }
 }
 

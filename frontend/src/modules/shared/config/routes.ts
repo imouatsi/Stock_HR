@@ -1,4 +1,27 @@
-import { UserRole } from '../types';
+import React from 'react';
+import { RouteObject } from 'react-router-dom';
+import { UserRole } from '../types/user';
+
+// Stock Module
+import StockList from '../../stock/pages/StockList';
+import Categories from '../../stock/pages/Categories';
+import Suppliers from '../../stock/pages/Suppliers';
+import Movements from '../../stock/pages/Movements';
+
+// HR Module
+import EmployeeList from '../../hr/pages/EmployeeList';
+import Departments from '../../hr/pages/Departments';
+import Positions from '../../hr/pages/Positions';
+import LeaveRequests from '../../hr/pages/LeaveRequests';
+
+// Accounting Module
+import Dashboard from '../../accounting/pages/Dashboard';
+import Invoices from '../../accounting/pages/Invoices';
+import Contracts from '../../accounting/pages/Contracts';
+import Proformas from '../../accounting/pages/Proformas';
+
+// Settings
+import Settings from '../../settings/pages/Settings';
 
 export interface RouteConfig {
   path: string;

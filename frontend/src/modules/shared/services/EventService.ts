@@ -1,73 +1,138 @@
-import { EventEmitter } from 'events';
+import { AssetStatus } from './AssetTrackingService';
+import { EmployeeStatus, InvoiceStatus, ExpenseStatus } from './StatusManagementService';
 
 // Define event types for cross-module communication
 export enum EventType {
-  // Stock events
-  STOCK_MOVEMENT_CREATED = 'stock:movement:created',
-  STOCK_MOVEMENT_UPDATED = 'stock:movement:updated',
-  STOCK_ITEM_LOW = 'stock:item:low',
-  STOCK_ITEM_OUT = 'stock:item:out',
-  
-  // HR events
-  EMPLOYEE_CREATED = 'hr:employee:created',
-  EMPLOYEE_UPDATED = 'hr:employee:updated',
-  EMPLOYEE_DELETED = 'hr:employee:deleted',
-  LEAVE_REQUEST_CREATED = 'hr:leave:created',
-  LEAVE_REQUEST_APPROVED = 'hr:leave:approved',
-  
-  // Accounting events
-  INVOICE_CREATED = 'accounting:invoice:created',
-  INVOICE_PAID = 'accounting:invoice:paid',
-  PURCHASE_ORDER_CREATED = 'accounting:purchase:created',
-  PURCHASE_ORDER_APPROVED = 'accounting:purchase:approved',
-  
-  // Cross-module events
-  ASSET_ASSIGNED = 'asset:assigned',
-  ASSET_RETURNED = 'asset:returned',
-  EXPENSE_CREATED = 'expense:created',
-  EXPENSE_APPROVED = 'expense:approved'
+  // Employee Events
+  EMPLOYEE_CREATED = 'EMPLOYEE_CREATED',
+  EMPLOYEE_UPDATED = 'EMPLOYEE_UPDATED',
+  EMPLOYEE_DELETED = 'EMPLOYEE_DELETED',
+  EMPLOYEE_STATUS_CHANGED = 'EMPLOYEE_STATUS_CHANGED',
+  EMPLOYEE_TERMINATED = 'EMPLOYEE_TERMINATED',
+
+  // Department Events
+  DEPARTMENT_CREATED = 'DEPARTMENT_CREATED',
+  DEPARTMENT_UPDATED = 'DEPARTMENT_UPDATED',
+  DEPARTMENT_DELETED = 'DEPARTMENT_DELETED',
+
+  // Position Events
+  POSITION_CREATED = 'POSITION_CREATED',
+  POSITION_UPDATED = 'POSITION_UPDATED',
+  POSITION_DELETED = 'POSITION_DELETED',
+
+  // Stock Events
+  STOCK_MOVEMENT_CREATED = 'STOCK_MOVEMENT_CREATED',
+  STOCK_ITEM_STATUS_CHANGED = 'STOCK_ITEM_STATUS_CHANGED',
+  STOCK_ITEM_UPDATED = 'STOCK_ITEM_UPDATED',
+  STOCK_ITEM_DELETED = 'STOCK_ITEM_DELETED',
+
+  // Asset Events
+  ASSET_CREATED = 'ASSET_CREATED',
+  ASSET_UPDATED = 'ASSET_UPDATED',
+  ASSET_DELETED = 'ASSET_DELETED',
+  ASSET_ASSIGNED = 'ASSET_ASSIGNED',
+  ASSET_STATUS_CHANGED = 'ASSET_STATUS_CHANGED',
+
+  // Invoice Events
+  INVOICE_CREATED = 'INVOICE_CREATED',
+  INVOICE_UPDATED = 'INVOICE_UPDATED',
+  INVOICE_DELETED = 'INVOICE_DELETED',
+  INVOICE_STATUS_CHANGED = 'INVOICE_STATUS_CHANGED',
+
+  // Expense Events
+  EXPENSE_CREATED = 'EXPENSE_CREATED',
+  EXPENSE_UPDATED = 'EXPENSE_UPDATED',
+  EXPENSE_DELETED = 'EXPENSE_DELETED',
+  EXPENSE_STATUS_CHANGED = 'EXPENSE_STATUS_CHANGED',
+  EXPENSE_APPROVED = 'EXPENSE_APPROVED',
+
+  // User Events
+  USER_CREATED = 'USER_CREATED',
+  USER_UPDATED = 'USER_UPDATED',
+  USER_DELETED = 'USER_DELETED',
+
+  // System Events
+  SYSTEM_STATUS_CHANGED = 'SYSTEM_STATUS_CHANGED',
+  SYSTEM_ALERT_CREATED = 'SYSTEM_ALERT_CREATED',
+
+  // Backup Events
+  BACKUP_STARTED = 'BACKUP_STARTED',
+  BACKUP_COMPLETED = 'BACKUP_COMPLETED',
+  BACKUP_FAILED = 'BACKUP_FAILED',
+
+  // Import/Export Events
+  IMPORT_EXPORT_STARTED = 'IMPORT_EXPORT_STARTED',
+  IMPORT_EXPORT_COMPLETED = 'IMPORT_EXPORT_COMPLETED',
+  IMPORT_EXPORT_FAILED = 'IMPORT_EXPORT_FAILED',
+
+  // Report Events
+  REPORT_GENERATED = 'REPORT_GENERATED',
+  REPORT_FAILED = 'REPORT_FAILED',
+
+  // Audit Events
+  AUDIT_LOG_CREATED = 'AUDIT_LOG_CREATED',
+
+  // Settings Events
+  SETTING_UPDATED = 'SETTING_UPDATED',
+
+  // Dashboard Events
+  DASHBOARD_UPDATED = 'DASHBOARD_UPDATED',
+
+  // Log Events
+  LOG_CREATED = 'LOG_CREATED'
 }
 
 // Define event data interfaces
 export interface EventData {
-  [EventType.STOCK_MOVEMENT_CREATED]: {
-    movementId: string;
-    itemId: string;
-    quantity: number;
-    type: 'in' | 'out' | 'transfer';
-    userId: string;
-  };
-  [EventType.STOCK_ITEM_LOW]: {
-    itemId: string;
-    currentQuantity: number;
-    minQuantity: number;
-  };
-  [EventType.EMPLOYEE_CREATED]: {
-    employeeId: string;
-    departmentId: string;
-    positionId: string;
-  };
-  [EventType.ASSET_ASSIGNED]: {
-    assetId: string;
-    employeeId: string;
-    assignedBy: string;
-    assignedDate: Date;
-  };
-  [EventType.EXPENSE_CREATED]: {
-    expenseId: string;
-    amount: number;
-    category: string;
-    createdBy: string;
-    departmentId: string;
-  };
+  [EventType.EMPLOYEE_CREATED]: { employeeId: string; name: string; role: string };
+  [EventType.EMPLOYEE_UPDATED]: { employeeId: string; changes: Partial<{ name: string; role: string }> };
+  [EventType.EMPLOYEE_DELETED]: { employeeId: string };
+  [EventType.EMPLOYEE_TERMINATED]: { employeeId: string; reason: string; terminatedBy: string };
+  [EventType.EMPLOYEE_RETIRED]: { employeeId: string; date: string; reason: string };
+  [EventType.EMPLOYEE_SUSPENDED]: { employeeId: string; reason: string; duration: string };
+  [EventType.EMPLOYEE_DECEASED]: { employeeId: string; date: string };
+  [EventType.EMPLOYEE_STATUS_CHANGED]: { employeeId: string; oldStatus: EmployeeStatus; newStatus: EmployeeStatus };
+
+  [EventType.ASSET_CREATED]: { assetId: string; name: string; type: string };
+  [EventType.ASSET_UPDATED]: { assetId: string; changes: Partial<{ name: string; type: string }> };
+  [EventType.ASSET_DELETED]: { assetId: string };
+  [EventType.ASSET_ASSIGNED]: { assetId: string; employeeId: string; assignedBy: string; assignedDate: string };
+  [EventType.ASSET_RETURNED]: { assetId: string; employeeId: string; returnedBy: string; returnedDate: string };
+  [EventType.ASSET_STATUS_CHANGED]: { assetId: string; oldStatus: AssetStatus; newStatus: AssetStatus };
+
+  [EventType.STOCK_ITEM_CREATED]: { itemId: string; name: string; category: string };
+  [EventType.STOCK_ITEM_UPDATED]: { itemId: string; changes: Partial<{ name: string; category: string }> };
+  [EventType.STOCK_ITEM_DELETED]: { itemId: string };
+  [EventType.STOCK_MOVEMENT_CREATED]: { movementId: string; itemId: string; quantity: number; type: 'in' | 'out' | 'transfer'; userId: string };
+  [EventType.STOCK_MOVEMENT_UPDATED]: { movementId: string; changes: Partial<{ quantity: number; type: 'in' | 'out' | 'transfer' }> };
+  [EventType.STOCK_MOVEMENT_CANCELLED]: { movementId: string; reason: string };
+  [EventType.STOCK_ITEM_STATUS_CHANGED]: { itemId: string; oldStatus: string; newStatus: string };
+  [EventType.STOCK_ITEM_OUT]: { itemId: string; quantity: number; destination: string };
+  [EventType.STOCK_ITEM_IN]: { itemId: string; quantity: number; source: string };
+  [EventType.STOCK_ITEM_TRANSFER]: { itemId: string; quantity: number; source: string; destination: string };
+
+  [EventType.INVOICE_CREATED]: { invoiceId: string; amount: number; client: string };
+  [EventType.INVOICE_UPDATED]: { invoiceId: string; changes: Partial<{ amount: number; client: string }> };
+  [EventType.INVOICE_DELETED]: { invoiceId: string };
+  [EventType.INVOICE_PAID]: { invoiceId: string; paidAmount: number; paidDate: string };
+  [EventType.INVOICE_VOID]: { invoiceId: string; reason: string };
+  [EventType.INVOICE_STATUS_CHANGED]: { invoiceId: string; oldStatus: InvoiceStatus; newStatus: InvoiceStatus };
+
+  [EventType.EXPENSE_CREATED]: { expenseId: string; amount: number; category: string; createdBy: string; departmentId: string };
+  [EventType.EXPENSE_APPROVED]: { expenseId: string; amount: number; category: string; approvedBy: string };
+  [EventType.EXPENSE_REJECTED]: { expenseId: string; reason: string; rejectedBy: string };
+  [EventType.EXPENSE_PAID]: { expenseId: string; paidAmount: number; paidDate: string };
+  [EventType.EXPENSE_STATUS_CHANGED]: { expenseId: string; oldStatus: ExpenseStatus; newStatus: ExpenseStatus };
 }
+
+type EventHandler<T extends EventType> = (data: any) => Promise<void>;
 
 class EventService {
   private static instance: EventService;
-  private emitter: EventEmitter;
+  private handlers: Map<EventType, Set<EventHandler<EventType>>>;
 
   private constructor() {
-    this.emitter = new EventEmitter();
+    this.handlers = new Map();
   }
 
   public static getInstance(): EventService {
@@ -77,20 +142,26 @@ class EventService {
     return EventService.instance;
   }
 
-  public emit<T extends EventType>(event: T, data: EventData[T]): void {
-    this.emitter.emit(event, data);
+  public on<T extends EventType>(event: T, handler: EventHandler<T>): void {
+    if (!this.handlers.has(event)) {
+      this.handlers.set(event, new Set());
+    }
+    this.handlers.get(event)?.add(handler as EventHandler<EventType>);
   }
 
-  public on<T extends EventType>(event: T, callback: (data: EventData[T]) => void): void {
-    this.emitter.on(event, callback);
+  public off<T extends EventType>(event: T, handler: EventHandler<T>): void {
+    this.handlers.get(event)?.delete(handler as EventHandler<EventType>);
   }
 
-  public off<T extends EventType>(event: T, callback: (data: EventData[T]) => void): void {
-    this.emitter.off(event, callback);
+  public async emit<T extends EventType>(event: T, data: any): Promise<void> {
+    const handlers = this.handlers.get(event);
+    if (handlers) {
+      await Promise.all(Array.from(handlers).map(handler => handler(data)));
+    }
   }
 
-  public removeAllListeners(): void {
-    this.emitter.removeAllListeners();
+  public clear(): void {
+    this.handlers.clear();
   }
 }
 

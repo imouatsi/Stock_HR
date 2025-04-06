@@ -1,26 +1,29 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
-import { RouteConfig } from '../config/routes';
+import { useAuth } from '../../../hooks/useAuth';
 import { CircularProgress, Box } from '@mui/material';
 
 interface ProtectedRouteProps {
-  route: RouteConfig;
   children: React.ReactNode;
+  route?: {
+    roles?: string[];
+    permissions?: string[];
+  };
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ route, children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, route }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
-  const { user, isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
 
   if (isLoading) {
     return (
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
       >
         <CircularProgress />
       </Box>
@@ -31,23 +34,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ route, children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  // Check role-based access
-  if (route.roles && !route.roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
-  }
-
-  // Check permission-based access
-  if (route.permissions) {
-    const hasPermission = route.permissions.some(permission =>
-      user.permissions.includes(permission)
-    );
-
-    if (!hasPermission) {
-      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  if (route?.roles && user) {
+    const hasRequiredRole = route.roles.includes(user.role);
+    if (!hasRequiredRole) {
+      return <Navigate to="/unauthorized" replace />;
     }
   }
 

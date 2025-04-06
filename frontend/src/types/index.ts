@@ -48,4 +48,8 @@ export interface ErrorResponse {
   status: string;
   message: string;
   errors?: Record<string, string[]>;
-} 
+}
+
+export * from './employee';
+export * from './department';
+export * from './position'; 
