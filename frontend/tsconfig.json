@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "dom.iterable",
@@ -11,6 +11,11 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -19,14 +24,27 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "sourceMap": true,
     "typeRoots": ["./node_modules/@types", "./src/@types"],
     "baseUrl": "./src",
     "paths": {
-      "*": ["*", "types/*"]
+      "@/*": ["./*"],
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@services/*": ["services/*"],
+      "@hooks/*": ["hooks/*"],
+      "@utils/*": ["utils/*"],
+      "@types/*": ["types/*"],
+      "@assets/*": ["assets/*"]
     },
-    "types": ["node", "react-i18next", "i18next"]
+    "types": ["node"]
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist"
   ]
 }

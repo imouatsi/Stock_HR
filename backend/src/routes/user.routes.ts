@@ -1,38 +1,26 @@
-import { Router } from 'express';
+import express from 'express';
 import { userController } from '../controllers/user.controller';
-import { validate } from '../middleware/validation.middleware';
-import { userSchema } from '../schemas/user.schema';
-import { role } from '../middleware/auth.middleware';
+import { userValidation } from '../validation/user.validation';
+import { validateRequest } from '../middleware/validate.middleware';
+import { protect, restrictTo } from '../controllers/auth.controller';
 
-const router = Router();
+const router = express.Router();
 
-// Public routes
-router.post('/register', validate(userSchema), userController.register);
-router.post('/login', userController.login);
+// Protect all routes
+router.use(protect);
 
-// Protected routes
-router.use(role('user')); // All routes below require at least user role
-
-router
-  .route('/profile')
-  .get(userController.getProfile)
-  .put(validate(userSchema), userController.updateProfile);
-
-// Admin routes
-router.use(role('admin')); // All routes below require admin role
+// Admin only routes
+router.use(restrictTo('admin'));
 
 router
   .route('/')
-  .get(userController.getAll)
-  .post(validate(userSchema), userController.create);
+  .get(userController.getAllUsers)
+  .post(validateRequest(userValidation.createUser), userController.createUser);
 
 router
   .route('/:id')
-  .get(userController.getById)
-  .put(validate(userSchema), userController.update)
-  .delete(userController.delete);
+  .get(userController.getUser)
+  .patch(validateRequest(userValidation.updateUser), userController.updateUser)
+  .delete(userController.deleteUser);
 
-// Authorization route
-router.patch('/:id/authorize', userController.authorizeUser);
-
-export default router;
+export default router; 

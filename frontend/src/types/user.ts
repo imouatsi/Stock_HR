@@ -1,11 +1,15 @@
 export interface User {
   id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: 'superadmin' | 'admin' | 'manager' | 'seller' | 'stock_clerk';
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  role: string;
+  permissions: string[];
   isActive: boolean;
-  lastLogin?: string;
-  createdAt: string;
-  updatedAt: string;
+  lastLogin?: Date;
+  settings?: {
+    theme: 'light' | 'dark';
+    language: string;
+    timezone: string;
+  };
 } 

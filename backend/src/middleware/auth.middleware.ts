@@ -1,51 +1,65 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '../utils/auth';
 import { User } from '../models/user.model';
 import { AppError } from '../utils/appError';
 
-export interface AuthRequest extends Request {
-  user?: any;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
 }
 
-export const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    let token;
-    if (req.headers.authorization?.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
+export const authMiddleware = {
+  protect: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // 1) Getting token and check if it's there
+      let token;
+      if (req.headers.authorization?.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+      }
+
+      if (!token) {
+        return next(new AppError('You are not logged in! Please log in to get access.', 401));
+      }
+
+      // 2) Verification token
+      const decoded = verifyToken(token);
+      if (!decoded) {
+        return next(new AppError('Invalid token. Please log in again!', 401));
+      }
+
+      // 3) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next(new AppError('The user belonging to this token no longer exists.', 401));
+      }
+
+      // 4) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next(new AppError('User recently changed password! Please log in again.', 401));
+      }
+
+      // Grant access to protected route
+      req.user = currentUser;
+      next();
+    } catch (error) {
+      next(error);
     }
+  },
 
-    if (!token) {
-      throw AppError.unauthorized('You are not logged in. Please log in to get access.');
-    }
+  restrictTo: (...roles: string[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+      if (!req.user) {
+        return next(new AppError('You are not logged in! Please log in to get access.', 401));
+      }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
-    const user = await User.findById(decoded.id);
+      if (!roles.includes(req.user.role)) {
+        return next(new AppError('You do not have permission to perform this action', 403));
+      }
 
-    if (!user) {
-      throw AppError.unauthorized('The user belonging to this token no longer exists.');
-    }
-
-    if (!user.isAuthorized) {
-      throw AppError.unauthorized('Your account is not yet authorized. Please wait for admin approval.');
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    next(error);
+      next();
+    };
   }
-};
-
-export const role = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      throw AppError.unauthorized('You are not logged in. Please log in to get access.');
-    }
-
-    if (!roles.includes(req.user.role)) {
-      throw AppError.forbidden('You do not have permission to perform this action.');
-    }
-
-    next();
-  };
 }; 

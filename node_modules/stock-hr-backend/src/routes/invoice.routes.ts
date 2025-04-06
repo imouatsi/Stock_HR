@@ -1,46 +1,28 @@
-import { Router } from 'express';
-import { InvoiceController } from '../controllers/invoice.controller';
-import { authMiddleware } from '../middleware/auth';
-import { validateRequest } from '../middleware/validateRequest.middleware';
-import { invoiceSchema } from '../validators/invoice.validator';
-import { AuthRequest } from '../types/authRequest';
+import express from 'express';
+import { invoiceController } from '../controllers/invoice.controller';
+import { invoiceValidation } from '../validation/invoice.validation';
+import { validateRequest } from '../middleware/validate.middleware';
+import { protect, restrictTo } from '../controllers/auth.controller';
 
-const router = Router();
-const invoiceController = new InvoiceController();
+const router = express.Router();
 
-// Apply auth middleware to all routes
-router.use(authMiddleware);
+// Protect all routes
+router.use(protect);
 
-// Create new invoice (proforma or final)
-router.post(
-  '/',
-  validateRequest(invoiceSchema),
-  (req, res) => InvoiceController.createInvoice(req as AuthRequest, res)
-);
+// Admin only routes
+router.use(restrictTo('admin'));
 
-// Get all invoices
-router.get('/', (req, res) => InvoiceController.getInvoices(req as AuthRequest, res));
+router
+  .route('/')
+  .get(invoiceController.getAllInvoices)
+  .post(validateRequest(invoiceValidation.createInvoice), invoiceController.createInvoice);
 
-// Get invoice by ID
-router.get('/:id', (req, res) => InvoiceController.getInvoiceById(req as AuthRequest, res));
+router
+  .route('/:id')
+  .get(invoiceController.getInvoice)
+  .patch(validateRequest(invoiceValidation.updateInvoice), invoiceController.updateInvoice)
+  .delete(invoiceController.deleteInvoice);
 
-// Update invoice
-router.put(
-  '/:id',
-  validateRequest(invoiceSchema),
-  (req, res) => InvoiceController.updateInvoice(req as AuthRequest, res)
-);
-
-// Validate invoice (only for final invoices)
-router.post('/:id/validate', (req, res) => InvoiceController.validateInvoice(req as AuthRequest, res));
-
-// Convert proforma to final invoice
-router.post('/:id/convert', (req, res) => InvoiceController.convertProformaToInvoice(req as AuthRequest, res));
-
-// Generate PDF
-router.get('/:id/pdf', (req, res, next) => invoiceController.generatePDF(req as AuthRequest, res, next));
-
-// Delete invoice
-router.delete('/:id', (req, res) => InvoiceController.deleteInvoice(req as AuthRequest, res));
+router.post('/:id/generate', invoiceController.generateInvoice);
 
 export default router; 

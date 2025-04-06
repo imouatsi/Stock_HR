@@ -1,76 +1,65 @@
-import express, { Express, RequestHandler } from 'express';
+import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import helmet from 'helmet';
 import { config } from './config';
 import { errorHandler } from './middleware/error.middleware';
-import routes from './routes';
-import { connectDatabase } from './config/database';
-import http from 'http';
-import logger from './utils/logger';
-import mongoose from 'mongoose';
-import app from './app';
-import { typedLogger } from './utils/logger';
+import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
+import companyRoutes from './routes/company.routes';
+import inventoryRoutes from './routes/inventory.routes';
+import contractRoutes from './routes/contract.routes';
+import licenseRoutes from './routes/license.routes';
+import stockRoutes from './routes/stock.routes';
+import invoiceRoutes from './routes/invoice.routes';
 
-// Create Express app
-const app: Express = express();
+const app = express();
 
-// Create HTTP server
-const server = http.createServer(app);
+// Security middleware
+app.use(helmet() as any);
 
-// CORS configuration - must be before other middleware
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  exposedHeaders: ['set-cookie']
-}));
+// Body parsing middleware
+app.use(express.json({ limit: '10kb' }) as any);
+app.use(express.urlencoded({ extended: true, limit: '10kb' }) as any);
+app.use(cookieParser() as any);
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser as unknown as () => RequestHandler);
+// CORS and compression
+app.use(cors() as any);
+app.use(compression() as any);
 
-// Add request logging middleware
-app.use((req, _res, next) => {
-  logger.info(`${req.method} ${req.url}`, {
-    headers: req.headers,
-    body: req.body,
-    query: req.query,
-    params: req.params
-  });
-  next();
-});
+// Logging in development
+if (config.nodeEnv === 'development') {
+  app.use(morgan('dev') as any);
+}
 
 // Routes
-app.use('/api', routes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/companies', companyRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/contracts', contractRoutes);
+app.use('/api/licenses', licenseRoutes);
+app.use('/api/stock', stockRoutes);
+app.use('/api/invoices', invoiceRoutes);
 
 // Error handling
 app.use(errorHandler);
 
-// Connect to MongoDB and start server
-const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stock_hr';
-
+// Database connection
 mongoose
-  .connect(MONGODB_URI)
+  .connect(config.mongoUri)
   .then(() => {
-    typedLogger.info('Connected to MongoDB');
-    app.listen(PORT, () => {
-      typedLogger.info(`Server running on port ${PORT}`);
-    });
+    console.log('Connected to MongoDB');
   })
   .catch((error) => {
-    typedLogger.error('Error connecting to MongoDB:', error);
-    process.exit(1);
+    console.error('MongoDB connection error:', error);
   });
 
-// Handle server shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM signal received. Closing HTTP server...');
-  server.close(() => {
-    logger.info('HTTP server closed');
-    process.exit(0);
-  });
-});
-
-export default app;
+// Start server
+const port = config.port;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+}); 

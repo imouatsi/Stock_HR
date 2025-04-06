@@ -1,36 +1,28 @@
-import { Router } from 'express';
-import { validateRequest } from '../middleware/validateRequest';
-import {
-  login,
-  register,
-  logout,
-  forgotPassword,
-  resetPassword,
-  changePassword,
-  updateProfile,
-} from '../controllers/auth.controller';
-import {
-  loginValidator,
-  registerValidator,
-  forgotPasswordValidator,
-  resetPasswordValidator,
-  changePasswordValidator,
-  updateProfileValidator,
-} from '../validators/auth.validator';
-import { protect } from '../middleware/auth';
+import express from 'express';
+import { signup, login, logout, protect, restrictTo } from '../controllers/auth.controller';
 
-const router = Router();
+const router = express.Router();
 
-// Public routes
-router.post('/register', registerValidator, validateRequest, register);
-router.post('/login', loginValidator, validateRequest, login);
-router.post('/forgot-password', forgotPasswordValidator, validateRequest, forgotPassword);
-router.post('/reset-password/:token', resetPasswordValidator, validateRequest, resetPassword);
+router.post('/signup', signup);
+router.post('/login', login);
+router.get('/logout', logout);
 
 // Protected routes
-router.use(protect); // All routes below this line require authentication
-router.post('/logout', logout);
-router.patch('/change-password', changePasswordValidator, validateRequest, changePassword);
-router.patch('/profile', updateProfileValidator, validateRequest, updateProfile);
+router.get('/me', protect, (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: req.user
+    }
+  });
+});
+
+// Admin only routes
+router.get('/admin', protect, restrictTo('admin'), (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to the admin area'
+  });
+});
 
 export default router; 

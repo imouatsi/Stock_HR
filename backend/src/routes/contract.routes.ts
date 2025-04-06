@@ -1,22 +1,28 @@
-import { Router, RequestHandler } from 'express';
-import {
-  getAllContracts,
-  getContractById,
-  createContract,
-  updateContract,
-  deleteContract,
-  generateContract
-} from '../controllers/contract.controller';
+import express from 'express';
+import { contractController } from '../controllers/contract.controller';
+import { contractValidation } from '../validation/contract.validation';
+import { validateRequest } from '../middleware/validate.middleware';
+import { protect, restrictTo } from '../controllers/auth.controller';
 
-const router = Router();
+const router = express.Router();
 
-router.get('/', getAllContracts as RequestHandler);
-router.get('/:id', getContractById as RequestHandler);
-router.post('/', createContract as RequestHandler);
-router.put('/:id', updateContract as RequestHandler);
-router.delete('/:id', deleteContract as RequestHandler);
+// Protect all routes
+router.use(protect);
 
-// Generate and export contract as PDF
-router.post('/generate', generateContract as RequestHandler);
+// Admin only routes
+router.use(restrictTo('admin'));
 
-export default router;
+router
+  .route('/')
+  .get(contractController.getAllContracts)
+  .post(validateRequest(contractValidation.createContract), contractController.createContract);
+
+router
+  .route('/:id')
+  .get(contractController.getContract)
+  .patch(validateRequest(contractValidation.updateContract), contractController.updateContract)
+  .delete(contractController.deleteContract);
+
+router.post('/:id/generate', contractController.generateContract);
+
+export default router; 

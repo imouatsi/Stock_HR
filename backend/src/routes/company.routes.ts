@@ -1,20 +1,26 @@
-import { Router } from 'express';
+import express from 'express';
 import { companyController } from '../controllers/company.controller';
-import { validate } from '../middleware/validation.middleware';
-import { companySchema } from '../schemas/company.schema';
-import { role } from '../middleware/auth.middleware';
+import { companyValidation } from '../validation/company.validation';
+import { validateRequest } from '../middleware/validate.middleware';
+import { protect, restrictTo } from '../controllers/auth.controller';
 
-const router = Router();
+const router = express.Router();
+
+// Protect all routes
+router.use(protect);
+
+// Admin only routes
+router.use(restrictTo('admin'));
 
 router
   .route('/')
-  .get(companyController.getAll)
-  .post(role('admin'), validate(companySchema), companyController.create);
+  .get(companyController.getAllCompanies)
+  .post(validateRequest(companyValidation.createCompany), companyController.createCompany);
 
 router
   .route('/:id')
-  .get(companyController.getById)
-  .put(role('admin'), validate(companySchema), companyController.update)
-  .delete(role('admin'), companyController.delete);
+  .get(companyController.getCompany)
+  .patch(validateRequest(companyValidation.updateCompany), companyController.updateCompany)
+  .delete(companyController.deleteCompany);
 
 export default router; 
