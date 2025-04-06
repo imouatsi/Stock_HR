@@ -452,4 +452,104 @@ Please refer to CONTRIBUTING.md for guidelines on:
 - Issue reporting
 
 ## License
-ISC License 
+ISC License
+
+# ChatGPT Interaction Guide
+
+## Project Overview
+This document provides guidelines for interacting with ChatGPT regarding the Stock & HR Management System project.
+
+## Project Structure
+```
+Stock_HR/
+├── frontend/          # React frontend application
+├── backend/           # Node.js backend application
+├── docs/             # Project documentation
+└── tests/            # Test files
+```
+
+## Authentication System
+The project uses a username-based authentication system with the following format:
+- Superadmin: SA00000
+- Admin: UA00001
+- User: U00002
+
+## Key Features
+1. User Authentication
+   - Username-based login
+   - Role-based access control
+   - JWT token management
+
+2. User Management
+   - User registration
+   - Admin authorization
+   - Profile management
+
+3. Security
+   - Password hashing
+   - Session management
+   - Input validation
+
+## Common Tasks
+When requesting assistance from ChatGPT, please specify:
+1. The specific component or feature you're working on
+2. Any error messages or issues you're encountering
+3. The desired outcome or behavior
+
+## Code Style
+- TypeScript for both frontend and backend
+- ESLint for code linting
+- Prettier for code formatting
+- Conventional commits for version control
+
+## Documentation
+- Keep documentation up to date
+- Use clear and concise language
+- Include code examples where relevant
+- Follow the existing documentation structure
+
+## Best Practices
+1. Security
+   - Never share sensitive information
+   - Use environment variables for secrets
+   - Follow security guidelines
+
+2. Code Quality
+   - Write clean, maintainable code
+   - Add appropriate comments
+   - Follow TypeScript best practices
+
+3. Testing
+   - Write unit tests
+   - Include integration tests
+   - Maintain test coverage
+
+## Common Commands
+```bash
+# Development
+npm run dev          # Start development server
+npm run build       # Build for production
+npm run test        # Run tests
+npm run lint        # Run linter
+
+# Documentation
+npm run docs:api    # Generate API documentation
+npm run docs:tech   # Generate technical documentation
+```
+
+## Troubleshooting
+When encountering issues:
+1. Check the error logs
+2. Verify environment variables
+3. Ensure dependencies are up to date
+4. Consult the documentation
+
+## Support
+For additional assistance:
+1. Check the project documentation
+2. Review the error logs
+3. Search for similar issues
+4. Contact the development team
+
+## Note
+This document is intended to help guide interactions with ChatGPT and should be updated as the project evolves. 

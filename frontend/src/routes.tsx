@@ -2,13 +2,16 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from './features/store';
-import { UserRole } from './modules/shared/types';
+import { UserRole } from './types';
 
 // Layout
 import Layout from './components/Layout';
 
 // Auth Pages
-import Login from './pages/Login';
+import Login from './modules/auth/pages/Login';
+import Register from './modules/auth/pages/Register';
+import ForgotPassword from './modules/auth/pages/ForgotPassword';
+import ResetPassword from './modules/auth/pages/ResetPassword';
 
 // Dashboard
 import Dashboard from './pages/Dashboard';
@@ -104,6 +107,9 @@ const AppRoutes: React.FC = () => {
       {/* Public routes */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       {/* Protected routes */}
       <Route path="/" element={

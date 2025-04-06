@@ -1,41 +1,38 @@
-import express from 'express';
-import * as userController from '../controllers/user.controller';
-import { protect, restrictTo } from '../middleware/auth';
-import { validate } from '../middleware/validation';
-import { body } from 'express-validator';
+import { Router } from 'express';
+import { userController } from '../controllers/user.controller';
+import { validate } from '../middleware/validation.middleware';
+import { userSchema } from '../schemas/user.schema';
+import { role } from '../middleware/auth.middleware';
 
-const router = express.Router();
-
-const userValidation = [
-  body('email').isEmail().withMessage('Please provide a valid email'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
-  body('role').isIn(['USER', 'ADMIN', 'SUPERADMIN']).withMessage('Invalid role')
-];
+const router = Router();
 
 // Public routes
-router.post('/register', validate(userValidation), userController.register);
+router.post('/register', validate(userSchema), userController.register);
 router.post('/login', userController.login);
 
 // Protected routes
-router.use(protect);
+router.use(role('user')); // All routes below require at least user role
 
-// User profile routes
-router.get('/profile', userController.getProfile);
-router.put('/profile', validate(userValidation), userController.updateProfile);
-router.patch('/preferences', userController.updatePreferences);
-router.post('/avatar', userController.uploadAvatar);
-
-// 2FA routes
-router.post('/2fa/enable', userController.enable2FA);
-router.post('/2fa/verify', userController.verify2FA);
+router
+  .route('/profile')
+  .get(userController.getProfile)
+  .put(validate(userSchema), userController.updateProfile);
 
 // Admin routes
-router.use(restrictTo('ADMIN', 'SUPERADMIN'));
+router.use(role('admin')); // All routes below require admin role
 
-router.route('/')
-  .get(userController.getUsers)
-  .post(validate(userValidation), userController.createUser);
+router
+  .route('/')
+  .get(userController.getAll)
+  .post(validate(userSchema), userController.create);
+
+router
+  .route('/:id')
+  .get(userController.getById)
+  .put(validate(userSchema), userController.update)
+  .delete(userController.delete);
+
+// Authorization route
+router.patch('/:id/authorize', userController.authorizeUser);
 
 export default router;

@@ -1,136 +1,224 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { User } from '../models/user.model';
 import { AppError } from '../utils/appError';
+import bcrypt from 'bcryptjs';
 
-export const login = async (_req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    // TODO: Implement login logic
-    res.status(200).json({
-      status: 'success',
-      message: 'Login successful'
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const userController = {
+  async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { username, password } = req.body;
 
-export const register = async (_req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    // TODO: Implement registration logic
-    res.status(201).json({
-      status: 'success',
-      message: 'Registration successful'
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      if (!username || !password) {
+        throw AppError.badRequest('Please provide username and password');
+      }
 
-export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: req.user,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const user = await User.findOne({ username }).select('+password +isAuthorized');
+      
+      if (!user || !user.isAuthorized) {
+        throw AppError.unauthorized('Invalid username or password');
+      }
 
-export const updateProfile = async (_req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    // TODO: Implement update profile logic
-    res.status(200).json({
-      status: 'success',
-      message: 'Profile updated successfully'
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const isPasswordValid = await user.comparePassword(password);
+      if (!isPasswordValid) {
+        throw AppError.unauthorized('Invalid username or password');
+      }
 
-export const getUsers = async (_req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const users = await User.find();
-    res.status(200).json({ status: 'success', data: { users } });
-  } catch (error) {
-    next(error);
-  }
-};
+      // Update last login
+      user.lastLogin = new Date();
+      await user.save({ validateBeforeSave: false });
 
-export const createUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const { email, password, firstName, lastName, role } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return next(new AppError(400, 'Email already in use'));
+      res.status(200).json({
+        status: 'success',
+        data: {
+          user: {
+            id: user._id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            isAuthorized: user.isAuthorized,
+            lastLogin: user.lastLogin
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
     }
+  },
 
-    const user = await User.create({ email, password, firstName, lastName, role });
-    res.status(201).json({ status: 'success', data: { user } });
-  } catch (error) {
-    next(error);
-  }
-};
+  async register(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { username, password, firstName, lastName, role } = req.body;
 
-export const enable2FA = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      return next(new AppError(401, 'User not authenticated'));
+      // Check if username exists
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        throw AppError.conflict('Username already in use');
+      }
+
+      // Create new user (not authorized by default)
+      const newUser = await User.create({
+        username,
+        password,
+        firstName,
+        lastName,
+        role: role || 'user',
+        isAuthorized: false
+      });
+
+      res.status(201).json({
+        status: 'success',
+        message: 'User registered successfully. Waiting for admin authorization.',
+        data: {
+          user: {
+            id: newUser._id,
+            username: newUser.username,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            role: newUser.role,
+            isAuthorized: newUser.isAuthorized
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
     }
+  },
 
-    user.mfa.enabled = true;
-    await user.save();
-    res.status(200).json({ status: 'success', message: '2FA enabled' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const verify2FA = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user;
-    if (!user || !user.mfa.secret) {
-      return next(new AppError(400, '2FA not enabled for this user'));
+  async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const user = await User.findById(req.user?.id).select('-password');
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+      res.json(user);
+    } catch (error) {
+      next(error);
     }
+  },
 
-    // Add logic to verify the 2FA code
-    res.status(200).json({ status: 'success', message: '2FA verified' });
-  } catch (error) {
-    next(error);
-  }
-};
+  async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { password, ...userData } = req.body;
+      const updateData = { ...userData };
 
-export const updatePreferences = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      return next(new AppError(401, 'User not authenticated'));
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 12);
+      }
+
+      const user = await User.findByIdAndUpdate(
+        req.user?.id,
+        updateData,
+        { new: true, runValidators: true }
+      ).select('-password');
+
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+
+      res.json(user);
+    } catch (error) {
+      next(error);
     }
+  },
 
-    user.preferences = { ...user.preferences, ...req.body.preferences };
-    await user.save();
-    res.status(200).json({ status: 'success', message: 'Preferences updated' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const uploadAvatar = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      return next(new AppError(401, 'User not authenticated'));
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await User.find().select('-password');
+      res.json(users);
+    } catch (error) {
+      next(error);
     }
+  },
 
-    // Add logic to handle avatar upload
-    res.status(200).json({ status: 'success', message: 'Avatar uploaded' });
-  } catch (error) {
-    next(error);
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await User.findById(req.params.id).select('-password');
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { password, ...userData } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 12);
+      
+      const user = await User.create({
+        ...userData,
+        password: hashedPassword,
+        isAuthorized: true // Admin-created users are authorized by default
+      });
+
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { password, ...userData } = req.body;
+      const updateData = { ...userData };
+
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 12);
+      }
+
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+      ).select('-password');
+
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await User.findByIdAndDelete(req.params.id);
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async authorizeUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { isAuthorized: true },
+        { new: true }
+      ).select('-password');
+
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+
+      res.json({
+        status: 'success',
+        message: 'User authorized successfully',
+        data: { user }
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 };
+
+export { userController };

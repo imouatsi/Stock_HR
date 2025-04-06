@@ -1,95 +1,42 @@
 import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import path from 'path';
+import { format } from 'winston';
+import { join } from 'path';
 import fs from 'fs';
 
+const { combine, timestamp, printf, colorize } = format;
+
 // Ensure logs directory exists
-const logsDir = path.join(process.cwd(), 'logs');
+const logsDir = join(process.cwd(), 'logs');
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }
 
-// Custom format for structured logging
-const structuredFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
-  const meta = Object.keys(metadata).length ? JSON.stringify(metadata, null, 2) : '';
-  return `${timestamp} [${level.toUpperCase()}]: ${message} ${meta}`;
-});
-
-// Custom format to mask sensitive data
-const maskSensitiveData = winston.format((info) => {
-  const masked = { ...info };
-  
-  // List of fields to mask
-  const sensitiveFields = ['password', 'token', 'authorization', 'cookie', 'apiKey'];
-  
-  // Recursive function to mask sensitive data
-  const maskData = (obj: any) => {
-    if (!obj || typeof obj !== 'object') return;
-    
-    Object.keys(obj).forEach(key => {
-      if (typeof obj[key] === 'object') {
-        maskData(obj[key]);
-      } else if (
-        sensitiveFields.some(field => 
-          key.toLowerCase().includes(field.toLowerCase())
-        )
-      ) {
-        obj[key] = '[REDACTED]';
-      }
-    });
-  };
-
-  maskData(masked);
-  return masked;
+const logFormat = printf((info) => {
+  const { level, message, timestamp, ...metadata } = info;
+  let msg = `${timestamp} [${level}]: ${message}`;
+  if (Object.keys(metadata).length > 0) {
+    msg += ` ${JSON.stringify(metadata)}`;
+  }
+  return msg;
 });
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  level: 'info',
   format: winston.format.combine(
-    maskSensitiveData(),
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
-    winston.format.errors({ stack: true }),
+    winston.format.timestamp(),
     winston.format.json()
   ),
-  defaultMeta: { 
-    service: 'stock-hr-api',
-    environment: process.env.NODE_ENV || 'development'
-  },
   transports: [
-    // Error logs
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'error-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      level: 'error',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        structuredFormat
-      )
-    }),
-    // Combined logs
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'combined-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        structuredFormat
-      )
-    })
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
   ]
 });
 
-// Add console transport in non-production environments
 if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
-      winston.format.timestamp(),
-      winston.format.align(),
-      structuredFormat
+      winston.format.simple()
     )
   }));
 }
@@ -129,8 +76,16 @@ export interface TypedLogger {
 
 // Create a typed logger instance
 export const typedLogger: TypedLogger = {
-  error: (message: string, metadata?: LogMetadata) => logger.error(message, metadata),
-  warn: (message: string, metadata?: LogMetadata) => logger.warn(message, metadata),
-  info: (message: string, metadata?: LogMetadata) => logger.info(message, metadata),
-  debug: (message: string, metadata?: LogMetadata) => logger.debug(message, metadata),
+  error: (message: string, metadata?: LogMetadata) => {
+    logger.error(message, metadata);
+  },
+  warn: (message: string, metadata?: LogMetadata) => {
+    logger.warn(message, metadata);
+  },
+  info: (message: string, metadata?: LogMetadata) => {
+    logger.info(message, metadata);
+  },
+  debug: (message: string, metadata?: LogMetadata) => {
+    logger.debug(message, metadata);
+  }
 };

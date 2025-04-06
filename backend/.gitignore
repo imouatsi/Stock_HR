@@ -4,14 +4,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Build output
+# Build
 dist/
 build/
 
 # Environment variables
 .env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
 
 # IDE
 .idea/
@@ -23,16 +29,12 @@ build/
 .DS_Store
 Thumbs.db
 
-# Logs
-logs/
-*.log
-
-# Uploads
-uploads/
-
-# Test coverage
+# Testing
 coverage/
 
 # Temporary files
-tmp/
-temp/ 
+*.tmp
+*.temp
+
+# Uploads
+uploads/ 

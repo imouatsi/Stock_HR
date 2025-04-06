@@ -11,34 +11,53 @@ export type ErrorCode =
 
 export interface ErrorDetails {
   field?: string;
-  value?: any;
-  reason?: string;
-  [key: string]: any;
+  message: string;
 }
 
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly status: string;
   public readonly isOperational: boolean;
-  public readonly code: ErrorCode;
   public readonly details?: ErrorDetails[];
-  public readonly timestamp: Date;
+  public readonly code: ErrorCode;
+  public readonly timestamp: string;
 
   constructor(
-    statusCode: number,
     message: string,
-    code: ErrorCode = 'INTERNAL_ERROR',
-    details?: ErrorDetails[]
+    statusCode: number,
+    details?: ErrorDetails[],
+    code?: ErrorCode
   ) {
     super(message);
     this.statusCode = statusCode;
     this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
     this.isOperational = true;
-    this.code = code;
     this.details = details;
-    this.timestamp = new Date();
+    this.code = code || this.getErrorCodeFromStatus(statusCode);
+    this.timestamp = new Date().toISOString();
 
     Error.captureStackTrace(this, this.constructor);
+  }
+
+  private getErrorCodeFromStatus(statusCode: number): ErrorCode {
+    switch (statusCode) {
+      case 400:
+        return 'BAD_REQUEST';
+      case 401:
+        return 'AUTHENTICATION_ERROR';
+      case 403:
+        return 'AUTHORIZATION_ERROR';
+      case 404:
+        return 'NOT_FOUND';
+      case 409:
+        return 'CONFLICT';
+      case 429:
+        return 'RATE_LIMIT_EXCEEDED';
+      case 503:
+        return 'SERVICE_UNAVAILABLE';
+      default:
+        return 'INTERNAL_ERROR';
+    }
   }
 
   public toJSON() {
@@ -54,38 +73,38 @@ export class AppError extends Error {
 
   // Helper methods for creating common errors
   static badRequest(message: string, details?: ErrorDetails[]) {
-    return new AppError(400, message, 'BAD_REQUEST', details);
+    return new AppError(message, 400, details, 'BAD_REQUEST');
   }
 
   static unauthorized(message: string = 'Authentication required', details?: ErrorDetails[]) {
-    return new AppError(401, message, 'AUTHENTICATION_ERROR', details);
+    return new AppError(message, 401, details, 'AUTHENTICATION_ERROR');
   }
 
   static forbidden(message: string = 'Access denied', details?: ErrorDetails[]) {
-    return new AppError(403, message, 'AUTHORIZATION_ERROR', details);
+    return new AppError(message, 403, details, 'AUTHORIZATION_ERROR');
   }
 
   static notFound(message: string = 'Resource not found', details?: ErrorDetails[]) {
-    return new AppError(404, message, 'NOT_FOUND', details);
+    return new AppError(message, 404, details, 'NOT_FOUND');
   }
 
   static conflict(message: string, details?: ErrorDetails[]) {
-    return new AppError(409, message, 'CONFLICT', details);
+    return new AppError(message, 409, details, 'CONFLICT');
   }
 
   static validationError(message: string, details?: ErrorDetails[]) {
-    return new AppError(400, message, 'VALIDATION_ERROR', details);
+    return new AppError(message, 400, details, 'VALIDATION_ERROR');
   }
 
   static rateLimitExceeded(message: string = 'Too many requests', details?: ErrorDetails[]) {
-    return new AppError(429, message, 'RATE_LIMIT_EXCEEDED', details);
+    return new AppError(message, 429, details, 'RATE_LIMIT_EXCEEDED');
   }
 
   static internal(message: string = 'Internal server error', details?: ErrorDetails[]) {
-    return new AppError(500, message, 'INTERNAL_ERROR', details);
+    return new AppError(message, 500, details, 'INTERNAL_ERROR');
   }
 
   static serviceUnavailable(message: string = 'Service temporarily unavailable', details?: ErrorDetails[]) {
-    return new AppError(503, message, 'SERVICE_UNAVAILABLE', details);
+    return new AppError(message, 503, details, 'SERVICE_UNAVAILABLE');
   }
 }

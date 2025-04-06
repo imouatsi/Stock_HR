@@ -2,12 +2,12 @@ import React from 'react';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../features/store';
+import { RootState, AppDispatch } from '../features/store';
 import { toggleTheme } from '../features/slices/settingsSlice';
 import { motion } from 'framer-motion';
 
 export const ThemeToggle: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const { settings } = useSelector((state: RootState) => state.settings);
 

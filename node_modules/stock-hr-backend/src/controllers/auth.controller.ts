@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, CookieOptions } from 'express';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { User } from '../models/user.model';
@@ -22,11 +22,11 @@ const createSendToken = (user: any, statusCode: number, res: Response) => {
   const token = signToken(user._id);
   
   // Set cookie options
-  const cookieOptions = {
+  const cookieOptions: CookieOptions = {
     expires: new Date(Date.now() + COOKIE_EXPIRES_IN),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax' as const
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   };
 
   // Set JWT cookie
@@ -46,7 +46,7 @@ const createSendToken = (user: any, statusCode: number, res: Response) => {
         lastName: user.lastName,
         role: user.role,
         permissions: user.permissions || [],
-        isActive: user.active || true,
+        isActive: user.isActive || true,
         lastLogin: user.lastLogin,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
@@ -61,13 +61,13 @@ export const register = catchAsync(async (req: Request, res: Response, next: Nex
   // Check if user exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return next(new AppError(400, 'Email already in use'));
+    return next(AppError.conflict('Email already in use'));
   }
 
   // Validate password
   const passwordValidation = validatePassword(req.body.password);
   if (!passwordValidation.isValid) {
-    return next(new AppError(400, passwordValidation.error!));
+    return next(AppError.validationError(passwordValidation.error!));
   }
 
   // Create new user
@@ -77,7 +77,7 @@ export const register = catchAsync(async (req: Request, res: Response, next: Nex
     email: req.body.email,
     password: req.body.password,
     role: req.body.role || 'user',
-    active: true
+    isActive: true
   });
 
   createSendToken(newUser, 201, res);
@@ -88,19 +88,19 @@ export const login = catchAsync(async (req: Request, res: Response, next: NextFu
 
   // Check if email and password exist
   if (!email || !password) {
-    return next(new AppError(400, 'Please provide email and password'));
+    return next(AppError.badRequest('Please provide email and password'));
   }
 
   // Find user and check if password is correct
-  const user = await User.findOne({ email }).select('+password +active');
+  const user = await User.findOne({ email }).select('+password +isActive');
   
-  if (!user || !user.active) {
-    return next(new AppError(401, 'Incorrect email or password'));
+  if (!user || !user.isActive) {
+    return next(AppError.unauthorized('Incorrect email or password'));
   }
 
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
-    return next(new AppError(401, 'Incorrect email or password'));
+    return next(AppError.unauthorized('Incorrect email or password'));
   }
 
   // Update last login
@@ -127,7 +127,7 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response, nex
   // Find user by email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError(404, 'There is no user with that email address'));
+    return next(AppError.notFound('There is no user with that email address'));
   }
 
   // Generate reset token
@@ -158,7 +158,7 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response, nex
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
-    return next(new AppError(500, 'Error sending email. Please try again later.'));
+    return next(AppError.internal('Error sending email. Please try again later.'));
   }
 });
 
@@ -175,13 +175,13 @@ export const resetPassword = catchAsync(async (req: Request, res: Response, next
   });
 
   if (!user) {
-    return next(new AppError(400, 'Token is invalid or has expired'));
+    return next(AppError.badRequest('Token is invalid or has expired'));
   }
 
   // Validate new password
   const passwordValidation = validatePassword(req.body.password);
   if (!passwordValidation.isValid) {
-    return next(new AppError(400, passwordValidation.error!));
+    return next(AppError.validationError(passwordValidation.error!));
   }
 
   // Update password and clear reset token
@@ -191,4 +191,63 @@ export const resetPassword = catchAsync(async (req: Request, res: Response, next
   await user.save();
 
   createSendToken(user, 200, res);
+});
+
+export const changePassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  // Get user from collection
+  const user = await User.findById(req.user!.id).select('+password');
+  if (!user) {
+    return next(AppError.notFound('User not found'));
+  }
+
+  // Check current password
+  const isCurrentPasswordValid = await user.comparePassword(req.body.currentPassword);
+  if (!isCurrentPasswordValid) {
+    return next(AppError.unauthorized('Current password is incorrect'));
+  }
+
+  // Validate new password
+  const passwordValidation = validatePassword(req.body.newPassword);
+  if (!passwordValidation.isValid) {
+    return next(AppError.validationError(passwordValidation.error!));
+  }
+
+  // Update password
+  user.password = req.body.newPassword;
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
+
+export const updateProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  // Create error if user tries to update password
+  if (req.body.password) {
+    return next(AppError.badRequest('This route is not for password updates. Please use /change-password'));
+  }
+
+  // Filter allowed fields
+  const allowedFields = ['firstName', 'lastName', 'email', 'settings', 'organization'];
+  const filteredBody = Object.keys(req.body)
+    .filter(key => allowedFields.includes(key))
+    .reduce((obj: any, key) => {
+      obj[key] = req.body[key];
+      return obj;
+    }, {});
+
+  // Update user document
+  const updatedUser = await User.findByIdAndUpdate(req.user!.id, filteredBody, {
+    new: true,
+    runValidators: true
+  });
+
+  if (!updatedUser) {
+    return next(AppError.notFound('User not found'));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser
+    }
+  });
 });

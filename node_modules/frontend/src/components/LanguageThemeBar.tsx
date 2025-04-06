@@ -4,7 +4,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { DarkMode, LightMode } from '@mui/icons-material';
-import { RootState } from '../features/store';
+import { RootState, AppDispatch } from '../features/store';
 import { updateLanguage, toggleTheme } from '../features/slices/settingsSlice';
 
 const languages = [
@@ -15,7 +15,7 @@ const languages = [
 
 export const LanguageThemeBar: React.FC = () => {
   const { i18n } = useTranslation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { theme, language } = useSelector((state: RootState) => state.settings.settings);
 
   const handleLanguageChange = (_: any, newLang: string) => {

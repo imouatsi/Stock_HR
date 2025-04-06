@@ -347,6 +347,148 @@ If you encounter issues not covered here:
 
 Remember: Everyone was a beginner once! Don't hesitate to ask for help when needed.
 
+## Getting Started
+
+### System Requirements
+- Node.js (v14 or higher)
+- MongoDB (v4.4 or higher)
+- Git
+
+### Installation
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/stock-hr.git
+cd stock-hr
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Configure environment variables
+```env
+NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/stock_hr
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=90d
+JWT_COOKIE_EXPIRES_IN=90
+```
+
+4. Start the application
+```bash
+npm start
+```
+
+## User Authentication
+
+### Username Format
+- Superadmin: SA00000
+- Admin: UA00001
+- User: U00002
+
+### Registration
+1. Fill in the registration form
+2. Choose a strong password
+3. Submit the form
+4. Wait for admin authorization
+
+### Login
+1. Enter your username
+2. Enter your password
+3. Click login
+4. Access your dashboard
+
+### Password Requirements
+- Minimum 8 characters
+- At least one number
+- At least one lowercase letter
+- At least one uppercase letter
+- At least one special character
+
+## User Roles
+
+### Superadmin
+- Full system access
+- Manage all users
+- Configure system settings
+- Access all features
+
+### Admin
+- Manage regular users
+- Authorize new users
+- View system reports
+- Access admin features
+
+### User
+- View personal profile
+- Update own information
+- Access assigned features
+- Submit requests
+
+## Common Tasks
+
+### Update Profile
+1. Go to profile page
+2. Edit information
+3. Save changes
+4. Verify updates
+
+### Change Password
+1. Go to settings
+2. Enter current password
+3. Enter new password
+4. Confirm new password
+5. Save changes
+
+### Request Authorization
+1. Register account
+2. Contact admin
+3. Wait for approval
+4. Receive notification
+
+## Troubleshooting
+
+### Login Issues
+- Check username format
+- Verify password
+- Ensure account is authorized
+- Contact admin if needed
+
+### Authorization Issues
+- Check email for notification
+- Contact admin for status
+- Verify account details
+- Follow up if delayed
+
+### Password Reset
+1. Click forgot password
+2. Enter username
+3. Check email
+4. Follow reset link
+5. Set new password
+
+## Best Practices
+
+### Security
+- Use strong passwords
+- Don't share credentials
+- Log out when done
+- Report suspicious activity
+
+### Account Management
+- Keep profile updated
+- Use secure passwords
+- Enable notifications
+- Review account activity
+
+### System Usage
+- Follow guidelines
+- Save work regularly
+- Use help resources
+- Report issues promptly
+
 ---
 
 Now you're ready to use the Stock & HR Management System! As you get more comfortable, explore more features and functionalities. 

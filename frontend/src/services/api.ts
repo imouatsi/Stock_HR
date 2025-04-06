@@ -32,7 +32,7 @@ const cache = setupCache({
 });
 
 // Create axios instance with cache adapter
-const api = axios.create({
+export const api = axios.create({
   ...config,
   headers: {
     'Content-Type': 'application/json',
@@ -89,6 +89,10 @@ const logAuthEvent = (event: string, details?: any) => {
 // Add a request interceptor
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     logAuthEvent('API Request', {
       url: config.url,
       method: config.method,
@@ -116,7 +120,7 @@ api.interceptors.response.use(
     });
     return response;
   },
-  (error) => {
+  async (error) => {
     logAuthEvent('API Response Error', {
       url: error.config?.url,
       status: error.response?.status,
@@ -125,6 +129,7 @@ api.interceptors.response.use(
     });
 
     if (error.response?.status === 401) {
+      localStorage.removeItem('token');
       // Only redirect to login if we're not already on the login page
       const currentPath = window.location.pathname;
       if (currentPath !== '/login') {
@@ -140,5 +145,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export default api;

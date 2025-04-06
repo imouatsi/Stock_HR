@@ -3,16 +3,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ICompany extends Document {
   name: string;
   address: string;
-  nif: string;
-  phone?: string;
-  email?: string;
+  phone: string;
+  email: string;
   website?: string;
   logo?: string;
-  bankDetails?: {
-    bankName?: string;
-    accountNumber?: string;
-    iban?: string;
-  };
+  taxId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,44 +24,27 @@ const companySchema = new Schema<ICompany>(
       required: [true, 'Company address is required'],
       trim: true,
     },
-    nif: {
-      type: String,
-      required: [true, 'NIF is required'],
-      trim: true,
-      unique: true,
-    },
     phone: {
       type: String,
+      required: [true, 'Company phone is required'],
       trim: true,
     },
     email: {
       type: String,
+      required: [true, 'Company email is required'],
       trim: true,
       lowercase: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
     },
     website: {
       type: String,
       trim: true,
-      match: [/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, 'Please enter a valid URL'],
     },
     logo: {
       type: String,
-      trim: true,
     },
-    bankDetails: {
-      bankName: {
-        type: String,
-        trim: true,
-      },
-      accountNumber: {
-        type: String,
-        trim: true,
-      },
-      iban: {
-        type: String,
-        trim: true,
-      },
+    taxId: {
+      type: String,
+      trim: true,
     },
   },
   {

@@ -1,26 +1,20 @@
 import { Router } from 'express';
-import { CompanyController } from '../controllers/company.controller';
-import { authMiddleware } from '../middleware/auth';
-import { validateRequest } from '../middleware/validateRequest.middleware';
-import { companySchema } from '../validators/company.validator';
-import { upload } from '../utils/upload';
+import { companyController } from '../controllers/company.controller';
+import { validate } from '../middleware/validation.middleware';
+import { companySchema } from '../schemas/company.schema';
+import { role } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Apply auth middleware to all routes
-router.use(authMiddleware);
+router
+  .route('/')
+  .get(companyController.getAll)
+  .post(role('admin'), validate(companySchema), companyController.create);
 
-// Get company details
-router.get('/', CompanyController.getCompanyDetails);
-
-// Update company details
-router.put(
-  '/',
-  validateRequest(companySchema),
-  CompanyController.updateCompanyDetails
-);
-
-// Upload company logo
-router.post('/logo', upload.single('logo') as any, CompanyController.uploadLogo);
+router
+  .route('/:id')
+  .get(companyController.getById)
+  .put(role('admin'), validate(companySchema), companyController.update)
+  .delete(role('admin'), companyController.delete);
 
 export default router; 

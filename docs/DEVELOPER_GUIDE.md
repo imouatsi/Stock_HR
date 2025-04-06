@@ -498,7 +498,88 @@ export default UserService;
 
 ## Authentication & Authorization
 
-### Authentication Flow
+### Authentication System
+
+#### Username Format
+The system uses a standardized username format for different user roles:
+- Superadmin: SA00000
+- Admin: UA00001
+- User: U00002
+
+#### User Model
+```typescript
+interface IUser {
+  username: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  role: UserRole;
+  isAuthorized: boolean;
+  permissions: string[];
+  isActive: boolean;
+  lastLogin?: Date;
+  passwordChangedAt?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  loginAttempts: number;
+  lockUntil?: Date;
+  settings: {
+    theme: 'light' | 'dark';
+    language: string;
+    timezone: string;
+    accessibility: {
+      highContrast: boolean;
+      fontSize: 'small' | 'medium' | 'large';
+    };
+    workspace: {
+      defaultView: string;
+      sidebarCollapsed: boolean;
+    };
+  };
+  organization?: mongoose.Types.ObjectId;
+}
+```
+
+#### User Schema
+```typescript
+const userSchema = new Schema<IUser>({
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+    trim: true,
+    match: [/^(SA|UA|U)\d{5}$/, 'Invalid username format']
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: 8,
+    select: false
+  },
+  // ... other fields
+});
+```
+
+#### Authentication Flow
+1. User Registration
+   - User provides username and password
+   - System validates username format
+   - System hashes password
+   - User is created with isAuthorized = false
+
+2. Admin Authorization
+   - Admin reviews user request
+   - Admin authorizes user
+   - User can now log in
+
+3. User Login
+   - User provides username and password
+   - System verifies credentials
+   - System checks authorization status
+   - System generates JWT token
+   - User is logged in
+
+#### Security Implementation
 
 1. User submits login credentials
 2. Backend validates credentials and returns JWT token
@@ -822,3 +903,230 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for detailed contribution guidelines.
 ---
 
 This documentation is a living document and will be updated as the project evolves. For questions or suggestions, please open an issue on the project repository. 
+
+## System Architecture
+
+### Authentication System
+```typescript
+interface AuthenticationSystem {
+  // Username format
+  username: {
+    superadmin: 'SA' + number;  // SA00000
+    admin: 'UA' + number;       // UA00001
+    user: 'U' + number;         // U00002
+  };
+
+  // Password requirements
+  password: {
+    minLength: 8;
+    requireNumbers: true;
+    requireLowercase: true;
+    requireUppercase: true;
+    requireSpecialChars: true;
+  };
+
+  // Authorization
+  authorization: {
+    isAuthorized: boolean;
+    role: 'superadmin' | 'admin' | 'user';
+    permissions: string[];
+  };
+}
+```
+
+### User Model
+```typescript
+interface IUser {
+  username: string;      // Format: SA00000, UA00001, U00002
+  password: string;      // Hashed
+  role: 'superadmin' | 'admin' | 'user';
+  isAuthorized: boolean;
+  firstName?: string;
+  lastName?: string;
+  permissions: string[];
+  settings: {
+    theme: 'light' | 'dark';
+    language: string;
+    notifications: boolean;
+  };
+  lastLogin?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### User Schema
+```typescript
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+    match: [/^(SA|UA|U)\d{5}$/, 'Invalid username format']
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [8, 'Password must be at least 8 characters long'],
+    select: false
+  },
+  role: {
+    type: String,
+    enum: ['superadmin', 'admin', 'user'],
+    default: 'user'
+  },
+  isAuthorized: {
+    type: Boolean,
+    default: false
+  },
+  firstName: String,
+  lastName: String,
+  permissions: [String],
+  settings: {
+    theme: {
+      type: String,
+      enum: ['light', 'dark'],
+      default: 'light'
+    },
+    language: String,
+    notifications: Boolean
+  },
+  lastLogin: Date
+}, {
+  timestamps: true
+});
+```
+
+## Authentication Flow
+
+### User Registration
+1. Validate username format
+2. Check username uniqueness
+3. Hash password
+4. Create user record
+5. Set isAuthorized to false
+
+### Admin Authorization
+1. Admin reviews user
+2. Updates isAuthorized
+3. Sets permissions
+4. Notifies user
+
+### User Login
+1. Validate credentials
+2. Check authorization
+3. Generate JWT
+4. Update last login
+5. Return user data
+
+## Security Implementation
+
+### Password Hashing
+```typescript
+const hashPassword = async (password: string): Promise<string> => {
+  const salt = await bcrypt.genSalt(12);
+  return bcrypt.hash(password, salt);
+};
+
+const comparePassword = async (password: string, hash: string): Promise<boolean> => {
+  return bcrypt.compare(password, hash);
+};
+```
+
+### JWT Implementation
+```typescript
+const generateToken = (userId: string): string => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  );
+};
+
+const verifyToken = (token: string): JwtPayload => {
+  return jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+};
+```
+
+## Error Handling
+
+### Custom Errors
+```typescript
+class AppError extends Error {
+  constructor(
+    public statusCode: number,
+    public message: string,
+    public isOperational = true
+  ) {
+    super(message);
+    Object.setPrototypeOf(this, AppError.prototype);
+  }
+}
+
+// Authentication errors
+class AuthError extends AppError {
+  constructor(message: string) {
+    super(401, message);
+  }
+}
+
+// Validation errors
+class ValidationError extends AppError {
+  constructor(message: string) {
+    super(400, message);
+  }
+}
+```
+
+## Testing
+
+### Unit Tests
+```typescript
+describe('User Model', () => {
+  test('should create user with valid username', async () => {
+    const userData = {
+      username: 'U00001',
+      password: 'Test@123',
+      role: 'user'
+    };
+    const user = await User.create(userData);
+    expect(user.username).toBe('U00001');
+    expect(user.role).toBe('user');
+    expect(user.isAuthorized).toBe(false);
+  });
+});
+```
+
+### Integration Tests
+```typescript
+describe('Authentication API', () => {
+  test('should login with valid credentials', async () => {
+    const response = await loginUser({
+      username: 'U00001',
+      password: 'Test@123'
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.token).toBeDefined();
+  });
+});
+```
+
+## Best Practices
+
+### Code Organization
+- Modular structure
+- Clear separation of concerns
+- Consistent naming conventions
+- Comprehensive documentation
+
+### Security
+- Input validation
+- Password hashing
+- JWT implementation
+- Access control
+
+### Performance
+- Database indexing
+- Query optimization
+- Caching strategy
+- Resource management 

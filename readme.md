@@ -1,142 +1,151 @@
-# Stock & HR Management System
+# Stock HR System
 
-A modern, full-stack application for managing inventory, invoices, and human resources. Built with React, Node.js, and MongoDB.
+A comprehensive HR management system built with Electron, TypeScript, and MongoDB.
 
 ## Features
 
-- 🚀 Modern, responsive UI with Material-UI
-- 🌍 Internationalization support (English & Arabic)
-- 🌙 Light/Dark theme support
-- 📊 Real-time inventory management
-- 📝 Invoice generation and management
-- 👥 HR management with employee profiles
-- 📈 Performance analytics and insights
-- 🔒 Secure authentication and authorization
-- 🔄 Real-time updates via WebSocket
-- 📱 Mobile-responsive design
+### Authentication
+- Username-based authentication
+- Role-based access control
+- Secure password hashing
+- JWT token management
 
-## Tech Stack
+### User Management
+- User registration
+- Admin authorization
+- Profile management
+- Role assignment
 
-### Frontend
-- React with TypeScript
-- Material-UI for UI components
-- Redux Toolkit for state management
-- Socket.io-client for real-time updates
-- i18next for internationalization
-- Axios for API communication
+### Security
+- Password encryption
+- Session management
+- Input validation
+- Error handling
 
-### Backend
-- Node.js with Express
-- TypeScript for type safety
-- MongoDB with Mongoose
-- JWT for authentication
-- Socket.io for real-time communication
-- Winston for logging
-
-## Getting Started
+## Installation
 
 ### Prerequisites
 - Node.js (v14 or higher)
-- MongoDB
-- npm or yarn
+- MongoDB (v4.4 or higher)
+- Git
 
-### Installation
-
-1. Clone the repository:
+### Setup
+1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/stock-hr.git
 cd stock-hr
 ```
 
-2. Install dependencies:
+2. Install dependencies
 ```bash
-# Install root dependencies
-npm install
-
-# Install frontend dependencies
-cd frontend
-npm install
-
-# Install backend dependencies
-cd ../backend
 npm install
 ```
 
-3. Set up environment variables:
-```bash
-# In the root directory
-cp .env.example .env
-
-# In the frontend directory
-cp .env.example .env
-
-# In the backend directory
-cp .env.example .env
+3. Configure environment variables
+```env
+NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/stock_hr
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=90d
+JWT_COOKIE_EXPIRES_IN=90
 ```
 
-4. Update the environment variables in each .env file with your configuration.
-
-### Running the Application
-
-1. Start the backend server:
+4. Start the application
 ```bash
-cd backend
-npm run dev
-```
-
-2. Start the frontend development server:
-```bash
-cd frontend
 npm start
 ```
 
-3. Access the application at http://localhost:3000
+## Usage
 
-## Project Structure
+### User Roles
+- Superadmin (SA00000)
+- Admin (UA00001)
+- User (U00002)
 
-```
-stock-hr/
-├── frontend/                # React frontend application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/         # Page components
-│   │   ├── features/      # Redux slices and features
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── utils/         # Utility functions
-│   │   ├── services/      # API services
-│   │   ├── theme/         # Theme configuration
-│   │   └── i18n/          # Internationalization
-│   └── public/            # Static assets
-├── backend/                # Node.js backend application
-│   ├── src/
-│   │   ├── controllers/   # Route controllers
-│   │   ├── models/        # Database models
-│   │   ├── routes/        # API routes
-│   │   ├── services/      # Business logic
-│   │   ├── middleware/    # Custom middleware
-│   │   └── utils/         # Utility functions
-│   └── logs/              # Application logs
-└── shared/                # Shared types and utilities
+### Authentication
+1. Register a new user
+```bash
+curl -X POST http://localhost:3000/api/v1/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "U00001", "password": "Test@123"}'
 ```
 
-## API Documentation
+2. Login with credentials
+```bash
+curl -X POST http://localhost:3000/api/v1/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "U00001", "password": "Test@123"}'
+```
 
-The API documentation is available at `/api-docs` when running the backend server.
+### Admin Functions
+1. Get all users
+```bash
+curl -X GET http://localhost:3000/api/v1/users \
+  -H "Authorization: Bearer your_token"
+```
+
+2. Authorize a user
+```bash
+curl -X PATCH http://localhost:3000/api/v1/users/user_id/authorize \
+  -H "Authorization: Bearer your_token"
+```
+
+## Development
+
+### Code Style
+- TypeScript strict mode
+- ESLint configuration
+- Prettier formatting
+- Conventional commits
+
+### Testing
+```bash
+# Run unit tests
+npm test
+
+# Run integration tests
+npm run test:integration
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### Documentation
+```bash
+# Generate API documentation
+npm run docs:api
+
+# Generate technical documentation
+npm run docs:tech
+```
+
+## Security
+
+### Authentication
+- Username format validation
+- Password strength requirements
+- JWT token expiration
+- Session management
+
+### Authorization
+- Role-based access control
+- Permission checks
+- Resource protection
+- Audit logging
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a pull request
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
-
-- Material-UI for the beautiful UI components
-- The React and Node.js communities for their excellent documentation
-- All contributors who have helped shape this project
-
 ## Support
 
-For support, please open an issue in the GitHub repository or contact the maintainers.
+For support, email support@example.com or create an issue in the repository.

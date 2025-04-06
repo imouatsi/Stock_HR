@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { User, IUser } from '../models/user.model';
 import { AppError } from '../utils/appError';
+import logger from '../utils/logger';
 
 // Extend Express Request type to include user
 declare global {
@@ -22,56 +23,67 @@ export const verifyToken = async (token: string): Promise<IUser> => {
     const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
     const user = await User.findById(decoded.id).select('-password +active');
     if (!user) {
-      throw new Error('User not found');
+      throw AppError.unauthorized('User not found');
     }
-    if (!user.active) {
-      throw new Error('User is inactive');
+    if (!user.isActive) {
+      throw AppError.unauthorized('User is inactive');
     }
     return user;
   } catch (error) {
-    throw new Error('Invalid token');
+    throw AppError.unauthorized('Invalid token');
   }
 };
 
 export const protect = async (req: Request, _res: Response, next: NextFunction) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
-
-  if (!token) {
-    return next(new AppError(401, 'You are not logged in! Please log in to get access.'));
-  }
-
   try {
+    // Get token from header or cookie
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+
+    if (!token) {
+      return next(AppError.unauthorized('You are not logged in! Please log in to get access.'));
+    }
+
+    // Verify token
     const decoded = jwt.verify(token, config.jwt.secret) as { id: string };
 
+    // Check if user exists
     const currentUser = await User.findById(decoded.id).select('+active');
     if (!currentUser) {
-      return next(new AppError(401, 'The user belonging to this token no longer exists.'));
+      return next(AppError.unauthorized('The user belonging to this token no longer exists.'));
     }
 
-    if (!currentUser.active) {
-      return next(new AppError(401, 'Your account is inactive. Please contact support.'));
+    // Check if user is active
+    if (!currentUser.isActive) {
+      return next(AppError.unauthorized('Your account is inactive. Please contact support.'));
     }
+
+    // Log successful authentication
+    logger.info('User authenticated successfully', {
+      userId: currentUser._id,
+      email: currentUser.email
+    });
 
     // Grant access to protected route
     req.user = currentUser;
     next();
   } catch (error) {
-    return next(new AppError(401, 'Invalid token. Please log in again.'));
+    logger.error('Authentication error', { error });
+    return next(AppError.unauthorized('Invalid token. Please log in again.'));
   }
 };
 
 export const restrictTo = (...roles: string[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      return next(new AppError(403, 'You do not have permission to perform this action'));
+      return next(AppError.forbidden('You do not have permission to perform this action'));
     }
     next();
   };

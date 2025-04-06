@@ -10,7 +10,7 @@ export const validateRequest = (
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessage = errors.array().map(err => err.msg).join(', ');
-    return next(new AppError(400, 'Invalid request body: ' + errorMessage));
+    return next(new AppError('Invalid request body: ' + errorMessage, 400));
   }
   next();
 };

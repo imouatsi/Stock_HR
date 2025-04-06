@@ -15,11 +15,12 @@ export type UserRole =
   | 'finance_manager';
 
 export interface IUser extends Document {
-  email: string;
+  username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   role: UserRole;
+  isAuthorized: boolean;
   permissions: string[];
   isActive: boolean;
   lastLogin?: Date;
@@ -29,7 +30,6 @@ export interface IUser extends Document {
   loginAttempts: number;
   lockUntil?: Date;
   settings: {
-    emailNotifications: boolean;
     theme: 'light' | 'dark';
     language: string;
     timezone: string;
@@ -42,12 +42,7 @@ export interface IUser extends Document {
       sidebarCollapsed: boolean;
     };
   };
-  organization: {
-    department?: string;
-    position?: string;
-    employeeId?: string;
-    joinDate?: Date;
-  };
+  organization?: mongoose.Types.ObjectId;
   comparePassword(candidatePassword: string): Promise<boolean>;
   incrementLoginAttempts(): Promise<void>;
   resetLoginAttempts(): Promise<void>;
@@ -55,28 +50,26 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    email: {
+    username: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, 'Username is required'],
       unique: true,
-      lowercase: true,
       trim: true,
+      match: [/^(SA|UA|U)\d{5}$/, 'Invalid username format']
     },
     password: {
       type: String,
       required: [true, 'Password is required'],
-      minlength: [8, 'Password must be at least 8 characters long'],
-      select: false,
+      minlength: 8,
+      select: false
     },
     firstName: {
       type: String,
-      required: [true, 'First name is required'],
-      trim: true,
+      trim: true
     },
     lastName: {
       type: String,
-      required: [true, 'Last name is required'],
-      trim: true,
+      trim: true
     },
     role: {
       type: String,
@@ -93,6 +86,10 @@ const userSchema = new Schema<IUser>(
         'finance_manager'
       ],
       required: [true, 'Role is required'],
+    },
+    isAuthorized: {
+      type: Boolean,
+      default: false
     },
     permissions: [{
       type: String,
@@ -143,7 +140,9 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: true,
     },
-    lastLogin: Date,
+    lastLogin: {
+      type: Date
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -153,10 +152,6 @@ const userSchema = new Schema<IUser>(
     },
     lockUntil: Date,
     settings: {
-      emailNotifications: {
-        type: Boolean,
-        default: true,
-      },
       theme: {
         type: String,
         enum: ['light', 'dark'],
@@ -193,14 +188,14 @@ const userSchema = new Schema<IUser>(
       },
     },
     organization: {
-      department: String,
-      position: String,
-      employeeId: String,
-      joinDate: Date,
+      type: Schema.Types.ObjectId,
+      ref: 'Organization'
     },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
@@ -209,7 +204,7 @@ userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
 
   try {
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
@@ -223,31 +218,43 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
   try {
     return await bcrypt.compare(candidatePassword, this.password);
   } catch (error) {
-    typedLogger.error('Error comparing password:', { error });
+    typedLogger.error('Error comparing passwords:', { error });
     return false;
   }
 };
 
 // Method to increment login attempts
 userSchema.methods.incrementLoginAttempts = async function(): Promise<void> {
-  if (this.lockUntil && this.lockUntil > new Date()) {
-    return;
+  try {
+    // If lockUntil is set and it's expired, reset login attempts
+    if (this.lockUntil && this.lockUntil < new Date()) {
+      this.loginAttempts = 1;
+      this.lockUntil = undefined;
+    } else {
+      this.loginAttempts += 1;
+      
+      // Lock account if max attempts reached
+      if (this.loginAttempts >= 5) {
+        this.lockUntil = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
+      }
+    }
+    await this.save();
+  } catch (error) {
+    typedLogger.error('Error incrementing login attempts:', { error });
+    throw error;
   }
-
-  this.loginAttempts += 1;
-
-  if (this.loginAttempts >= 5) {
-    this.lockUntil = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
-  }
-
-  await this.save();
 };
 
 // Method to reset login attempts
 userSchema.methods.resetLoginAttempts = async function(): Promise<void> {
-  this.loginAttempts = 0;
-  this.lockUntil = undefined;
-  await this.save();
+  try {
+    this.loginAttempts = 0;
+    this.lockUntil = undefined;
+    await this.save();
+  } catch (error) {
+    typedLogger.error('Error resetting login attempts:', { error });
+    throw error;
+  }
 };
 
-export default mongoose.model<IUser>('User', userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);

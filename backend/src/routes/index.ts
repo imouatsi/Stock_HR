@@ -7,6 +7,8 @@ import contractRoutes from './contract.routes';
 import invoiceRoutes from './invoice.routes';
 import licenseRoutes from './license.routes';
 import stockRoutes from '../modules/stock/routes/stock.routes';
+import companyRoutes from './company.routes';
+import { auth } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -14,7 +16,8 @@ const router = Router();
 router.use('/auth', authRoutes);
 
 // Protected routes
-router.use('/users', protect, userRoutes);
+router.use('/company', auth, companyRoutes);
+router.use('/user', auth, userRoutes);
 router.use('/inventory', protect, inventoryRoutes);
 router.use('/contracts', protect, contractRoutes);
 router.use('/invoices', protect, invoiceRoutes);

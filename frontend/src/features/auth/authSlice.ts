@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import authService, { UserProfile, LoginCredentials, RegisterData } from '../../services/authService';
-import { AxiosError } from 'axios';
+import { api } from '../../services/api';
+import { UserProfile } from '../../types';
 
 interface AuthState {
   user: UserProfile | null;
@@ -11,7 +11,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: authService.getStoredUser(),
+  user: null,
   token: localStorage.getItem('token'),
   isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
@@ -20,42 +20,37 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk<
   { token: string; data: { user: UserProfile } },
-  LoginCredentials,
+  { email: string; password: string },
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await authService.login(credentials.email, credentials.password);
-    return response;
-  } catch (err) {
-    if (err instanceof AxiosError && err.response?.data?.message) {
-      return rejectWithValue(err.response.data.message);
-    }
-    return rejectWithValue('An unexpected error occurred during login');
+    const response = await api.post('/auth/login', credentials);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.message || 'Login failed');
   }
 });
 
 export const register = createAsyncThunk<
   { token: string; data: { user: UserProfile } },
-  RegisterData,
+  { email: string; password: string; firstName: string; lastName: string },
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {
-    const response = await authService.register(userData);
-    return response;
-  } catch (err) {
-    if (err instanceof AxiosError && err.response?.data?.message) {
-      return rejectWithValue(err.response.data.message);
-    }
-    return rejectWithValue('An unexpected error occurred during registration');
+    const response = await api.post('/auth/register', userData);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.message || 'Registration failed');
   }
 });
 
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async () => {
-    authService.logout();
+export const logout = createAsyncThunk('auth/logout', async () => {
+  try {
+    await api.post('/auth/logout');
+  } catch (err) {
+    console.error('Logout error:', err);
   }
-);
+});
 
 export const getCurrentUser = createAsyncThunk<
   UserProfile,
@@ -63,12 +58,10 @@ export const getCurrentUser = createAsyncThunk<
   { rejectValue: string }
 >('auth/getCurrentUser', async (_, { rejectWithValue }) => {
   try {
-    return await authService.getCurrentUser();
-  } catch (err) {
-    if (err instanceof AxiosError && err.response?.data?.message) {
-      return rejectWithValue(err.response.data.message);
-    }
-    return rejectWithValue('Failed to fetch current user');
+    const response = await api.get('/auth/me');
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.message || 'Failed to fetch user');
   }
 });
 
@@ -78,6 +71,15 @@ const authSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+    clearUser: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
     },
   },
   extraReducers: (builder) => {
@@ -92,14 +94,11 @@ const authSlice = createSlice({
         state.user = action.payload.data.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
-        state.error = null;
+        localStorage.setItem('token', action.payload.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Login failed';
-        state.token = null;
-        state.user = null;
-        state.isAuthenticated = false;
       })
       // Register
       .addCase(register.pending, (state) => {
@@ -111,20 +110,18 @@ const authSlice = createSlice({
         state.user = action.payload.data.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
-        state.error = null;
+        localStorage.setItem('token', action.payload.token);
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Registration failed';
-        state.isAuthenticated = false;
       })
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
-        state.loading = false;
-        state.error = null;
+        localStorage.removeItem('token');
       })
       // Get Current User
       .addCase(getCurrentUser.pending, (state) => {
@@ -135,15 +132,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
-        state.error = null;
       })
       .addCase(getCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch user data';
+        state.error = action.payload || 'Failed to fetch user';
+        state.user = null;
+        state.token = null;
         state.isAuthenticated = false;
+        localStorage.removeItem('token');
       });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, setUser, clearUser } = authSlice.actions;
 export default authSlice.reducer; 

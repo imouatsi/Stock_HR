@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Language as LanguageIcon } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../features/store';
+import { RootState, AppDispatch } from '../features/store';
 import { updateLanguage } from '../features/slices/settingsSlice';
 import { motion } from 'framer-motion';
 
@@ -14,7 +14,7 @@ const languages = [
 
 export const LanguageSelector: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { settings } = useSelector((state: RootState) => state.settings);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
