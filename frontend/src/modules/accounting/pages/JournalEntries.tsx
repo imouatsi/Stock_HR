@@ -13,24 +13,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-interface Employee {
+interface JournalEntry {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  department: string;
-  position: string;
-  status: 'active' | 'inactive';
+  date: string;
+  reference: string;
+  description: string;
+  debit: number;
+  credit: number;
+  account: string;
 }
 
-const Employees: React.FC = () => {
+const JournalEntries: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddEmployee = () => {
-    // TODO: Implement add employee functionality
+  const handleAddEntry = () => {
+    // TODO: Implement add entry functionality
     toast({
       title: t('common.notImplemented'),
       description: t('common.featureComingSoon'),
@@ -40,9 +40,9 @@ const Employees: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t('hr.employees.title')}</h1>
-        <Button onClick={handleAddEmployee}>
-          {t('hr.employees.addEmployee')}
+        <h1 className="text-3xl font-bold">{t('accounting.journalEntries.title')}</h1>
+        <Button onClick={handleAddEntry}>
+          {t('accounting.journalEntries.addEntry')}
         </Button>
       </div>
 
@@ -50,41 +50,31 @@ const Employees: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('hr.employees.firstName')}</TableHead>
-              <TableHead>{t('hr.employees.lastName')}</TableHead>
-              <TableHead>{t('hr.employees.email')}</TableHead>
-              <TableHead>{t('hr.employees.department')}</TableHead>
-              <TableHead>{t('hr.employees.position')}</TableHead>
-              <TableHead>{t('hr.employees.status')}</TableHead>
+              <TableHead>{t('accounting.journalEntries.date')}</TableHead>
+              <TableHead>{t('accounting.journalEntries.reference')}</TableHead>
+              <TableHead>{t('accounting.journalEntries.description')}</TableHead>
+              <TableHead>{t('accounting.journalEntries.account')}</TableHead>
+              <TableHead className="text-right">{t('accounting.journalEntries.debit')}</TableHead>
+              <TableHead className="text-right">{t('accounting.journalEntries.credit')}</TableHead>
               <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.length === 0 ? (
+            {entries.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center">
                   {t('common.noData')}
                 </TableCell>
               </TableRow>
             ) : (
-              employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>{employee.firstName}</TableCell>
-                  <TableCell>{employee.lastName}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.position}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {t(`hr.employees.status.${employee.status}`)}
-                    </span>
-                  </TableCell>
+              entries.map((entry) => (
+                <TableRow key={entry.id}>
+                  <TableCell>{entry.date}</TableCell>
+                  <TableCell>{entry.reference}</TableCell>
+                  <TableCell>{entry.description}</TableCell>
+                  <TableCell>{entry.account}</TableCell>
+                  <TableCell className="text-right">${entry.debit.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">${entry.credit.toFixed(2)}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
@@ -110,4 +100,4 @@ const Employees: React.FC = () => {
   );
 };
 
-export default Employees; 
+export default JournalEntries; 

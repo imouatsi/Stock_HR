@@ -1,0 +1,101 @@
+{
+  "hr": {
+    "dashboard": {
+      "title": "Tableau de bord RH",
+      "totalEmployees": "Total des employés",
+      "activeDepartments": "Départements actifs",
+      "pendingLeaveRequests": "Demandes de congé en attente",
+      "upcomingReviews": "Évaluations à venir"
+    },
+    "employees": {
+      "title": "Employés",
+      "addEmployee": "Ajouter un employé",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "department": "Département",
+      "position": "Poste",
+      "status": "Statut",
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      }
+    }
+  },
+  "accounting": {
+    "dashboard": {
+      "title": "Tableau de bord Comptabilité",
+      "totalRevenue": "Revenu total",
+      "totalExpenses": "Dépenses totales",
+      "pendingInvoices": "Factures en attente",
+      "openContracts": "Contrats ouverts"
+    },
+    "invoices": {
+      "title": "Factures",
+      "addInvoice": "Ajouter une facture",
+      "number": "Numéro de facture",
+      "date": "Date",
+      "dueDate": "Date d'échéance",
+      "client": "Client",
+      "amount": "Montant",
+      "status": "Statut",
+      "status": {
+        "paid": "Payé",
+        "pending": "En attente",
+        "overdue": "En retard"
+      }
+    },
+    "proforma": {
+      "title": "Factures Proforma",
+      "addProforma": "Ajouter une facture proforma",
+      "number": "Numéro de facture proforma",
+      "date": "Date",
+      "client": "Client",
+      "amount": "Montant",
+      "status": "Statut",
+      "status": {
+        "draft": "Brouillon",
+        "sent": "Envoyé",
+        "accepted": "Accepté",
+        "rejected": "Rejeté"
+      }
+    },
+    "journalEntries": {
+      "title": "Écritures Comptables",
+      "addEntry": "Ajouter une écriture",
+      "date": "Date",
+      "reference": "Référence",
+      "description": "Description",
+      "account": "Compte",
+      "debit": "Débit",
+      "credit": "Crédit"
+    },
+    "chartOfAccounts": {
+      "title": "Plan Comptable",
+      "addAccount": "Ajouter un compte",
+      "code": "Code",
+      "name": "Nom",
+      "type": "Type",
+      "category": "Catégorie",
+      "balance": "Solde"
+    },
+    "financialStatements": {
+      "title": "États Financiers",
+      "generate": "Générer un état",
+      "type": "Type",
+      "period": "Période",
+      "date": "Date",
+      "status": "Statut",
+      "types": {
+        "balance_sheet": "Bilan",
+        "income_statement": "Compte de résultat",
+        "cash_flow": "Tableau de flux de trésorerie"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "final": "Final",
+        "approved": "Approuvé"
+      }
+    }
+  }
+} 

@@ -1,0 +1,101 @@
+{
+  "hr": {
+    "dashboard": {
+      "title": "HR Dashboard",
+      "totalEmployees": "Total Employees",
+      "activeDepartments": "Active Departments",
+      "pendingLeaveRequests": "Pending Leave Requests",
+      "upcomingReviews": "Upcoming Reviews"
+    },
+    "employees": {
+      "title": "Employees",
+      "addEmployee": "Add Employee",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "department": "Department",
+      "position": "Position",
+      "status": "Status",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    }
+  },
+  "accounting": {
+    "dashboard": {
+      "title": "Accounting Dashboard",
+      "totalRevenue": "Total Revenue",
+      "totalExpenses": "Total Expenses",
+      "pendingInvoices": "Pending Invoices",
+      "openContracts": "Open Contracts"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "addInvoice": "Add Invoice",
+      "number": "Invoice Number",
+      "date": "Date",
+      "dueDate": "Due Date",
+      "client": "Client",
+      "amount": "Amount",
+      "status": "Status",
+      "status": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "overdue": "Overdue"
+      }
+    },
+    "proforma": {
+      "title": "Proforma Invoices",
+      "addProforma": "Add Proforma",
+      "number": "Proforma Number",
+      "date": "Date",
+      "client": "Client",
+      "amount": "Amount",
+      "status": "Status",
+      "status": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      }
+    },
+    "journalEntries": {
+      "title": "Journal Entries",
+      "addEntry": "Add Entry",
+      "date": "Date",
+      "reference": "Reference",
+      "description": "Description",
+      "account": "Account",
+      "debit": "Debit",
+      "credit": "Credit"
+    },
+    "chartOfAccounts": {
+      "title": "Chart of Accounts",
+      "addAccount": "Add Account",
+      "code": "Code",
+      "name": "Name",
+      "type": "Type",
+      "category": "Category",
+      "balance": "Balance"
+    },
+    "financialStatements": {
+      "title": "Financial Statements",
+      "generate": "Generate Statement",
+      "type": "Type",
+      "period": "Period",
+      "date": "Date",
+      "status": "Status",
+      "types": {
+        "balance_sheet": "Balance Sheet",
+        "income_statement": "Income Statement",
+        "cash_flow": "Cash Flow Statement"
+      },
+      "status": {
+        "draft": "Draft",
+        "final": "Final",
+        "approved": "Approved"
+      }
+    }
+  }
+} 

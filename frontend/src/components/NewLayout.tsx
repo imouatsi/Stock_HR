@@ -64,12 +64,47 @@ const languages = [
 ];
 
 const menuItems = [
-  { text: 'common.dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
-  { text: 'common.inventory', icon: <Package size={20} />, path: '/stock/inventory', roles: ['admin', 'superadmin', 'inventory_clerk'] },
-  { text: 'contracts.title', icon: <FileText size={20} />, path: '/contracts', roles: ['superadmin'] },
-  { text: 'invoices.title', icon: <Receipt size={20} />, path: '/invoices', roles: ['admin', 'superadmin', 'manager'] },
-  { text: 'common.proforma', icon: <FileSpreadsheet size={20} />, path: '/proforma-invoices', roles: ['admin', 'superadmin', 'manager'] },
-  { text: 'users.title', icon: <Users size={20} />, path: '/users', roles: ['admin', 'superadmin'] },
+  { text: 'common.dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
+  { 
+    text: 'stock.title', 
+    icon: <Package size={20} />, 
+    path: '/stock', 
+    roles: ['admin', 'superadmin', 'inventory_clerk'],
+    children: [
+      { text: 'stock.inventory', path: '/stock/inventory' },
+      { text: 'stock.categories', path: '/stock/categories' },
+      { text: 'stock.suppliers', path: '/stock/suppliers' },
+      { text: 'stock.movements', path: '/stock/movements' },
+      { text: 'stock.purchaseOrders', path: '/stock/purchase-orders' },
+    ]
+  },
+  { 
+    text: 'hr.title', 
+    icon: <Users size={20} />, 
+    path: '/hr/dashboard',
+    roles: ['admin', 'superadmin', 'hr_manager'],
+    children: [
+      { text: 'hr.employees', path: '/hr/employees' },
+      { text: 'hr.departments', path: '/hr/departments' },
+      { text: 'hr.positions', path: '/hr/positions' },
+      { text: 'hr.leaveRequests', path: '/hr/leave-requests' },
+      { text: 'hr.performanceReviews', path: '/hr/performance-reviews' },
+    ]
+  },
+  { 
+    text: 'accounting.title', 
+    icon: <FileText size={20} />, 
+    path: '/accounting/dashboard',
+    roles: ['admin', 'superadmin', 'accountant'],
+    children: [
+      { text: 'accounting.invoices', path: '/accounting/invoices' },
+      { text: 'accounting.contracts', path: '/accounting/contracts' },
+      { text: 'accounting.proformas', path: '/accounting/proformas' },
+      { text: 'accounting.journalEntries', path: '/accounting/journal-entries' },
+      { text: 'accounting.chartOfAccounts', path: '/accounting/chart-of-accounts' },
+      { text: 'accounting.financialStatements', path: '/accounting/financial-statements' },
+    ]
+  },
   { text: 'settings.title', icon: <Settings size={20} />, path: '/settings', roles: ['admin', 'superadmin'] },
 ];
 
@@ -133,6 +168,10 @@ function Layout() {
 
   const handleThemeToggle = () => {
     dispatch(toggleTheme());
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   const renderMenuItems = () => {
@@ -267,20 +306,18 @@ function Layout() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleNavigation('/profile')}>
+                <DropdownMenuItem onClick={handleProfileClick}>
                   <User className="mr-2 h-4 w-4" />
-                  Profile
+                  <span>{t('profile.title')}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleNavigation('/settings')}>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  <span>{t('settings.title')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  <span>{t('auth.logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,6 +13,8 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '@/components/ui/use-toast';
 
 const settingsSchema = z.object({
   language: z.string(),
@@ -59,6 +61,12 @@ export function Settings() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { settings, isLoading } = useSelector((state: RootState) => state.settings);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState<SettingsFormData>({
+    ...settings,
+    currency: 'DZD', // Force DZD as default
+  });
 
   const {
     control,
@@ -72,20 +80,40 @@ export function Settings() {
     },
   });
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
   const onSubmit = async (data: SettingsFormData) => {
     try {
       dispatch(setLoading(true));
       await dispatch(updateSettings(data)).unwrap();
+      toast({
+        title: 'Success',
+        description: 'Settings updated successfully',
+      });
       // Reload the page to apply language changes if the language was changed
       if (data.language !== settings.language) {
         window.location.reload();
       }
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update settings',
+        variant: 'destructive',
+      });
     } finally {
       dispatch(setLoading(false));
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">

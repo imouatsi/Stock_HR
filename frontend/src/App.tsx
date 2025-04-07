@@ -19,13 +19,13 @@ import { Analytics } from './modules/analytics/pages/Analytics';
 import { Settings } from './modules/settings/pages/Settings';
 import { NotFound } from './components/NotFound';
 import { Contracts } from './modules/accounting/pages/Contracts';
-import { Invoices } from './modules/accounting/pages/Invoices';
+import Invoices from './modules/accounting/pages/Invoices';
 import { ProformaInvoices } from './modules/accounting/pages/ProformaInvoices';
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Router>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" forceDark>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />

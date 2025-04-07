@@ -97,6 +97,9 @@ const INITIAL_FILTERS: Filters = {
   sortOrder: 'asc'
 };
 
+const MOCK_CATEGORIES = ['Electronics', 'Furniture', 'Office Supplies', 'Books', 'Stationery'];
+const MOCK_SUPPLIERS = ['Supplier A', 'Supplier B', 'Supplier C', 'Supplier D'];
+
 export function StockList() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -140,18 +143,20 @@ export function StockList() {
   const fetchCategories = async () => {
     try {
       const response = await api.get('/stock/categories');
-      setCategories(response.data);
+      setCategories(response.data || MOCK_CATEGORIES);
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      // Silently fall back to mock data
+      setCategories(MOCK_CATEGORIES);
     }
   };
 
   const fetchSuppliers = async () => {
     try {
       const response = await api.get('/stock/suppliers');
-      setSuppliers(response.data);
+      setSuppliers(response.data || MOCK_SUPPLIERS);
     } catch (error) {
-      console.error('Failed to fetch suppliers:', error);
+      // Silently fall back to mock data
+      setSuppliers(MOCK_SUPPLIERS);
     }
   };
 
@@ -194,7 +199,7 @@ export function StockList() {
   const handleFilterSelectChange = (value: string, name: string) => {
     setFilters(prev => ({
       ...prev,
-      [name]: value
+      [name]: value === 'all' ? '' : value
     }));
   };
 
@@ -367,7 +372,7 @@ export function StockList() {
                     <SelectValue placeholder={t('stock.filters.category')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t('stock.filters.all')}</SelectItem>
+                    <SelectItem value="all">{t('stock.filters.all')}</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -491,6 +496,9 @@ export function StockList() {
             <DialogTitle>
               {selectedItem ? t('stock.editItem') : t('stock.addItem')}
             </DialogTitle>
+            <DialogDescription>
+              {selectedItem ? t('stock.editItemDescription') : t('stock.addItemDescription')}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

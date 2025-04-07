@@ -13,24 +13,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-interface Employee {
+interface FinancialStatement {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  department: string;
-  position: string;
-  status: 'active' | 'inactive';
+  type: 'balance_sheet' | 'income_statement' | 'cash_flow';
+  period: string;
+  date: string;
+  status: 'draft' | 'final' | 'approved';
 }
 
-const Employees: React.FC = () => {
+const FinancialStatements: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [statements, setStatements] = useState<FinancialStatement[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddEmployee = () => {
-    // TODO: Implement add employee functionality
+  const handleGenerateStatement = () => {
+    // TODO: Implement generate statement functionality
     toast({
       title: t('common.notImplemented'),
       description: t('common.featureComingSoon'),
@@ -40,9 +38,9 @@ const Employees: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t('hr.employees.title')}</h1>
-        <Button onClick={handleAddEmployee}>
-          {t('hr.employees.addEmployee')}
+        <h1 className="text-3xl font-bold">{t('accounting.financialStatements.title')}</h1>
+        <Button onClick={handleGenerateStatement}>
+          {t('accounting.financialStatements.generate')}
         </Button>
       </div>
 
@@ -50,39 +48,37 @@ const Employees: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('hr.employees.firstName')}</TableHead>
-              <TableHead>{t('hr.employees.lastName')}</TableHead>
-              <TableHead>{t('hr.employees.email')}</TableHead>
-              <TableHead>{t('hr.employees.department')}</TableHead>
-              <TableHead>{t('hr.employees.position')}</TableHead>
-              <TableHead>{t('hr.employees.status')}</TableHead>
+              <TableHead>{t('accounting.financialStatements.type')}</TableHead>
+              <TableHead>{t('accounting.financialStatements.period')}</TableHead>
+              <TableHead>{t('accounting.financialStatements.date')}</TableHead>
+              <TableHead>{t('accounting.financialStatements.status')}</TableHead>
               <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.length === 0 ? (
+            {statements.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={5} className="text-center">
                   {t('common.noData')}
                 </TableCell>
               </TableRow>
             ) : (
-              employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>{employee.firstName}</TableCell>
-                  <TableCell>{employee.lastName}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.position}</TableCell>
+              statements.map((statement) => (
+                <TableRow key={statement.id}>
+                  <TableCell>{t(`accounting.financialStatements.types.${statement.type}`)}</TableCell>
+                  <TableCell>{statement.period}</TableCell>
+                  <TableCell>{statement.date}</TableCell>
                   <TableCell>
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === 'active'
+                        statement.status === 'approved'
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          : statement.status === 'final'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {t(`hr.employees.status.${employee.status}`)}
+                      {t(`accounting.financialStatements.status.${statement.status}`)}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -90,14 +86,14 @@ const Employees: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        // TODO: Implement edit functionality
+                        // TODO: Implement view functionality
                         toast({
                           title: t('common.notImplemented'),
                           description: t('common.featureComingSoon'),
                         });
                       }}
                     >
-                      {t('common.edit')}
+                      {t('common.view')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -110,4 +106,4 @@ const Employees: React.FC = () => {
   );
 };
 
-export default Employees; 
+export default FinancialStatements; 

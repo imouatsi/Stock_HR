@@ -13,24 +13,23 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-interface Employee {
+interface Account {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  department: string;
-  position: string;
-  status: 'active' | 'inactive';
+  code: string;
+  name: string;
+  type: string;
+  category: string;
+  balance: number;
 }
 
-const Employees: React.FC = () => {
+const ChartOfAccounts: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddEmployee = () => {
-    // TODO: Implement add employee functionality
+  const handleAddAccount = () => {
+    // TODO: Implement add account functionality
     toast({
       title: t('common.notImplemented'),
       description: t('common.featureComingSoon'),
@@ -40,9 +39,9 @@ const Employees: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t('hr.employees.title')}</h1>
-        <Button onClick={handleAddEmployee}>
-          {t('hr.employees.addEmployee')}
+        <h1 className="text-3xl font-bold">{t('accounting.chartOfAccounts.title')}</h1>
+        <Button onClick={handleAddAccount}>
+          {t('accounting.chartOfAccounts.addAccount')}
         </Button>
       </div>
 
@@ -50,41 +49,29 @@ const Employees: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('hr.employees.firstName')}</TableHead>
-              <TableHead>{t('hr.employees.lastName')}</TableHead>
-              <TableHead>{t('hr.employees.email')}</TableHead>
-              <TableHead>{t('hr.employees.department')}</TableHead>
-              <TableHead>{t('hr.employees.position')}</TableHead>
-              <TableHead>{t('hr.employees.status')}</TableHead>
+              <TableHead>{t('accounting.chartOfAccounts.code')}</TableHead>
+              <TableHead>{t('accounting.chartOfAccounts.name')}</TableHead>
+              <TableHead>{t('accounting.chartOfAccounts.type')}</TableHead>
+              <TableHead>{t('accounting.chartOfAccounts.category')}</TableHead>
+              <TableHead className="text-right">{t('accounting.chartOfAccounts.balance')}</TableHead>
               <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.length === 0 ? (
+            {accounts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={6} className="text-center">
                   {t('common.noData')}
                 </TableCell>
               </TableRow>
             ) : (
-              employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>{employee.firstName}</TableCell>
-                  <TableCell>{employee.lastName}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.position}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {t(`hr.employees.status.${employee.status}`)}
-                    </span>
-                  </TableCell>
+              accounts.map((account) => (
+                <TableRow key={account.id}>
+                  <TableCell>{account.code}</TableCell>
+                  <TableCell>{account.name}</TableCell>
+                  <TableCell>{account.type}</TableCell>
+                  <TableCell>{account.category}</TableCell>
+                  <TableCell className="text-right">${account.balance.toFixed(2)}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
@@ -110,4 +97,4 @@ const Employees: React.FC = () => {
   );
 };
 
-export default Employees; 
+export default ChartOfAccounts; 

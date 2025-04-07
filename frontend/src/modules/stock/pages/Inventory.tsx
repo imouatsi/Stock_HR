@@ -35,10 +35,12 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import GradientButton from '../../../components/ui/GradientButton';
 import { stockService, type InventoryItem, type StockCategory } from '../../../services/stockService';
 import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '@/components/ui/use-toast';
 
 export const Inventory: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [categories, setCategories] = useState<StockCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +159,13 @@ export const Inventory: React.FC = () => {
     }
   };
 
+  const handleAddItem = () => {
+    toast({
+      title: t('common.notImplemented'),
+      description: t('common.featureComingSoon'),
+    });
+  };
+
   if (loading && items.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -178,9 +187,9 @@ export const Inventory: React.FC = () => {
         {canCreate && (
           <GradientButton
             startIcon={<AddIcon />}
-            onClick={() => handleOpen()}
+            onClick={handleAddItem}
           >
-            {t('stock.inventory.add')}
+            {t('stock.inventory.addItem')}
           </GradientButton>
         )}
       </Box>
