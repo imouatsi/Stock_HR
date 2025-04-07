@@ -1,56 +1,74 @@
 import React from 'react';
-import { DataTable } from '@/components/ui/data-table';
-import { ColumnDef } from '@tanstack/react-table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Department } from '@/types/department';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-const columns: ColumnDef<Department>[] = [
-  {
-    accessorKey: 'id',
-    header: 'ID',
-  },
-  {
-    accessorKey: 'name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'description',
-    header: 'Description',
-  },
-  {
-    accessorKey: 'manager',
-    header: 'Manager',
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const navigate = useNavigate();
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => navigate(`/hr/departments/${row.original.id}`)}
-        >
-          View Details
-        </Button>
-      );
-    },
-  },
-];
+interface DepartmentListProps {
+  departments: Department[];
+  onEdit: (department: Department) => void;
+  onDelete: (department: Department) => void;
+}
 
-export const DepartmentList: React.FC = () => {
-  const [departments, setDepartments] = React.useState<Department[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    // TODO: Fetch departments from API
-    setLoading(false);
-  }, []);
-
+export const DepartmentList: React.FC<DepartmentListProps> = ({
+  departments,
+  onEdit,
+  onDelete,
+}) => {
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-4">Departments</h1>
-      <DataTable columns={columns} data={departments} loading={loading} />
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Manager</TableHead>
+            <TableHead className="w-[70px]">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {departments.map((department) => (
+            <TableRow key={department.id}>
+              <TableCell>{department.name}</TableCell>
+              <TableCell>{department.description}</TableCell>
+              <TableCell>{department.managerId}</TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => onEdit(department)}>
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDelete(department)}>
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }; 

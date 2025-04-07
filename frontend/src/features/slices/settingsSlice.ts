@@ -1,22 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '../../config';
 
+interface NotificationSettings {
+  email: {
+    security: boolean;
+    updates: boolean;
+    marketing: boolean;
+  };
+  browser: boolean;
+  sound: boolean;
+  desktop: boolean;
+}
+
 interface Settings {
   language: string;
   theme: 'light' | 'dark';
   currency: string;
   dateFormat: string;
   timeFormat: string;
-  notifications: {
-    email: {
-      security: boolean;
-      updates: boolean;
-      marketing: boolean;
-    };
-    browser: boolean;
-    sound: boolean;
-    desktop: boolean;
-  };
+  notifications: NotificationSettings;
   autoLogout: number; // in minutes
   accessibility: {
     fontSize: 'small' | 'medium' | 'large';
@@ -169,6 +171,15 @@ const settingsSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    updateSettings: (state, action: PayloadAction<Settings>) => {
+      state.settings = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
   },
 });
 
@@ -187,6 +198,9 @@ export const {
   updateWorkspace,
   updateSecurity,
   clearError,
+  updateSettings,
+  setLoading,
+  setError,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

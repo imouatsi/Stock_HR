@@ -56,6 +56,11 @@ import {
   dialogTitle,
   dialogPaper,
 } from '../../../theme/gradientStyles';
+import { useTranslation as useTranslationUI } from '../../../hooks/useTranslation';
+import { Input } from '../../../components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TableHeader as TableHeaderUI, TableBody as TableBodyUI, TableRow as TableRowUI } from '../../../components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface StockItem {
   _id: string;
@@ -90,8 +95,9 @@ interface Filters {
   sortOrder: 'asc' | 'desc';
 }
 
-const StockList: React.FC = () => {
+export function StockList() {
   const { t } = useTranslation();
+  const { t: tUI } = useTranslationUI();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -228,10 +234,23 @@ const StockList: React.FC = () => {
   };
 
   const getStatusColor = (quantity: number, reorderPoint: number) => {
-    if (quantity <= 0) return { color: 'error.main', bg: 'error.light', label: 'Out of Stock' };
-    if (quantity <= reorderPoint) return { color: 'warning.main', bg: 'warning.light', label: 'Low Stock' };
-    return { color: 'success.main', bg: 'success.light', label: 'In Stock' };
+    if (quantity <= 0) return 'destructive';
+    if (quantity <= reorderPoint) return 'warning';
+    return 'success';
   };
+
+  const filteredItems = items
+    .filter(item => 
+      item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      item.description.toLowerCase().includes(filters.search.toLowerCase())
+    )
+    .filter(item => 
+      filters.category ? item.category === filters.category : true
+    )
+    .sort((a, b) => {
+      const order = filters.sortOrder === 'asc' ? 1 : -1;
+      return a[filters.sortBy as keyof StockItem] > b[filters.sortBy as keyof StockItem] ? order : -order;
+    });
 
   if (loading) {
     return (
@@ -265,345 +284,242 @@ const StockList: React.FC = () => {
   }
 
   return (
-    <Box sx={pageContainer}>
-      <Box className="page-title">
-        <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-          <Typography 
-            variant="h4" 
-            component="h1"
-            sx={gradientText}
-          >
-            {t('stock.title')}
-          </Typography>
-        </Slide>
-        <Grow in={true} timeout={1000}>
-          <GradientButton
-            onClick={handleClickOpen}
-            startIcon={<AddIcon />}
-          >
-            {t('stock.addItem')}
-          </GradientButton>
-        </Grow>
-      </Box>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Stock Management</h1>
+        <Button onClick={handleClickOpen}>Add New Item</Button>
+      </div>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <Input placeholder="Search items..." className="max-w-sm" value={filters.search} onChange={handleFilterTextChange} />
+            <Button variant="outline">Filter</Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              name="search"
-              label={t('common.search')}
-              value={filters.search}
-              onChange={handleFilterTextChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth>
-              <InputLabel>{t('stock.category')}</InputLabel>
-              <Select
-                name="category"
-                value={filters.category}
-                onChange={handleFilterSelectChange}
-                label={t('stock.category')}
-              >
-                <MenuItem value="">{t('common.all')}</MenuItem>
-                <MenuItem value="raw_materials">Raw Materials</MenuItem>
-                <MenuItem value="finished_goods">Finished Goods</MenuItem>
-                <MenuItem value="packaging">Packaging</MenuItem>
-                <MenuItem value="spare_parts">Spare Parts</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth>
-              <InputLabel>{t('common.sortBy')}</InputLabel>
-              <Select
-                name="sortBy"
-                value={filters.sortBy}
-                onChange={handleFilterSelectChange}
-                label={t('common.sortBy')}
-              >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="quantity">Quantity</MenuItem>
-                <MenuItem value="unitPrice">Price</MenuItem>
-                <MenuItem value="category">Category</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      <Fade in={true}>
-        <TableContainer 
-          component={Paper}
-          sx={tableContainer(theme)}
-        >
+      <Card>
+        <CardHeader>
+          <CardTitle>Stock Items</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Table>
-            <TableHead>
-              <TableRow sx={tableHeader}>
-                <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
-                  {t('stock.name')}
-                  {filters.sortBy === 'name' && (
-                    <SortIcon 
-                      sx={{ 
-                        ml: 1,
-                        transform: filters.sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
-                      }} 
-                    />
-                  )}
-                </TableCell>
-                <TableCell onClick={() => handleSort('quantity')} style={{ cursor: 'pointer' }}>
-                  {t('stock.quantity')}
-                  {filters.sortBy === 'quantity' && (
-                    <SortIcon 
-                      sx={{ 
-                        ml: 1,
-                        transform: filters.sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
-                      }} 
-                    />
-                  )}
-                </TableCell>
-                <TableCell>{t('stock.location')}</TableCell>
-                <TableCell onClick={() => handleSort('unitPrice')} style={{ cursor: 'pointer' }}>
-                  {t('stock.price')}
-                  {filters.sortBy === 'unitPrice' && (
-                    <SortIcon 
-                      sx={{ 
-                        ml: 1,
-                        transform: filters.sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
-                      }} 
-                    />
-                  )}
-                </TableCell>
-                <TableCell>{t('stock.status')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Unit</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
-              {items.map((item) => (
-                <React.Fragment key={item._id}>
-                  <TableRow 
-                    onClick={() => handleRowClick(item._id)}
-                    onMouseEnter={() => setHoveredRow(item._id)}
-                    onMouseLeave={() => setHoveredRow(null)}
-                    sx={{
-                      transition: 'all 0.2s ease-in-out',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: 'action.hover',
-                        transform: 'scale(1.01)',
-                        '& .row-actions': {
-                          transform: 'translateX(0)',
-                          opacity: 1,
+              {filteredItems.map((item) => (
+                <TableRowUI key={item._id}>
+                  <TableBodyUI>
+                    <TableRowUI 
+                      onClick={() => handleRowClick(item._id)}
+                      onMouseEnter={() => setHoveredRow(item._id)}
+                      onMouseLeave={() => setHoveredRow(null)}
+                      sx={{
+                        transition: 'all 0.2s ease-in-out',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                          transform: 'scale(1.01)',
+                          '& .row-actions': {
+                            transform: 'translateX(0)',
+                            opacity: 1,
+                          },
                         },
-                      },
-                      ...(expandedRow === item._id && {
-                        backgroundColor: 'action.selected',
-                      }),
-                    }}
-                  >
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <InventoryIcon color="primary" />
-                        {item.name}
-                        {expandedRow === item._id ? (
-                          <ExpandLessIcon color="action" />
-                        ) : (
-                          <ExpandMoreIcon color="action" />
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>{item.location}</TableCell>
-                    <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={getStatusColor(item.quantity, item.reorderPoint).label}
-                        sx={{
-                          backgroundColor: getStatusColor(item.quantity, item.reorderPoint).bg,
-                          color: getStatusColor(item.quantity, item.reorderPoint).color,
-                          fontWeight: 'medium',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box 
-                        className="row-actions"
-                        sx={{
-                          display: 'flex',
-                          gap: 1,
-                          transform: 'translateX(20px)',
-                          opacity: 0,
-                          transition: 'all 0.3s ease-in-out',
-                        }}
-                      >
-                        <Tooltip title={t('common.edit')} arrow TransitionComponent={Zoom}>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle edit
-                            }}
-                            sx={{
-                              transition: 'all 0.2s ease-in-out',
-                              '&:hover': {
-                                transform: 'scale(1.1) rotate(-8deg)',
-                                color: 'info.main',
-                              },
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')} arrow TransitionComponent={Zoom}>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteConfirm(item._id);
-                            }}
-                            sx={{
-                              transition: 'all 0.2s ease-in-out',
-                              '&:hover': {
-                                transform: 'scale(1.1) rotate(8deg)',
-                                color: 'error.main',
-                              },
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                  {expandedRow === item._id && (
-                    <TableRow>
-                      <TableCell colSpan={6} sx={{ p: 0 }}>
-                        <Collapse in={expandedRow === item._id} timeout="auto" unmountOnExit>
-                          <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
-                            <Paper 
-                              elevation={0}
-                              sx={{ 
-                                p: 2,
-                                backgroundColor: 'background.paper',
-                                borderRadius: 2,
-                                transition: 'all 0.3s ease-in-out',
+                        ...(expandedRow === item._id && {
+                          backgroundColor: 'action.selected',
+                        }),
+                      }}
+                    >
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>{item.unitPrice.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(item.quantity, item.reorderPoint)}>
+                          {item.quantity <= 0 ? 'Out of Stock' : 
+                           item.quantity <= item.reorderPoint ? 'Low Stock' : 'In Stock'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Box 
+                          className="row-actions"
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            transform: 'translateX(20px)',
+                            opacity: 0,
+                            transition: 'all 0.3s ease-in-out',
+                          }}
+                        >
+                          <Tooltip title={t('common.edit')} arrow TransitionComponent={Zoom}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle edit
+                              }}
+                              sx={{
+                                transition: 'all 0.2s ease-in-out',
                                 '&:hover': {
-                                  boxShadow: (theme) => theme.shadows[2],
+                                  transform: 'scale(1.1) rotate(-8deg)',
+                                  color: 'info.main',
                                 },
                               }}
                             >
-                              <Typography variant="subtitle1" gutterBottom>
-                                {t('stock.details')}
-                              </Typography>
-                              <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                  <Box>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {t('stock.description')}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {item.description}
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                  <Box>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {t('stock.supplier')}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {item.supplier}
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                  <Box>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {t('stock.reorderPoint')}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {item.reorderPoint}
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                  <Box>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {t('stock.lastRestocked')}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {new Date(item.lastRestocked).toLocaleDateString()}
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-                              </Grid>
-                            </Paper>
-                          </Box>
-                        </Collapse>
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')} arrow TransitionComponent={Zoom}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirm(item._id);
+                              }}
+                              sx={{
+                                transition: 'all 0.2s ease-in-out',
+                                '&:hover': {
+                                  transform: 'scale(1.1) rotate(8deg)',
+                                  color: 'error.main',
+                                },
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
-                    </TableRow>
-                  )}
-                  {deleteConfirm === item._id && (
-                    <TableRow>
-                      <TableCell colSpan={6} sx={{ p: 0 }}>
-                        <Collapse in={true} timeout="auto">
-                          <Box sx={{ p: 2, backgroundColor: 'error.light' }}>
-                            <Typography variant="body2" color="error" gutterBottom>
-                              {t('stock.confirmDelete')}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                              <Button
-                                size="small"
-                                variant="contained"
-                                color="error"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(item._id);
-                                }}
-                                sx={{
-                                  animation: 'shake 0.5s ease-in-out',
-                                  '@keyframes shake': {
-                                    '0%, 100%': { transform: 'translateX(0)' },
-                                    '25%': { transform: 'translateX(-5px)' },
-                                    '75%': { transform: 'translateX(5px)' },
+                    </TableRowUI>
+                    {expandedRow === item._id && (
+                      <TableRowUI>
+                        <TableCell colSpan={6} sx={{ p: 0 }}>
+                          <Collapse in={expandedRow === item._id} timeout="auto" unmountOnExit>
+                            <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
+                              <Paper 
+                                elevation={0}
+                                sx={{ 
+                                  p: 2,
+                                  backgroundColor: 'background.paper',
+                                  borderRadius: 2,
+                                  transition: 'all 0.3s ease-in-out',
+                                  '&:hover': {
+                                    boxShadow: (theme) => theme.shadows[2],
                                   },
                                 }}
                               >
-                                {t('common.confirm')}
-                              </Button>
-                              <Button
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteConfirm(null);
-                                }}
-                              >
-                                {t('common.cancel')}
-                              </Button>
+                                <Typography variant="subtitle1" gutterBottom>
+                                  {t('stock.details')}
+                                </Typography>
+                                <Grid container spacing={2}>
+                                  <Grid item xs={12} md={6}>
+                                    <Box>
+                                      <Typography variant="body2" color="text.secondary">
+                                        {t('stock.description')}
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {item.description}
+                                      </Typography>
+                                    </Box>
+                                  </Grid>
+                                  <Grid item xs={12} md={6}>
+                                    <Box>
+                                      <Typography variant="body2" color="text.secondary">
+                                        {t('stock.supplier')}
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {item.supplier}
+                                      </Typography>
+                                    </Box>
+                                  </Grid>
+                                  <Grid item xs={12} md={6}>
+                                    <Box>
+                                      <Typography variant="body2" color="text.secondary">
+                                        {t('stock.reorderPoint')}
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {item.reorderPoint}
+                                      </Typography>
+                                    </Box>
+                                  </Grid>
+                                  <Grid item xs={12} md={6}>
+                                    <Box>
+                                      <Typography variant="body2" color="text.secondary">
+                                        {t('stock.lastRestocked')}
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {new Date(item.lastRestocked).toLocaleDateString()}
+                                      </Typography>
+                                    </Box>
+                                  </Grid>
+                                </Grid>
+                              </Paper>
                             </Box>
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
+                          </Collapse>
+                        </TableCell>
+                      </TableRowUI>
+                    )}
+                    {deleteConfirm === item._id && (
+                      <TableRowUI>
+                        <TableCell colSpan={6} sx={{ p: 0 }}>
+                          <Collapse in={true} timeout="auto">
+                            <Box sx={{ p: 2, backgroundColor: 'error.light' }}>
+                              <Typography variant="body2" color="error" gutterBottom>
+                                {t('stock.confirmDelete')}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  color="error"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(item._id);
+                                  }}
+                                  sx={{
+                                    animation: 'shake 0.5s ease-in-out',
+                                    '@keyframes shake': {
+                                      '0%, 100%': { transform: 'translateX(0)' },
+                                      '25%': { transform: 'translateX(-5px)' },
+                                      '75%': { transform: 'translateX(5px)' },
+                                    },
+                                  }}
+                                >
+                                  {t('common.confirm')}
+                                </Button>
+                                <Button
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteConfirm(null);
+                                  }}
+                                >
+                                  {t('common.cancel')}
+                                </Button>
+                              </Box>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRowUI>
+                    )}
+                  </TableBodyUI>
+                </TableRowUI>
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
-      </Fade>
+        </CardContent>
+      </Card>
 
       <Dialog 
         open={open} 
@@ -756,8 +672,6 @@ const StockList: React.FC = () => {
           }
         `}
       </style>
-    </Box>
+    </div>
   );
-};
-
-export default StockList; 
+} 

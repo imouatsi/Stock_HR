@@ -1,122 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-  Alert,
-  Link,
-} from '@mui/material';
-import { login, clearError } from '../../../features/auth/authSlice';
-import { RootState } from '../../../features/store';
-import { AppDispatch } from '../../../features/store';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-const Login: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+export function Login() {
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      // TODO: Implement login logic
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
     }
-    return () => {
-      dispatch(clearError());
-    };
-  }, [isAuthenticated, navigate, dispatch]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(login({ email, password }));
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
-        p: 2,
-      }}
-    >
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          maxWidth: 400,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Login
-        </Typography>
-
-        {error && (
-          <Alert severity="error" onClose={() => dispatch(clearError())}>
-            {error}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            margin="normal"
-            required
-            autoFocus
-          />
-
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            required
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            sx={{ mt: 3, mb: 2 }}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Login'}
-          </Button>
-
-          <Box sx={{ textAlign: 'center' }}>
-            <Link href="/forgot-password" variant="body2">
-              Forgot password?
-            </Link>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Don't have an account?{' '}
-              <Link href="/register" variant="body2">
-                Register
-              </Link>
-            </Typography>
-          </Box>
-        </form>
-      </Paper>
-    </Box>
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                {...register('email')}
+                placeholder="Enter your email"
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                {...register('password')}
+                placeholder="Enter your password"
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+            <Button type="submit" className="w-full">
+              Sign In
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
-};
-
-export default Login; 
+} 

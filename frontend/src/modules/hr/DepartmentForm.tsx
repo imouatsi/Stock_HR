@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import * as z from 'zod';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -11,24 +11,29 @@ import { Department } from '@/types/department';
 
 const departmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
-  manager: z.string().min(1, 'Manager is required'),
+  description: z.string().optional(),
+  managerId: z.string().optional(),
 });
 
-type DepartmentFormData = z.infer<typeof departmentSchema>;
+type DepartmentFormValues = z.infer<typeof departmentSchema>;
 
 interface DepartmentFormProps {
   initialData?: Department;
-  onSubmit: (data: DepartmentFormData) => void;
+  onSubmit: (data: DepartmentFormValues) => void;
+  isLoading?: boolean;
 }
 
-export const DepartmentForm: React.FC<DepartmentFormProps> = ({ initialData, onSubmit }) => {
+export const DepartmentForm: React.FC<DepartmentFormProps> = ({
+  initialData,
+  onSubmit,
+  isLoading = false,
+}) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     setValue,
-  } = useForm<DepartmentFormData>({
+    formState: { errors },
+  } = useForm<DepartmentFormValues>({
     resolver: zodResolver(departmentSchema),
     defaultValues: initialData,
   });
@@ -40,8 +45,10 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({ initialData, onS
         <Input
           id="name"
           {...register('name')}
-          error={errors.name?.message}
         />
+        {errors.name && (
+          <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+        )}
       </div>
 
       <div>
@@ -49,26 +56,30 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({ initialData, onS
         <Textarea
           id="description"
           {...register('description')}
-          error={errors.description?.message}
         />
+        {errors.description && (
+          <p className="text-sm text-red-500 mt-1">{errors.description.message}</p>
+        )}
       </div>
 
       <div>
         <Label htmlFor="manager">Manager</Label>
         <Select
-          onValueChange={(value) => setValue('manager', value)}
-          defaultValue={initialData?.manager}
+          onValueChange={(value: string) => setValue('managerId', value)}
+          defaultValue={initialData?.managerId}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select manager" />
           </SelectTrigger>
           <SelectContent>
-            {/* TODO: Add manager options */}
+            {/* Add your manager options here */}
           </SelectContent>
         </Select>
       </div>
 
-      <Button type="submit">Save Department</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? 'Saving...' : 'Save'}
+      </Button>
     </form>
   );
 }; 

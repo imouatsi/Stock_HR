@@ -1,122 +1,58 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemButton,
-  Box,
-  Typography,
-  Divider,
-} from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  People as PeopleIcon,
-  Inventory as InventoryIcon,
-  Description as DescriptionIcon,
-  Receipt as ReceiptIcon,
-  Settings as SettingsIcon,
-  Assessment as AssessmentIcon,
-} from '@mui/icons-material';
-import { useSelector } from 'react-redux';
-import { RootState } from '../features/store';
+  LayoutDashboard,
+  Package,
+  Users,
+  BarChart3,
+  Settings,
+  LogOut,
+} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface MenuItem {
-  title: string;
-  path: string;
-  icon: React.ReactNode;
-  roles: string[];
-}
-
-const menuItems: MenuItem[] = [
-  {
-    title: 'Dashboard',
-    path: '/',
-    icon: <DashboardIcon />,
-    roles: ['admin', 'superadmin', 'user'],
-  },
-  {
-    title: 'Users',
-    path: '/users',
-    icon: <PeopleIcon />,
-    roles: ['admin', 'superadmin'],
-  },
-  {
-    title: 'Inventory',
-    path: '/inventory',
-    icon: <InventoryIcon />,
-    roles: ['admin', 'superadmin', 'user'],
-  },
-  {
-    title: 'Contracts',
-    path: '/contracts',
-    icon: <DescriptionIcon />,
-    roles: ['admin', 'superadmin', 'user'],
-  },
-  {
-    title: 'Invoices',
-    path: '/invoices',
-    icon: <ReceiptIcon />,
-    roles: ['admin', 'superadmin', 'user'],
-  },
-  {
-    title: 'Auth Logs',
-    path: '/auth-logs',
-    icon: <AssessmentIcon />,
-    roles: ['superadmin'],
-  },
-  {
-    title: 'Settings',
-    path: '/settings',
-    icon: <SettingsIcon />,
-    roles: ['admin', 'superadmin'],
-  },
-];
-
-const Sidebar: React.FC = () => {
-  const navigate = useNavigate();
+export function Sidebar() {
   const location = useLocation();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { logout } = useAuth();
 
-  const filteredMenuItems = menuItems.filter((item) =>
-    item.roles.includes(user?.role || '')
-  );
+  const menuItems = [
+    { path: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+    { path: '/stock', icon: <Package size={20} />, label: 'Stock' },
+    { path: '/users', icon: <Users size={20} />, label: 'Users' },
+    { path: '/analytics', icon: <BarChart3 size={20} />, label: 'Analytics' },
+    { path: '/settings', icon: <Settings size={20} />, label: 'Settings' },
+  ];
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 240,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: 240,
-          boxSizing: 'border-box',
-        },
-      }}
-    >
-      <Box sx={{ overflow: 'auto', mt: 2 }}>
-        <Typography variant="h6" sx={{ px: 2, mb: 2 }}>
-          Stock HR
-        </Typography>
-        <Divider />
-        <List>
-          {filteredMenuItems.map((item) => (
-            <ListItem key={item.path} disablePadding>
-              <ListItemButton
-                selected={location.pathname === item.path}
-                onClick={() => navigate(item.path)}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-    </Drawer>
+    <div className="flex h-full w-64 flex-col border-r bg-background">
+      <div className="flex h-14 items-center border-b px-4">
+        <h1 className="text-lg font-semibold">Stock HR</h1>
+      </div>
+      <nav className="flex-1 space-y-1 p-2">
+        {menuItems.map((item) => (
+          <Button
+            key={item.path}
+            asChild
+            variant={location.pathname === item.path ? 'secondary' : 'ghost'}
+            className="w-full justify-start"
+          >
+            <Link to={item.path}>
+              {item.icon}
+              <span className="ml-2">{item.label}</span>
+            </Link>
+          </Button>
+        ))}
+      </nav>
+      <div className="border-t p-2">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-destructive hover:text-destructive"
+          onClick={logout}
+        >
+          <LogOut size={20} />
+          <span className="ml-2">Logout</span>
+        </Button>
+      </div>
+    </div>
   );
-};
-
-export default Sidebar; 
+} 

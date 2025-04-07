@@ -5,6 +5,7 @@ import contractReducer from './slices/contractSlice';
 import invoiceReducer from './slices/invoiceSlice';
 import userReducer from './slices/userSlice';
 import settingsReducer from './slices/settingsSlice';
+import analyticsReducer from './slices/analyticsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     invoices: invoiceReducer,
     users: userReducer,
     settings: settingsReducer,
+    analytics: analyticsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

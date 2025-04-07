@@ -3,7 +3,6 @@ export interface Department {
   name: string;
   description?: string;
   managerId?: string;
-  parentId?: string;
   createdAt: string;
   updatedAt: string;
 }

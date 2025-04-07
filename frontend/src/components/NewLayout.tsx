@@ -73,7 +73,7 @@ const menuItems = [
   { text: 'settings', icon: <Settings size={20} />, path: '/settings', roles: ['admin', 'superadmin'] },
 ];
 
-const NewLayout = () => {
+function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -294,6 +294,6 @@ const NewLayout = () => {
       </div>
     </div>
   );
-};
+}
 
-export default NewLayout; 
+export default Layout; 
