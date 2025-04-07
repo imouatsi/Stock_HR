@@ -39,6 +39,8 @@ import { stockService, type StockMovement, type InventoryItem } from '../../../s
 import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
+import { useToast } from '../../../hooks/useToast';
+import { api } from '../../../services/api';
 
 interface MovementFilters {
   type: string;
@@ -57,16 +59,35 @@ interface MovementFormData {
   notes?: string;
 }
 
+interface Movement {
+  _id: string;
+  itemId: string;
+  itemName: string;
+  type: 'in' | 'out';
+  quantity: number;
+  date: string;
+  reason: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+interface StockItem {
+  _id: string;
+  name: string;
+  quantity: number;
+}
+
 export const Movements: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
-  const [movements, setMovements] = useState<StockMovement[]>([]);
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const { showToast } = useToast();
+  const [movements, setMovements] = useState<Movement[]>([]);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedMovement, setSelectedMovement] = useState<StockMovement | null>(null);
+  const [selectedMovement, setSelectedMovement] = useState<Movement | null>(null);
   const [filters, setFilters] = useState<MovementFilters>({
     type: '',
     status: '',
@@ -86,26 +107,41 @@ export const Movements: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [actionType, setActionType] = useState<'delete' | 'cancel' | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchData();
-  }, [filters]);
+    fetchMovements();
+    fetchStockItems();
+  }, []);
 
-  const fetchData = async () => {
+  const fetchMovements = async () => {
     try {
       setLoading(true);
+      const response = await api.get('/movements');
+      setMovements(response.data);
       setError(null);
-      const [movementsData, itemsData] = await Promise.all([
-        stockService.getAllMovements(filters),
-        stockService.getAllInventoryItems(),
-      ]);
-      setMovements(movementsData);
-      setInventoryItems(itemsData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
-      enqueueSnackbar('Error loading data', { variant: 'error' });
+      setError(t('common.error.loading'));
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.loading'),
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStockItems = async () => {
+    try {
+      const response = await api.get('/stock');
+      setStockItems(response.data);
+    } catch (err) {
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.loading'),
+        variant: 'destructive'
+      });
     }
   };
 
@@ -116,16 +152,16 @@ export const Movements: React.FC = () => {
     }));
   };
 
-  const handleOpenDialog = (movement?: StockMovement) => {
+  const handleOpenDialog = (movement?: Movement) => {
     if (movement) {
       setSelectedMovement(movement);
       setFormData({
-        inventoryItem: movement.inventoryItem,
+        inventoryItem: movement.itemName,
         quantity: movement.quantity,
         type: movement.type,
-        source: movement.source || '',
-        destination: movement.destination || '',
-        notes: movement.notes || '',
+        source: '',
+        destination: '',
+        notes: movement.reason,
       });
     } else {
       setSelectedMovement(null);
@@ -188,32 +224,31 @@ export const Movements: React.FC = () => {
     setFormErrors(errors);
   };
 
-  const handleSubmit = async () => {
-    const errors = validateForm(formData);
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      setSaving(true);
-      setError(null);
-
-      if (selectedMovement) {
-        await stockService.updateMovement(selectedMovement._id, formData);
-        enqueueSnackbar('Movement updated successfully', { variant: 'success' });
-      } else {
-        await stockService.createMovement(formData);
-        enqueueSnackbar('Movement created successfully', { variant: 'success' });
-      }
-
-      handleCloseDialog();
-      fetchData();
+      await api.post('/movements', formData);
+      showToast({
+        title: t('common.success'),
+        description: t('stock.movements.createSuccess')
+      });
+      setOpenDialog(false);
+      setFormData({
+        inventoryItem: '',
+        quantity: 0,
+        type: 'in',
+        source: '',
+        destination: '',
+        notes: '',
+      });
+      fetchMovements();
+      fetchStockItems();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save movement');
-      enqueueSnackbar('Error saving movement', { variant: 'error' });
-    } finally {
-      setSaving(false);
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.save'),
+        variant: 'destructive'
+      });
     }
   };
 
@@ -223,16 +258,26 @@ export const Movements: React.FC = () => {
     try {
       setLoading(true);
       if (actionType === 'delete') {
-        await stockService.deleteMovement(selectedMovement._id);
-        enqueueSnackbar('Movement deleted successfully', { variant: 'success' });
+        await api.delete(`/movements/${selectedMovement._id}`);
+        showToast({
+          title: t('common.success'),
+          description: t('stock.movements.deleteSuccess')
+        });
       } else if (actionType === 'cancel') {
-        await stockService.cancelMovement(selectedMovement._id);
-        enqueueSnackbar('Movement cancelled successfully', { variant: 'success' });
+        await api.put(`/movements/${selectedMovement._id}/cancel`);
+        showToast({
+          title: t('common.success'),
+          description: t('stock.movements.cancelSuccess')
+        });
       }
-      fetchData();
+      fetchMovements();
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to ${actionType} movement`);
-      enqueueSnackbar(`Error ${actionType}ing movement`, { variant: 'error' });
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.save'),
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
       setConfirmDialog(false);
@@ -267,6 +312,11 @@ export const Movements: React.FC = () => {
     }
   };
 
+  const filteredMovements = movements.filter(movement =>
+    movement.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    movement.reason.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading && movements.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -276,294 +326,139 @@ export const Movements: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          {t('stock.movements.title')}
-        </Typography>
-        {user?.permissions.includes('stock:create') && (
-          <GradientButton
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-          >
-            {t('stock.movements.add')}
-          </GradientButton>
-        )}
-      </Box>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{t('stock.movements.title')}</h1>
+        <Button onClick={() => setOpenDialog(true)}>
+          {t('stock.movements.add')}
+        </Button>
+      </div>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+      <div className="flex gap-4">
+        <Input
+          placeholder={t('stock.movements.search')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
 
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth>
-              <InputLabel>{t('stock.movements.type')}</InputLabel>
-              <Select
-                value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                label={t('stock.movements.type')}
-              >
-                <MenuItem value="">{t('common.all')}</MenuItem>
-                <MenuItem value="in">{t('stock.movements.in')}</MenuItem>
-                <MenuItem value="out">{t('stock.movements.out')}</MenuItem>
-                <MenuItem value="transfer">{t('stock.movements.transfer')}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth>
-              <InputLabel>{t('stock.movements.status')}</InputLabel>
-              <Select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                label={t('stock.movements.status')}
-              >
-                <MenuItem value="">{t('common.all')}</MenuItem>
-                <MenuItem value="pending">{t('stock.movements.pending')}</MenuItem>
-                <MenuItem value="completed">{t('stock.movements.completed')}</MenuItem>
-                <MenuItem value="cancelled">{t('stock.movements.cancelled')}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth>
-              <InputLabel>{t('stock.movements.inventoryItem')}</InputLabel>
-              <Select
-                value={filters.inventoryItem}
-                onChange={(e) => handleFilterChange('inventoryItem', e.target.value)}
-                label={t('stock.movements.inventoryItem')}
-              >
-                <MenuItem value="">{t('common.all')}</MenuItem>
-                {inventoryItems.map((item) => (
-                  <MenuItem key={item._id} value={item._id}>
-                    {item.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              type="date"
-              label={t('stock.movements.startDate')}
-              value={filters.startDate}
-              onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              type="date"
-              label={t('stock.movements.endDate')}
-              value={filters.endDate}
-              onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-        </Grid>
-      </Paper>
-
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('stock.movements.reference')}</TableCell>
-              <TableCell>{t('stock.movements.type')}</TableCell>
-              <TableCell>{t('stock.movements.quantity')}</TableCell>
-              <TableCell>{t('stock.movements.inventoryItem')}</TableCell>
-              <TableCell>{t('stock.movements.status')}</TableCell>
-              <TableCell>{t('stock.movements.timestamp')}</TableCell>
-              <TableCell>{t('stock.movements.user')}</TableCell>
-              <TableCell>{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {movements.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      ) : error ? (
+        <div className="text-red-500 text-center">{error}</div>
+      ) : (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={8} align="center">
-                  {t('common.noData')}
-                </TableCell>
+                <TableHead>{t('stock.movements.item')}</TableHead>
+                <TableHead>{t('stock.movements.type')}</TableHead>
+                <TableHead>{t('stock.movements.quantity')}</TableHead>
+                <TableHead>{t('stock.movements.date')}</TableHead>
+                <TableHead>{t('stock.movements.reason')}</TableHead>
               </TableRow>
-            ) : (
-              movements.map((movement) => (
+            </TableHeader>
+            <TableBody>
+              {filteredMovements.map((movement) => (
                 <TableRow key={movement._id}>
-                  <TableCell>{movement.reference}</TableCell>
+                  <TableCell>{movement.itemName}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={t(`stock.movements.${movement.type}`)}
-                      color={getMovementTypeColor(movement.type)}
-                      size="small"
-                    />
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      movement.type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {movement.type === 'in' ? t('stock.movements.in') : t('stock.movements.out')}
+                    </span>
                   </TableCell>
                   <TableCell>{movement.quantity}</TableCell>
-                  <TableCell>
-                    {inventoryItems.find(item => item._id === movement.inventoryItem)?.name}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={t(`stock.movements.${movement.status}`)}
-                      color={getStatusColor(movement.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{format(new Date(movement.timestamp), 'dd/MM/yyyy HH:mm')}</TableCell>
-                  <TableCell>{movement.user.name}</TableCell>
-                  <TableCell>
-                    <Tooltip title={t('common.edit')}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenDialog(movement)}
-                        disabled={movement.status === 'completed'}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('stock.movements.cancel')}>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setSelectedMovement(movement);
-                          setActionType('cancel');
-                          setConfirmDialog(true);
-                        }}
-                        disabled={movement.status !== 'pending'}
-                      >
-                        <CancelIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('common.delete')}>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setSelectedMovement(movement);
-                          setActionType('delete');
-                          setConfirmDialog(true);
-                        }}
-                        disabled={movement.status === 'completed'}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                  <TableCell>{new Date(movement.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{movement.reason}</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
-      {/* Movement Form Dialog */}
       <Dialog open={openDialog} onOpenChange={handleCloseDialog}>
         <DialogContent>
-          <DialogTitle>
-            {selectedMovement ? t('stock.movements.edit') : t('stock.movements.add')}
-          </DialogTitle>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth error={!!formErrors.inventoryItem}>
-                <InputLabel>{t('stock.movements.inventoryItem')}</InputLabel>
-                <Select
-                  value={formData.inventoryItem}
-                  onChange={(e) => handleFormChange('inventoryItem', e.target.value)}
-                  label={t('stock.movements.inventoryItem')}
-                  disabled={!!selectedMovement}
-                >
-                  {inventoryItems.map((item) => (
-                    <MenuItem key={item._id} value={item._id}>
-                      {item.name}
-                    </MenuItem>
+          <DialogHeader>
+            <DialogTitle>{t('stock.movements.add')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.movements.item')}
+              </label>
+              <Select
+                value={formData.inventoryItem}
+                onValueChange={(value) => handleFormChange('inventoryItem', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('stock.movements.selectItem')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {stockItems.map((item) => (
+                    <SelectItem key={item._id} value={item._id}>
+                      {item.name} ({item.quantity})
+                    </SelectItem>
                   ))}
-                </Select>
-                {formErrors.inventoryItem && (
-                  <Typography color="error" variant="caption">
-                    {formErrors.inventoryItem}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth error={!!formErrors.type}>
-                <InputLabel>{t('stock.movements.type')}</InputLabel>
-                <Select
-                  value={formData.type}
-                  onChange={(e) => handleFormChange('type', e.target.value)}
-                  label={t('stock.movements.type')}
-                  disabled={!!selectedMovement}
-                >
-                  <MenuItem value="in">{t('stock.movements.in')}</MenuItem>
-                  <MenuItem value="out">{t('stock.movements.out')}</MenuItem>
-                  <MenuItem value="transfer">{t('stock.movements.transfer')}</MenuItem>
-                </Select>
-                {formErrors.type && (
-                  <Typography color="error" variant="caption">
-                    {formErrors.type}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.movements.type')}
+              </label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => handleFormChange('type', value as 'in' | 'out')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('stock.movements.selectType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="in">{t('stock.movements.in')}</SelectItem>
+                  <SelectItem value="out">{t('stock.movements.out')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.movements.quantity')}
+              </label>
+              <Input
                 type="number"
-                label={t('stock.movements.quantity')}
+                min="1"
                 value={formData.quantity}
-                onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
-                error={!!formErrors.quantity}
-                helperText={formErrors.quantity}
-                disabled={!!selectedMovement}
+                onChange={(e) => handleFormChange('quantity', parseInt(e.target.value))}
+                required
               />
-            </Grid>
-            {formData.type === 'transfer' && (
-              <>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label={t('stock.movements.source')}
-                    value={formData.source}
-                    onChange={(e) => handleFormChange('source', e.target.value)}
-                    error={!!formErrors.source}
-                    helperText={formErrors.source}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label={t('stock.movements.destination')}
-                    value={formData.destination}
-                    onChange={(e) => handleFormChange('destination', e.target.value)}
-                    error={!!formErrors.destination}
-                    helperText={formErrors.destination}
-                  />
-                </Grid>
-              </>
-            )}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label={t('stock.movements.notes')}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.movements.reason')}
+              </label>
+              <Input
                 value={formData.notes}
                 onChange={(e) => handleFormChange('notes', e.target.value)}
+                required
               />
-            </Grid>
-          </Grid>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-            <Button onClick={handleSubmit} color="primary" variant="contained">
-              {t('common.save')}
-            </Button>
-          </DialogActions>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpenDialog(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button type="submit">
+                {t('common.add')}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
-      {/* Confirmation Dialog */}
       <Dialog open={confirmDialog} onOpenChange={() => setConfirmDialog(false)}>
         <DialogContent>
           <DialogHeader>
@@ -582,6 +477,6 @@ export const Movements: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Box>
+    </div>
   );
 }; 

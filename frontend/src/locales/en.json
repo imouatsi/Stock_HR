@@ -37,7 +37,16 @@
     "create": "Create",
     "search": "Search",
     "filter": "Filter",
-    "actions": "Actions"
+    "actions": "Actions",
+    "add": "Add",
+    "loading": "Loading...",
+    "error": {
+      "title": "Error",
+      "loading": "Failed to load data",
+      "save": "Failed to save data",
+      "delete": "Failed to delete data"
+    },
+    "success": "Success"
   },
   "auth": {
     "login": "Login",
@@ -59,13 +68,9 @@
     "list": "User List"
   },
   "stock": {
-    "title": "Stock",
-    "create": "Create Item",
-    "edit": "Edit Item",
-    "delete": "Delete Item",
-    "list": "Stock List",
+    "title": "Stock Management",
     "inventory": {
-      "title": "Inventory Management",
+      "title": "Inventory",
       "add": "Add Item",
       "edit": "Edit Item",
       "name": "Name",
@@ -74,7 +79,60 @@
       "unit": "Unit",
       "minStock": "Minimum Stock",
       "maxStock": "Maximum Stock",
-      "currentStock": "Current Stock"
+      "currentStock": "Current Stock",
+      "search": "Search items...",
+      "createSuccess": "Item created successfully",
+      "updateSuccess": "Item updated successfully",
+      "deleteSuccess": "Item deleted successfully",
+      "confirmDelete": "Are you sure you want to delete this item?"
+    },
+    "categories": {
+      "title": "Categories",
+      "add": "Add Category",
+      "edit": "Edit Category",
+      "name": "Name",
+      "description": "Description",
+      "search": "Search categories...",
+      "createSuccess": "Category created successfully",
+      "updateSuccess": "Category updated successfully",
+      "deleteSuccess": "Category deleted successfully",
+      "confirmDelete": "Are you sure you want to delete this category?"
+    },
+    "suppliers": {
+      "title": "Suppliers",
+      "add": "Add Supplier",
+      "edit": "Edit Supplier",
+      "name": "Name",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "search": "Search suppliers...",
+      "createSuccess": "Supplier created successfully",
+      "updateSuccess": "Supplier updated successfully",
+      "deleteSuccess": "Supplier deleted successfully",
+      "confirmDelete": "Are you sure you want to delete this supplier?"
+    },
+    "movements": {
+      "title": "Stock Movements",
+      "add": "Add Movement",
+      "edit": "Edit Movement",
+      "item": "Item",
+      "type": "Type",
+      "quantity": "Quantity",
+      "date": "Date",
+      "reason": "Reason",
+      "search": "Search movements...",
+      "selectItem": "Select an item",
+      "selectType": "Select a type",
+      "in": "In",
+      "out": "Out",
+      "createSuccess": "Movement created successfully",
+      "updateSuccess": "Movement updated successfully",
+      "deleteSuccess": "Movement deleted successfully",
+      "cancelSuccess": "Movement cancelled successfully",
+      "confirmDelete": "Are you sure you want to delete this movement?",
+      "confirmCancel": "Are you sure you want to cancel this movement?"
     }
   },
   "analytics": {

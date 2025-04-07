@@ -1,46 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Tooltip,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
-import { useTranslation } from '../../../hooks/useTranslation';
-import GradientButton from '../../../components/ui/GradientButton';
-import { stockService, type StockCategory } from '../../../services/stockService';
-import { useAuth } from '../../../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../../contexts/AuthContext';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
+import { useToast } from '../../../hooks/useToast';
+import { api } from '../../../services/api';
+
+interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const Categories: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [categories, setCategories] = useState<StockCategory[]>([]);
+  const { showToast } = useToast();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<StockCategory | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
+    description: ''
   });
 
   useEffect(() => {
@@ -50,188 +38,183 @@ export const Categories: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const data = await stockService.getAllCategories();
-      setCategories(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch categories');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOpen = (category?: StockCategory) => {
-    if (category) {
-      setEditingCategory(category);
-      setFormData({
-        name: category.name,
-        description: category.description || '',
-      });
-    } else {
-      setEditingCategory(null);
-      setFormData({
-        name: '',
-        description: '',
-      });
-    }
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setEditingCategory(null);
-    setFormData({
-      name: '',
-      description: '',
-    });
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setLoading(true);
+      const response = await api.get('/categories');
+      setCategories(response.data);
       setError(null);
-
-      if (!formData.name) {
-        throw new Error('Name is required');
-      }
-
-      if (editingCategory) {
-        await stockService.updateCategory(editingCategory._id, formData);
-      } else {
-        await stockService.createCategory(formData);
-      }
-
-      await fetchCategories();
-      handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save category');
+      setError(t('common.error.loading'));
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.loading'),
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingCategory) {
+        await api.put(`/categories/${editingCategory._id}`, formData);
+        showToast({
+          title: t('common.success'),
+          description: t('stock.categories.updateSuccess')
+        });
+      } else {
+        await api.post('/categories', formData);
+        showToast({
+          title: t('common.success'),
+          description: t('stock.categories.createSuccess')
+        });
+      }
+      setIsDialogOpen(false);
+      setEditingCategory(null);
+      setFormData({ name: '', description: '' });
+      fetchCategories();
+    } catch (err) {
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.save'),
+        variant: 'destructive'
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this category?')) {
-      return;
-    }
-
+    if (!window.confirm(t('stock.categories.confirmDelete'))) return;
+    
     try {
-      setLoading(true);
-      setError(null);
-      await stockService.deleteCategory(id);
-      await fetchCategories();
+      await api.delete(`/categories/${id}`);
+      showToast({
+        title: t('common.success'),
+        description: t('stock.categories.deleteSuccess')
+      });
+      fetchCategories();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete category');
-    } finally {
-      setLoading(false);
+      showToast({
+        title: t('common.error.title'),
+        description: t('common.error.delete'),
+        variant: 'destructive'
+      });
     }
   };
 
-  if (loading && categories.length === 0) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const filteredCategories = categories.filter(category =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          {t('stock.categories.title')}
-        </Typography>
-        {user?.permissions.includes('stock:create') && (
-          <GradientButton
-            startIcon={<AddIcon />}
-            onClick={() => handleOpen()}
-          >
-            {t('stock.categories.add')}
-          </GradientButton>
-        )}
-      </Box>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{t('stock.categories.title')}</h1>
+        <Button onClick={() => setIsDialogOpen(true)}>
+          {t('stock.categories.add')}
+        </Button>
+      </div>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
+      <div className="flex gap-4">
+        <Input
+          placeholder={t('stock.categories.search')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      ) : error ? (
+        <div className="text-red-500 text-center">{error}</div>
+      ) : (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('stock.categories.name')}</TableHead>
+                <TableHead>{t('stock.categories.description')}</TableHead>
+                <TableHead>{t('common.actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCategories.map((category) => (
+                <TableRow key={category._id}>
+                  <TableCell>{category.name}</TableCell>
+                  <TableCell>{category.description}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingCategory(category);
+                          setFormData({
+                            name: category.name,
+                            description: category.description || ''
+                          });
+                          setIsDialogOpen(true);
+                        }}
+                      >
+                        {t('common.edit')}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(category._id)}
+                      >
+                        {t('common.delete')}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('stock.categories.name')}</TableCell>
-              <TableCell>{t('stock.categories.description')}</TableCell>
-              <TableCell>{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category._id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>{category.description}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    {user?.permissions.includes('stock:update') && (
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleOpen(category)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {user?.permissions.includes('stock:delete') && (
-                      <Tooltip title={t('common.delete')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(category._id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {editingCategory ? t('stock.categories.edit') : t('stock.categories.add')}
-        </DialogTitle>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <TextField
-              autoFocus
-              label={t('stock.categories.name')}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label={t('stock.categories.description')}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={3}
-            />
-          </Box>
+          <DialogHeader>
+            <DialogTitle>
+              {editingCategory ? t('stock.categories.edit') : t('stock.categories.add')}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.categories.name')}
+              </label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('stock.categories.description')}
+              </label>
+              <Input
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button type="submit">
+                {editingCategory ? t('common.save') : t('common.add')}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>{t('common.cancel')}</Button>
-          <GradientButton onClick={handleSubmit} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : t('common.save')}
-          </GradientButton>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 }; 

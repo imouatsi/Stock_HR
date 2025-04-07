@@ -59,7 +59,12 @@
     "filter": "Filtrer",
     "actions": "Actions",
     "loading": "Chargement...",
-    "error": "Erreur",
+    "error": {
+      "title": "Erreur",
+      "loading": "Échec du chargement des données",
+      "save": "Échec de l'enregistrement des données",
+      "delete": "Échec de la suppression des données"
+    },
     "success": "Succès",
     "confirm": "Confirmer",
     "yes": "Oui",
@@ -85,7 +90,7 @@
     "list": "Liste des utilisateurs"
   },
   "stock": {
-    "title": "Stock",
+    "title": "Gestion des stocks",
     "create": "Créer un article",
     "edit": "Modifier l'article",
     "delete": "Supprimer l'article",
@@ -126,7 +131,7 @@
       "outOfStock": "Rupture de stock"
     },
     "inventory": {
-      "title": "Gestion des stocks",
+      "title": "Inventaire",
       "add": "Ajouter un article",
       "edit": "Modifier l'article",
       "name": "Nom",
@@ -135,7 +140,60 @@
       "unit": "Unité",
       "minStock": "Stock minimum",
       "maxStock": "Stock maximum",
-      "currentStock": "Stock actuel"
+      "currentStock": "Stock actuel",
+      "search": "Rechercher des articles...",
+      "createSuccess": "Article créé avec succès",
+      "updateSuccess": "Article mis à jour avec succès",
+      "deleteSuccess": "Article supprimé avec succès",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet article ?"
+    },
+    "categories": {
+      "title": "Catégories",
+      "add": "Ajouter une catégorie",
+      "edit": "Modifier la catégorie",
+      "name": "Nom",
+      "description": "Description",
+      "search": "Rechercher des catégories...",
+      "createSuccess": "Catégorie créée avec succès",
+      "updateSuccess": "Catégorie mise à jour avec succès",
+      "deleteSuccess": "Catégorie supprimée avec succès",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette catégorie ?"
+    },
+    "suppliers": {
+      "title": "Fournisseurs",
+      "add": "Ajouter un fournisseur",
+      "edit": "Modifier le fournisseur",
+      "name": "Nom",
+      "contactPerson": "Personne à contacter",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "search": "Rechercher des fournisseurs...",
+      "createSuccess": "Fournisseur créé avec succès",
+      "updateSuccess": "Fournisseur mis à jour avec succès",
+      "deleteSuccess": "Fournisseur supprimé avec succès",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+    },
+    "movements": {
+      "title": "Mouvements de stock",
+      "add": "Ajouter un mouvement",
+      "edit": "Modifier le mouvement",
+      "item": "Article",
+      "type": "Type",
+      "quantity": "Quantité",
+      "date": "Date",
+      "reason": "Raison",
+      "search": "Rechercher des mouvements...",
+      "selectItem": "Sélectionner un article",
+      "selectType": "Sélectionner un type",
+      "in": "Entrée",
+      "out": "Sortie",
+      "createSuccess": "Mouvement créé avec succès",
+      "updateSuccess": "Mouvement mis à jour avec succès",
+      "deleteSuccess": "Mouvement supprimé avec succès",
+      "cancelSuccess": "Mouvement annulé avec succès",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce mouvement ?",
+      "confirmCancel": "Êtes-vous sûr de vouloir annuler ce mouvement ?"
     }
   },
   "analytics": {
