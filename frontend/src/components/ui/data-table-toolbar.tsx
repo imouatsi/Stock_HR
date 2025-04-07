@@ -13,10 +13,12 @@ import {
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
+  searchKey: string
 }
 
 export function DataTableToolbar<TData>({
   table,
+  searchKey,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
@@ -24,10 +26,10 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder={`Filter by ${searchKey}...`}
+          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn(searchKey)?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
@@ -42,10 +44,12 @@ export function DataTableToolbar<TData>({
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="active">Active</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="sent">Sent</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
             </SelectContent>
           </Select>
         )}

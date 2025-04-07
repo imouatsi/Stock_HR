@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button } from '../../../components/ui/button';
 import { DataTable } from '../../../components/ui/data-table';
-import { columns } from './columns';
+import { columns } from './contractColumns';
+import type { Contract } from './contractColumns';
 
-export default function Contracts() {
-  const data = [
+export const Contracts = () => {
+  const data: Contract[] = [
     {
       id: '1',
       contractNumber: 'CNT-001',
@@ -31,7 +32,11 @@ export default function Contracts() {
         <h1 className="text-3xl font-bold">Contracts</h1>
         <Button>Create New Contract</Button>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable 
+        columns={columns} 
+        data={data} 
+        searchKey="contractNumber"
+      />
     </div>
   );
-} 
+}; 

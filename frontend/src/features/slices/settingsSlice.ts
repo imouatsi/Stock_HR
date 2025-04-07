@@ -173,6 +173,7 @@ const settingsSlice = createSlice({
     },
     updateSettings: (state, action: PayloadAction<Settings>) => {
       state.settings = action.payload;
+      localStorage.setItem('settings', JSON.stringify(action.payload));
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;

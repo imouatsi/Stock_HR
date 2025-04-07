@@ -46,6 +46,9 @@ import {
   dialogTitle,
   dialogPaper,
 } from '../theme/gradientStyles';
+import { DataTable } from '../components/ui/data-table';
+import { Plus } from 'lucide-react';
+import { columns } from './inventoryColumns';
 
 interface InventoryItem {
   _id: string;
@@ -67,6 +70,42 @@ interface FormData {
   category: string;
   supplier: string;
 }
+
+const data: InventoryItem[] = [
+  {
+    _id: '1',
+    name: 'Office Chair',
+    description: 'A comfortable office chair',
+    quantity: 25,
+    unitPrice: 199.99,
+    category: 'Furniture',
+    supplier: 'ABC Furniture',
+    createdAt: '2024-04-01T10:00:00',
+    updatedAt: '2024-04-01T10:00:00',
+  },
+  {
+    _id: '2',
+    name: 'Desk Lamp',
+    description: 'A stylish desk lamp',
+    quantity: 5,
+    unitPrice: 49.99,
+    category: 'Lighting',
+    supplier: 'XYZ Lighting',
+    createdAt: '2024-04-01T10:00:00',
+    updatedAt: '2024-04-01T10:00:00',
+  },
+  {
+    _id: '3',
+    name: 'Printer Paper',
+    description: 'A pack of 500 sheets of printer paper',
+    quantity: 0,
+    unitPrice: 9.99,
+    category: 'Supplies',
+    supplier: 'Office Depot',
+    createdAt: '2024-04-01T10:00:00',
+    updatedAt: '2024-04-01T10:00:00',
+  },
+];
 
 const Inventory: React.FC = () => {
   const { t } = useTranslation();
@@ -549,6 +588,8 @@ const Inventory: React.FC = () => {
           }
         `}
       </style>
+
+      <DataTable columns={columns} data={data} searchKey="name" />
     </Box>
   );
 };

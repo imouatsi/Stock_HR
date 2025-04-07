@@ -57,7 +57,7 @@ interface MovementFormData {
   notes?: string;
 }
 
-const Movements: React.FC = () => {
+export const Movements: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -459,11 +459,11 @@ const Movements: React.FC = () => {
       </TableContainer>
 
       {/* Movement Form Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {selectedMovement ? t('stock.movements.edit') : t('stock.movements.add')}
-        </DialogTitle>
+      <Dialog open={openDialog} onOpenChange={handleCloseDialog}>
         <DialogContent>
+          <DialogTitle>
+            {selectedMovement ? t('stock.movements.edit') : t('stock.movements.add')}
+          </DialogTitle>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth error={!!formErrors.inventoryItem}>
@@ -554,37 +554,34 @@ const Movements: React.FC = () => {
               />
             </Grid>
           </Grid>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
+            <Button onClick={handleSubmit} color="primary" variant="contained">
+              {t('common.save')}
+            </Button>
+          </DialogActions>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            color="primary"
-            disabled={Object.keys(formErrors).length > 0 || saving}
-          >
-            {saving ? <CircularProgress size={24} /> : t('common.save')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
-        <DialogTitle>
-          {actionType === 'delete' ? t('stock.movements.deleteConfirm') : t('stock.movements.cancelConfirm')}
-        </DialogTitle>
+      <Dialog open={confirmDialog} onOpenChange={() => setConfirmDialog(false)}>
         <DialogContent>
-          {t(actionType === 'delete' ? 'stock.movements.deleteMessage' : 'stock.movements.cancelMessage')}
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'delete' ? t('stock.movements.deleteConfirm') : t('stock.movements.cancelConfirm')}
+            </DialogTitle>
+            <DialogDescription>
+              {t(actionType === 'delete' ? 'stock.movements.deleteMessage' : 'stock.movements.cancelMessage')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setConfirmDialog(false)}>{t('common.no')}</Button>
+            <Button onClick={handleConfirmAction} color="primary" variant="contained">
+              {t('common.yes')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog(false)}>{t('common.no')}</Button>
-          <Button onClick={handleConfirmAction} color="primary" variant="contained">
-            {t('common.yes')}
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );
-};
-
-export default Movements; 
+}; 

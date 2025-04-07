@@ -7,7 +7,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
   Table,
   TableBody,
   TableCell,
@@ -512,16 +515,17 @@ const Invoices: React.FC = () => {
 
       <Dialog 
         open={open} 
-        onClose={handleClose}
-        TransitionComponent={Zoom}
-        PaperProps={{
-          sx: dialogPaper
-        }}
+        onOpenChange={handleClose}
       >
-        <DialogTitle sx={dialogTitle}>
-          {t('invoices.createNew')}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('invoices.createNew')}
+            </DialogTitle>
+            <DialogDescription>
+              Fill in the details to create a new invoice
+            </DialogDescription>
+          </DialogHeader>
           <TextField
             autoFocus
             margin="dense"
@@ -549,72 +553,15 @@ const Invoices: React.FC = () => {
                 onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                 sx={{ mb: 1 }}
               />
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <TextField
-                  margin="dense"
-                  name={`items.${index}.quantity`}
-                  label={t('invoices.quantity')}
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  margin="dense"
-                  name={`items.${index}.price`}
-                  label={t('invoices.price')}
-                  type="number"
-                  value={item.price}
-                  onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-              </Box>
-              <Typography sx={{ mt: 1, fontWeight: 'bold' }}>
-                {t('invoices.total')}: ${item.total.toFixed(2)}
-              </Typography>
             </Box>
           ))}
-          
-          <Button
-            variant="outlined"
-            onClick={handleAddItem}
-            sx={{ mt: 2 }}
-          >
-            {t('invoices.addItem')}
-          </Button>
-
-          <TextField
-            margin="dense"
-            name="tax"
-            label={t('invoices.tax')}
-            type="number"
-            value={invoiceData.tax}
-            onChange={handleChange}
-            sx={{ mt: 2 }}
-          />
-
-          <TextField
-            margin="dense"
-            name="dueDate"
-            label={t('invoices.dueDate')}
-            type="date"
-            value={invoiceData.dueDate}
-            onChange={handleChange}
-            sx={{ mt: 2 }}
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
+          <DialogFooter>
+            <Button onClick={handleClose}>{t('common.cancel')}</Button>
+            <Button onClick={handleSubmit} color="primary" variant="contained">
+              {t('common.save')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleClose}>
-            {t('common.cancel')}
-          </Button>
-          <GradientButton onClick={handleSubmit}>
-            {t('common.submit')}
-          </GradientButton>
-        </DialogActions>
       </Dialog>
     </Box>
   );

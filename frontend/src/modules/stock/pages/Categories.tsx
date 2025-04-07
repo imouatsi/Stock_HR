@@ -30,7 +30,7 @@ import GradientButton from '../../../components/ui/GradientButton';
 import { stockService, type StockCategory } from '../../../services/stockService';
 import { useAuth } from '../../../hooks/useAuth';
 
-const Categories: React.FC = () => {
+export const Categories: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [categories, setCategories] = useState<StockCategory[]>([]);
@@ -200,12 +200,12 @@ const Categories: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>
           {editingCategory ? t('stock.categories.edit') : t('stock.categories.add')}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ pt: 2 }}>
             <TextField
               autoFocus
               label={t('stock.categories.name')}
@@ -213,6 +213,7 @@ const Categories: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               fullWidth
               required
+              sx={{ mb: 2 }}
             />
             <TextField
               label={t('stock.categories.description')}
@@ -233,6 +234,4 @@ const Categories: React.FC = () => {
       </Dialog>
     </Box>
   );
-};
-
-export default Categories; 
+}; 

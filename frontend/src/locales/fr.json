@@ -1,17 +1,146 @@
 {
   "contracts": {
-    "title": "Contrats"
+    "title": "Contrats",
+    "generateButton": "Générer un contrat"
   },
   "invoices": {
-    "title": "Factures"
+    "title": "Factures",
+    "addButton": "Ajouter une facture"
   },
   "users": {
-    "title": "Utilisateurs"
+    "title": "Utilisateurs",
+    "addButton": "Ajouter un utilisateur"
   },
   "settings": {
-    "title": "Paramètres"
+    "title": "Paramètres",
+    "darkMode": "Mode sombre",
+    "enableNotifications": "Activer les notifications",
+    "language": "Langue",
+    "selectLanguage": "Sélectionner la langue",
+    "currency": "Devise",
+    "selectCurrency": "Sélectionner la devise",
+    "dateFormat": "Format de date",
+    "selectDateFormat": "Sélectionner le format de date",
+    "timeFormat": "Format de l'heure",
+    "selectTimeFormat": "Sélectionner le format de l'heure",
+    "notifications": "Notifications",
+    "securityAlerts": "Alertes de sécurité",
+    "updates": "Mises à jour",
+    "marketing": "Marketing",
+    "browserNotifications": "Notifications du navigateur",
+    "soundNotifications": "Notifications sonores",
+    "desktopNotifications": "Notifications du bureau",
+    "autoLogout": "Déconnexion automatique (minutes)",
+    "theme": "Thème",
+    "profile": "Profil",
+    "preferences": "Préférences"
   },
   "common": {
-    "noData": "Aucune donnée disponible"
+    "noData": "Aucune donnée disponible",
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "proforma": "Factures proforma",
+    "users": "Utilisateurs",
+    "stock": "Stock",
+    "analytics": "Analytique",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "submit": "Envoyer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "actions": "Actions",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "submit": "Envoyer",
+    "error": "Email ou mot de passe invalide"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue dans le système de gestion des stocks et des ressources humaines"
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "create": "Créer un utilisateur",
+    "edit": "Modifier l'utilisateur",
+    "delete": "Supprimer l'utilisateur",
+    "list": "Liste des utilisateurs"
+  },
+  "stock": {
+    "title": "Stock",
+    "create": "Créer un article",
+    "edit": "Modifier l'article",
+    "delete": "Supprimer l'article",
+    "list": "Liste des stocks",
+    "addItem": "Ajouter un nouvel article",
+    "editItem": "Modifier l'article",
+    "deleteItem": "Supprimer l'article",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet article ?",
+    "fields": {
+      "name": "Nom de l'article",
+      "description": "Description",
+      "quantity": "Quantité",
+      "unitPrice": "Prix unitaire",
+      "category": "Catégorie",
+      "supplier": "Fournisseur",
+      "reorderPoint": "Point de réapprovisionnement",
+      "location": "Emplacement",
+      "lastRestocked": "Dernier réapprovisionnement",
+      "createdAt": "Date de création",
+      "updatedAt": "Date de modification"
+    },
+    "validation": {
+      "required": "Tous les champs requis doivent être remplis",
+      "numberPositive": "La valeur doit être supérieure à zéro",
+      "invalidFormat": "Format invalide"
+    },
+    "filters": {
+      "search": "Rechercher dans le stock",
+      "category": "Filtrer par catégorie",
+      "sortBy": "Trier par",
+      "all": "Tous",
+      "ascending": "Croissant",
+      "descending": "Décroissant"
+    },
+    "status": {
+      "inStock": "En stock",
+      "lowStock": "Stock bas",
+      "outOfStock": "Rupture de stock"
+    },
+    "inventory": {
+      "title": "Gestion des stocks",
+      "add": "Ajouter un article",
+      "edit": "Modifier l'article",
+      "name": "Nom",
+      "description": "Description",
+      "category": "Catégorie",
+      "unit": "Unité",
+      "minStock": "Stock minimum",
+      "maxStock": "Stock maximum",
+      "currentStock": "Stock actuel"
+    }
+  },
+  "analytics": {
+    "title": "Analytique",
+    "overview": "Aperçu",
+    "reports": "Rapports"
   }
 }

@@ -64,13 +64,13 @@ const languages = [
 ];
 
 const menuItems = [
-  { text: 'dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
-  { text: 'inventory', icon: <Package size={20} />, path: '/inventory', roles: ['admin', 'superadmin', 'inventory_clerk'] },
-  { text: 'contracts', icon: <FileText size={20} />, path: '/contracts', roles: ['superadmin'] },
-  { text: 'invoices', icon: <Receipt size={20} />, path: '/invoices', roles: ['admin', 'superadmin', 'manager'] },
-  { text: 'proforma', icon: <FileSpreadsheet size={20} />, path: '/proforma-invoices', roles: ['admin', 'superadmin', 'manager'] },
-  { text: 'users', icon: <Users size={20} />, path: '/users', roles: ['admin', 'superadmin'] },
-  { text: 'settings', icon: <Settings size={20} />, path: '/settings', roles: ['admin', 'superadmin'] },
+  { text: 'common.dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
+  { text: 'common.inventory', icon: <Package size={20} />, path: '/stock/inventory', roles: ['admin', 'superadmin', 'inventory_clerk'] },
+  { text: 'contracts.title', icon: <FileText size={20} />, path: '/contracts', roles: ['superadmin'] },
+  { text: 'invoices.title', icon: <Receipt size={20} />, path: '/invoices', roles: ['admin', 'superadmin', 'manager'] },
+  { text: 'common.proforma', icon: <FileSpreadsheet size={20} />, path: '/proforma-invoices', roles: ['admin', 'superadmin', 'manager'] },
+  { text: 'users.title', icon: <Users size={20} />, path: '/users', roles: ['admin', 'superadmin'] },
+  { text: 'settings.title', icon: <Settings size={20} />, path: '/settings', roles: ['admin', 'superadmin'] },
 ];
 
 function Layout() {

@@ -1,8 +1,8 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 interface State {
@@ -10,36 +10,51 @@ interface State {
   error?: Error;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false
-  };
+export class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
   }
 
-  public render() {
+  render() {
     if (this.state.hasError) {
-      return (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h5" color="error" gutterBottom>
-            Something went wrong
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => this.setState({ hasError: false })}
-          >
-            Try again
-          </Button>
-        </Box>
-      );
+      return <ErrorFallback error={this.state.error} />;
     }
 
     return this.props.children;
   }
 }
+
+const ErrorFallback: React.FC<{ error?: Error }> = ({ error }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">
+        {t('error.title', 'Something went wrong')}
+      </h1>
+      <p className="text-gray-600 mb-4">
+        {t('error.message', 'We apologize for the inconvenience. Please try again later.')}
+      </p>
+      {error && (
+        <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800">
+          {error.message}
+        </pre>
+      )}
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        {t('error.reload', 'Reload Page')}
+      </button>
+    </div>
+  );
+};

@@ -7,7 +7,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
   Table,
   TableBody,
   TableCell,
@@ -506,16 +509,17 @@ const Contracts: React.FC = () => {
 
       <Dialog 
         open={open} 
-        onClose={handleClose}
-        TransitionComponent={Zoom}
-        PaperProps={{
-          sx: dialogPaper
-        }}
+        onOpenChange={handleClose}
       >
-        <DialogTitle sx={dialogTitle}>
-          {t('contracts.createNew')}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('contracts.createNew')}
+            </DialogTitle>
+            <DialogDescription>
+              Fill in the details to create a new contract
+            </DialogDescription>
+          </DialogHeader>
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
@@ -700,25 +704,13 @@ const Contracts: React.FC = () => {
               />
             </Grid>
           </Grid>
+          <DialogFooter>
+            <Button onClick={handleClose}>{t('common.cancel')}</Button>
+            <Button onClick={handleSubmit} color="primary" variant="contained">
+              {t('common.save')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button 
-            onClick={handleClose}
-            variant="outlined"
-            sx={{
-              mr: 1,
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-              },
-            }}
-          >
-            {t('contracts.cancel')}
-          </Button>
-          <GradientButton onClick={handleSubmit}>
-            {t('contracts.submit')}
-          </GradientButton>
-        </DialogActions>
       </Dialog>
     </Box>
   );

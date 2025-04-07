@@ -34,7 +34,7 @@ import GradientButton from '../../../components/ui/GradientButton';
 import { stockService, type Supplier } from '../../../services/stockService';
 import { useAuth } from '../../../hooks/useAuth';
 
-const Suppliers: React.FC = () => {
+export const Suppliers: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -48,7 +48,8 @@ const Suppliers: React.FC = () => {
     email: '',
     phone: '',
     address: '',
-    taxId: '',
+    taxNumber: '',
+    paymentTerms: '',
   });
 
   useEffect(() => {
@@ -72,11 +73,12 @@ const Suppliers: React.FC = () => {
       setEditingSupplier(supplier);
       setFormData({
         name: supplier.name,
-        contactPerson: supplier.contactPerson,
-        email: supplier.email,
-        phone: supplier.phone,
-        address: supplier.address,
-        taxId: supplier.taxId || '',
+        contactPerson: supplier.contactPerson || '',
+        email: supplier.email || '',
+        phone: supplier.phone || '',
+        address: supplier.address || '',
+        taxNumber: supplier.taxNumber || '',
+        paymentTerms: supplier.paymentTerms || '',
       });
     } else {
       setEditingSupplier(null);
@@ -86,7 +88,8 @@ const Suppliers: React.FC = () => {
         email: '',
         phone: '',
         address: '',
-        taxId: '',
+        taxNumber: '',
+        paymentTerms: '',
       });
     }
     setOpen(true);
@@ -101,7 +104,8 @@ const Suppliers: React.FC = () => {
       email: '',
       phone: '',
       address: '',
-      taxId: '',
+      taxNumber: '',
+      paymentTerms: '',
     });
   };
 
@@ -110,8 +114,8 @@ const Suppliers: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      if (!formData.name || !formData.contactPerson || !formData.email || !formData.phone || !formData.address) {
-        throw new Error('Please fill in all required fields');
+      if (!formData.name) {
+        throw new Error('Name is required');
       }
 
       if (editingSupplier) {
@@ -137,6 +141,23 @@ const Suppliers: React.FC = () => {
       await fetchSuppliers();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to toggle supplier status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this supplier?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await stockService.deleteSupplier(id);
+      await fetchSuppliers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete supplier');
     } finally {
       setLoading(false);
     }
@@ -220,6 +241,16 @@ const Suppliers: React.FC = () => {
                         </Tooltip>
                       </>
                     )}
+                    {user?.permissions.includes('stock:delete') && (
+                      <Tooltip title={t('common.delete')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(supplier._id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Box>
                 </TableCell>
               </TableRow>
@@ -228,72 +259,73 @@ const Suppliers: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>
           {editingSupplier ? t('stock.suppliers.edit') : t('stock.suppliers.add')}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  autoFocus
-                  label={t('stock.suppliers.name')}
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label={t('stock.suppliers.contactPerson')}
-                  value={formData.contactPerson}
-                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label={t('stock.suppliers.email')}
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label={t('stock.suppliers.phone')}
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={t('stock.suppliers.address')}
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  fullWidth
-                  required
-                  multiline
-                  rows={2}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label={t('stock.suppliers.taxId')}
-                  value={formData.taxId}
-                  onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                  fullWidth
-                />
-              </Grid>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.name')}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                fullWidth
+                required
+              />
             </Grid>
-          </Box>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.contactPerson')}
+                value={formData.contactPerson}
+                onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.email')}
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.phone')}
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.address')}
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                fullWidth
+                multiline
+                rows={2}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.taxNumber')}
+                value={formData.taxNumber}
+                onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label={t('stock.suppliers.paymentTerms')}
+                value={formData.paymentTerms}
+                onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>{t('common.cancel')}</Button>
@@ -304,6 +336,4 @@ const Suppliers: React.FC = () => {
       </Dialog>
     </Box>
   );
-};
-
-export default Suppliers; 
+}; 

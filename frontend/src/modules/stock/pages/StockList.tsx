@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useToast } from '../../../hooks/useToast';
 import api, { getApiResponse, handleApiError } from '../../../utils/api';
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
@@ -31,6 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import {
   Plus,
   Edit,
@@ -42,6 +44,7 @@ import {
   Filter,
   ArrowUpDown,
 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 interface StockItem {
   _id: string;
@@ -76,71 +79,100 @@ interface Filters {
   sortOrder: 'asc' | 'desc';
 }
 
+const INITIAL_FORM_DATA: FormData = {
+  name: '',
+  description: '',
+  quantity: 0,
+  unitPrice: 0,
+  category: '',
+  supplier: '',
+  reorderPoint: 0,
+  location: ''
+};
+
+const INITIAL_FILTERS: Filters = {
+  search: '',
+  category: '',
+  sortBy: 'name',
+  sortOrder: 'asc'
+};
+
 export function StockList() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<StockItem | null>(null);
   const [items, setItems] = useState<StockItem[]>([]);
-  const [filters, setFilters] = useState<Filters>({
-    search: '',
-    category: '',
-    sortBy: 'name',
-    sortOrder: 'asc'
-  });
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    description: '',
-    quantity: 0,
-    unitPrice: 0,
-    category: '',
-    supplier: '',
-    reorderPoint: 0,
-    location: ''
-  });
+  const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [suppliers, setSuppliers] = useState<string[]>([]);
 
   useEffect(() => {
     fetchItems();
+    fetchCategories();
+    fetchSuppliers();
   }, [filters]);
 
   const fetchItems = async () => {
     try {
       setLoading(true);
       const response = await api.get('/stock', { params: filters });
-      setItems(getApiResponse<StockItem[]>(response));
+      setItems(response.data);
+      setError(null);
     } catch (error) {
-      setError(handleApiError(error).message);
+      setError(t('common.error'));
+      toast({
+        title: t('common.error'),
+        description: t('stock.errors.fetchFailed'),
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/stock/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
+
+  const fetchSuppliers = async () => {
+    try {
+      const response = await api.get('/stock/suppliers');
+      setSuppliers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch suppliers:', error);
+    }
+  };
+
   const handleClickOpen = () => {
+    setFormData(INITIAL_FORM_DATA);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setFormData({
-      name: '',
-      description: '',
-      quantity: 0,
-      unitPrice: 0,
-      category: '',
-      supplier: '',
-      reorderPoint: 0,
-      location: ''
-    });
+    setFormData(INITIAL_FORM_DATA);
+    setError(null);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'quantity' || name === 'unitPrice' || name === 'reorderPoint' ? Number(value) : value
+      [name]: name === 'quantity' || name === 'unitPrice' || name === 'reorderPoint' 
+        ? Number(value) || 0
+        : value
     }));
   };
 
@@ -174,22 +206,92 @@ export function StockList() {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.name || !formData.quantity || !formData.unitPrice || !formData.category || !formData.supplier) {
+      throw new Error(t('stock.validation.required'));
+    }
+    if (formData.quantity < 0 || formData.unitPrice < 0 || formData.reorderPoint < 0) {
+      throw new Error(t('stock.validation.numberPositive'));
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      if (!formData.name || !formData.quantity || !formData.unitPrice || !formData.category || !formData.supplier) {
-        throw new Error(t('stock.validation.required'));
+      validateForm();
+
+      if (selectedItem) {
+        await api.put(`/stock/${selectedItem._id}`, formData);
+        toast({
+          title: t('common.success'),
+          description: t('stock.messages.updateSuccess'),
+        });
+      } else {
+        await api.post('/stock', formData);
+        toast({
+          title: t('common.success'),
+          description: t('stock.messages.createSuccess'),
+        });
       }
 
-      await api.post('/stock', formData);
       await fetchItems();
       handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit stock item');
+      const message = err instanceof Error ? err.message : t('stock.errors.submitFailed');
+      setError(message);
+      toast({
+        title: t('common.error'),
+        description: message,
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (item: StockItem) => {
+    setSelectedItem(item);
+    setFormData({
+      name: item.name,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      category: item.category,
+      supplier: item.supplier,
+      reorderPoint: item.reorderPoint,
+      location: item.location
+    });
+    setOpen(true);
+  };
+
+  const handleDelete = async (item: StockItem) => {
+    setSelectedItem(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedItem) return;
+
+    try {
+      setLoading(true);
+      await api.delete(`/stock/${selectedItem._id}`);
+      toast({
+        title: t('common.success'),
+        description: t('stock.messages.deleteSuccess'),
+      });
+      await fetchItems();
+    } catch (error) {
+      toast({
+        title: t('common.error'),
+        description: t('stock.errors.deleteFailed'),
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setSelectedItem(null);
     }
   };
 
@@ -197,23 +299,16 @@ export function StockList() {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      setLoading(true);
-      await api.delete(`/stock/${id}`);
-      await fetchItems();
-      setDeleteConfirm(null);
-    } catch (err) {
-      setError('Failed to delete stock item');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getStatusColor = (quantity: number, reorderPoint: number) => {
+  const getStatusColor = (quantity: number, reorderPoint: number): string => {
     if (quantity <= 0) return 'destructive';
     if (quantity <= reorderPoint) return 'warning';
     return 'success';
+  };
+
+  const getStatusText = (quantity: number, reorderPoint: number): string => {
+    if (quantity <= 0) return t('stock.status.outOfStock');
+    if (quantity <= reorderPoint) return t('stock.status.lowStock');
+    return t('stock.status.inStock');
   };
 
   const filteredItems = items
@@ -241,116 +336,151 @@ export function StockList() {
   }
 
   return (
-    <div className="space-y-4 p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{t('stock.title')}</h1>
-        <Button onClick={handleClickOpen} className="gap-2">
-          <Plus className="h-4 w-4" />
-          {t('stock.addNew')}
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>{t('stock.filters')}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle>{t('stock.title')}</CardTitle>
+          <Button onClick={handleClickOpen}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('stock.addItem')}
+          </Button>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('stock.search')}</label>
-              <Input
-                name="search"
-                value={filters.search}
-                onChange={handleFilterTextChange}
-                placeholder={t('stock.searchPlaceholder')}
-                className="w-full"
-                icon={<Search className="h-4 w-4" />}
-              />
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4">
+              <div className="flex-1">
+                <Input
+                  name="search"
+                  placeholder={t('stock.filters.search')}
+                  value={filters.search}
+                  onChange={handleFilterTextChange}
+                  className="w-full"
+                  icon={<Search className="h-4 w-4" />}
+                />
+              </div>
+              <div className="w-48">
+                <Select
+                  value={filters.category}
+                  onValueChange={(value) => handleFilterSelectChange(value, 'category')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('stock.filters.category')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">{t('stock.filters.all')}</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('stock.category')}</label>
-              <Select
-                value={filters.category}
-                onValueChange={(value) => handleFilterSelectChange(value, 'category')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('stock.selectCategory')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">{t('stock.allCategories')}</SelectItem>
-                  {/* Add your categories here */}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('stock.sortBy')}</label>
-              <Select
-                value={filters.sortBy}
-                onValueChange={(value) => handleFilterSelectChange(value, 'sortBy')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('stock.selectSortField')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">{t('stock.name')}</SelectItem>
-                  <SelectItem value="quantity">{t('stock.quantity')}</SelectItem>
-                  <SelectItem value="category">{t('stock.category')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
-                    {t('stock.name')}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead>{t('stock.description')}</TableHead>
-                  <TableHead onClick={() => handleSort('quantity')} className="cursor-pointer">
-                    {t('stock.quantity')}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead>{t('stock.unitPrice')}</TableHead>
-                  <TableHead onClick={() => handleSort('category')} className="cursor-pointer">
-                    {t('stock.category')}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead>{t('stock.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems.map((item) => (
-                  <TableRow key={item._id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(item.quantity, item.reorderPoint)}>
-                        {item.quantity}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <ScrollArea className="h-[600px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                      {t('stock.fields.name')}
+                      {filters.sortBy === 'name' && (
+                        filters.sortOrder === 'asc' ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                      )}
+                    </TableHead>
+                    <TableHead onClick={() => handleSort('quantity')} className="cursor-pointer">
+                      {t('stock.fields.quantity')}
+                      {filters.sortBy === 'quantity' && (
+                        filters.sortOrder === 'asc' ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                      )}
+                    </TableHead>
+                    <TableHead onClick={() => handleSort('category')} className="cursor-pointer">
+                      {t('stock.fields.category')}
+                      {filters.sortBy === 'category' && (
+                        filters.sortOrder === 'asc' ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                      )}
+                    </TableHead>
+                    <TableHead onClick={() => handleSort('supplier')} className="cursor-pointer">
+                      {t('stock.fields.supplier')}
+                      {filters.sortBy === 'supplier' && (
+                        filters.sortOrder === 'asc' ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                      )}
+                    </TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center">
+                        {t('common.loading')}
+                      </TableCell>
+                    </TableRow>
+                  ) : items.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center">
+                        {t('common.noData')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    items.map((item) => (
+                      <React.Fragment key={item._id}>
+                        <TableRow
+                          className="cursor-pointer"
+                          onClick={() => handleRowClick(item._id)}
+                          onMouseEnter={() => setHoveredRow(item._id)}
+                          onMouseLeave={() => setHoveredRow(null)}
+                        >
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>
+                            <Badge variant={getStatusColor(item.quantity, item.reorderPoint)}>
+                              {item.quantity} - {getStatusText(item.quantity, item.reorderPoint)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{item.category}</TableCell>
+                          <TableCell>{item.supplier}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(item);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(item);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        {expandedRow === item._id && (
+                          <TableRow>
+                            <TableCell colSpan={5}>
+                              <div className="p-4 space-y-2">
+                                <p><strong>{t('stock.fields.description')}:</strong> {item.description}</p>
+                                <p><strong>{t('stock.fields.unitPrice')}:</strong> {item.unitPrice} DZD</p>
+                                <p><strong>{t('stock.fields.reorderPoint')}:</strong> {item.reorderPoint}</p>
+                                <p><strong>{t('stock.fields.location')}:</strong> {item.location}</p>
+                                <p><strong>{t('stock.fields.lastRestocked')}:</strong> {new Date(item.lastRestocked).toLocaleDateString()}</p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </ScrollArea>
           </div>
         </CardContent>
       </Card>
@@ -358,97 +488,137 @@ export function StockList() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('stock.addNewItem')}</DialogTitle>
+            <DialogTitle>
+              {selectedItem ? t('stock.editItem') : t('stock.addItem')}
+            </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">{t('stock.name')}</label>
+                <Label htmlFor="name">{t('stock.fields.name')}</Label>
                 <Input
+                  id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleTextChange}
-                  placeholder={t('stock.namePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">{t('stock.category')}</label>
+                <Label htmlFor="quantity">{t('stock.fields.quantity')}</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={handleTextChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">{t('stock.fields.category')}</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => handleSelectChange(value, 'category')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t('stock.selectCategory')} />
+                    <SelectValue placeholder={t('stock.filters.category')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {/* Add your categories here */}
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="supplier">{t('stock.fields.supplier')}</Label>
+                <Select
+                  value={formData.supplier}
+                  onValueChange={(value) => handleSelectChange(value, 'supplier')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('stock.fields.supplier')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suppliers.map((supplier) => (
+                      <SelectItem key={supplier} value={supplier}>
+                        {supplier}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="unitPrice">{t('stock.fields.unitPrice')}</Label>
+                <Input
+                  id="unitPrice"
+                  name="unitPrice"
+                  type="number"
+                  value={formData.unitPrice}
+                  onChange={handleTextChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="reorderPoint">{t('stock.fields.reorderPoint')}</Label>
+                <Input
+                  id="reorderPoint"
+                  name="reorderPoint"
+                  type="number"
+                  value={formData.reorderPoint}
+                  onChange={handleTextChange}
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t('stock.description')}</label>
+              <Label htmlFor="description">{t('stock.fields.description')}</Label>
               <Input
+                id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleTextChange}
-                placeholder={t('stock.descriptionPlaceholder')}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('stock.quantity')}</label>
-                <Input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleTextChange}
-                  placeholder={t('stock.quantityPlaceholder')}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('stock.unitPrice')}</label>
-                <Input
-                  type="number"
-                  name="unitPrice"
-                  value={formData.unitPrice}
-                  onChange={handleTextChange}
-                  placeholder={t('stock.unitPricePlaceholder')}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">{t('stock.fields.location')}</Label>
+              <Input
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleTextChange}
+              />
             </div>
           </div>
+          {error && (
+            <p className="text-sm text-red-500 mt-2">{error}</p>
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={handleClose}>
               {t('common.cancel')}
             </Button>
-            <Button onClick={handleSubmit}>
-              {t('common.save')}
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? t('common.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {deleteConfirm && (
-        <Dialog open={true} onOpenChange={() => setDeleteConfirm(null)}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>{t('stock.confirmDelete')}</DialogTitle>
-            </DialogHeader>
-            <DialogDescription>
-              {t('stock.confirmDeleteDescription')}
-            </DialogDescription>
-            <div className="flex justify-end gap-4">
-              <Button variant="outline" onClick={() => handleDelete(deleteConfirm)}>
-                {t('common.confirm')}
-              </Button>
-              <Button variant="destructive" onClick={() => setDeleteConfirm(null)}>
-                {t('common.cancel')}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('stock.deleteItem')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('stock.deleteConfirm')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={loading}>
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 } 

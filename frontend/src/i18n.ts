@@ -17,9 +17,16 @@ i18n
       ar: { translation: arTranslation },
     },
     fallbackLng: 'en',
-    debug: process.env.NODE_ENV === 'development',
+    debug: false,
     interpolation: {
       escapeValue: false,
+    },
+    react: {
+      useSuspense: false,
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
     },
   });
 

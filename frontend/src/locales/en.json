@@ -19,6 +19,8 @@
   "common": {
     "noData": "No data available",
     "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "proforma": "Proforma Invoices",
     "users": "Users",
     "stock": "Stock",
     "analytics": "Analytics",
@@ -61,7 +63,19 @@
     "create": "Create Item",
     "edit": "Edit Item",
     "delete": "Delete Item",
-    "list": "Stock List"
+    "list": "Stock List",
+    "inventory": {
+      "title": "Inventory Management",
+      "add": "Add Item",
+      "edit": "Edit Item",
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "unit": "Unit",
+      "minStock": "Minimum Stock",
+      "maxStock": "Maximum Stock",
+      "currentStock": "Current Stock"
+    }
   },
   "analytics": {
     "title": "Analytics",

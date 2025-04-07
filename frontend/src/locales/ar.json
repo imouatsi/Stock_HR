@@ -14,9 +14,133 @@
   "settings": {
     "title": "الإعدادات",
     "darkMode": "الوضع الداكن",
-    "enableNotifications": "تفعيل الإشعارات"
+    "enableNotifications": "تفعيل الإشعارات",
+    "language": "اللغة",
+    "selectLanguage": "اختر اللغة",
+    "currency": "العملة",
+    "selectCurrency": "اختر العملة",
+    "dateFormat": "تنسيق التاريخ",
+    "selectDateFormat": "اختر تنسيق التاريخ",
+    "timeFormat": "تنسيق الوقت",
+    "selectTimeFormat": "اختر تنسيق الوقت",
+    "notifications": "الإشعارات",
+    "securityAlerts": "تنبيهات الأمان",
+    "updates": "التحديثات",
+    "marketing": "التسويق",
+    "browserNotifications": "إشعارات المتصفح",
+    "soundNotifications": "التنبيهات الصوتية",
+    "desktopNotifications": "إشعارات سطح المكتب",
+    "autoLogout": "تسجيل الخروج التلقائي (بالدقائق)",
+    "theme": "المظهر",
+    "profile": "الملف الشخصي",
+    "preferences": "التفضيلات"
   },
   "common": {
-    "noData": "لا توجد بيانات"
+    "noData": "لا توجد بيانات",
+    "dashboard": "لوحة التحكم",
+    "inventory": "المخزون",
+    "proforma": "الفواتير الأولية",
+    "users": "المستخدمون",
+    "stock": "المخزون",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث",
+    "filter": "تصفية",
+    "actions": "إجراءات",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "تم بنجاح",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "submit": "إرسال",
+    "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بك في نظام إدارة المخزون والموارد البشرية"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "create": "إنشاء مستخدم",
+    "edit": "تعديل المستخدم",
+    "delete": "حذف المستخدم",
+    "list": "قائمة المستخدمين"
+  },
+  "stock": {
+    "title": "المخزون",
+    "create": "إضافة صنف",
+    "edit": "تعديل الصنف",
+    "delete": "حذف الصنف",
+    "list": "قائمة المخزون",
+    "addItem": "إضافة صنف جديد",
+    "editItem": "تعديل الصنف",
+    "deleteItem": "حذف الصنف",
+    "deleteConfirm": "هل أنت متأكد من حذف هذا الصنف؟",
+    "fields": {
+      "name": "اسم الصنف",
+      "description": "الوصف",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "category": "الفئة",
+      "supplier": "المورد",
+      "reorderPoint": "نقطة إعادة الطلب",
+      "location": "الموقع",
+      "lastRestocked": "آخر تجديد للمخزون",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث"
+    },
+    "validation": {
+      "required": "جميع الحقول المطلوبة يجب ملؤها",
+      "numberPositive": "يجب أن تكون القيمة أكبر من الصفر",
+      "invalidFormat": "تنسيق غير صحيح"
+    },
+    "filters": {
+      "search": "البحث في المخزون",
+      "category": "تصفية حسب الفئة",
+      "sortBy": "ترتيب حسب",
+      "all": "الكل",
+      "ascending": "تصاعدي",
+      "descending": "تنازلي"
+    },
+    "status": {
+      "inStock": "متوفر",
+      "lowStock": "مخزون منخفض",
+      "outOfStock": "نفذ المخزون"
+    },
+    "inventory": {
+      "title": "إدارة المخزون",
+      "add": "إضافة صنف",
+      "edit": "تعديل الصنف",
+      "name": "الاسم",
+      "description": "الوصف",
+      "category": "الفئة",
+      "unit": "الوحدة",
+      "minStock": "الحد الأدنى للمخزون",
+      "maxStock": "الحد الأقصى للمخزون",
+      "currentStock": "المخزون الحالي"
+    }
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "overview": "نظرة عامة",
+    "reports": "التقارير"
   }
 }

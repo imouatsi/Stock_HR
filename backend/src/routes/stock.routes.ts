@@ -1,23 +1,33 @@
 import { Router } from 'express';
+import { validateRequest } from '../middleware/validateRequest';
+import { isAuthenticated } from '../middleware/auth';
 import { stockController } from '../controllers/stock.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { validateRequest } from '../middleware/validate.middleware';
-import { stockValidation } from '../validation/stock.validation';
+import { stockSchema } from '../schemas/stock.schema';
 
 const router = Router();
 
-// Protected routes
-router.use(authMiddleware.protect);
+// Apply authentication middleware to all stock routes
+router.use(isAuthenticated);
 
-router
-  .route('/')
-  .get(stockController.getAllStocks)
-  .post(validateRequest(stockValidation.createStock), stockController.createStock);
+// Get all stock items with optional filters
+router.get('/', stockController.getAllStockItems);
 
-router
-  .route('/:id')
-  .get(stockController.getStock)
-  .patch(validateRequest(stockValidation.updateStock), stockController.updateStock)
-  .delete(stockController.deleteStock);
+// Get a single stock item by ID
+router.get('/:id', stockController.getStockItem);
+
+// Create a new stock item
+router.post('/', validateRequest(stockSchema), stockController.createStockItem);
+
+// Update a stock item
+router.put('/:id', validateRequest(stockSchema), stockController.updateStockItem);
+
+// Delete a stock item
+router.delete('/:id', stockController.deleteStockItem);
+
+// Get all categories
+router.get('/categories/list', stockController.getCategories);
+
+// Get all suppliers
+router.get('/suppliers/list', stockController.getSuppliers);
 
 export default router; 

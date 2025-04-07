@@ -7,7 +7,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
   FormControl,
   Grid,
   IconButton,
@@ -333,45 +336,54 @@ const StockMovementList: React.FC = () => {
       </Grid>
 
       {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
-        <DialogTitle>
-          {actionType === 'delete' ? 'Delete Movement' : 'Cancel Movement'}
-        </DialogTitle>
+      <Dialog open={confirmDialog} onOpenChange={() => setConfirmDialog(false)}>
         <DialogContent>
-          Are you sure you want to {actionType} this movement?
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'delete' ? 'Delete Movement' : 'Cancel Movement'}
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to {actionType} this movement?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setConfirmDialog(false)}>No</Button>
+            <Button onClick={handleConfirmAction} color="primary" variant="contained">
+              Yes
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog(false)}>No</Button>
-          <Button onClick={handleConfirmAction} color="primary" variant="contained">
-            Yes
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Movement Form Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {selectedMovement ? 'Edit Movement' : 'New Movement'}
-        </DialogTitle>
+      <Dialog open={openDialog} onOpenChange={handleCloseDialog}>
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedMovement ? 'Edit Movement' : 'New Movement'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedMovement ? 'Update the movement details' : 'Fill in the details to create a new movement'}
+            </DialogDescription>
+          </DialogHeader>
           <StockMovementForm
             movement={selectedMovement || undefined}
             onChange={handleFormChange}
             errors={formErrors}
             isEdit={!!selectedMovement}
           />
+          <DialogFooter>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={handleSave}
+              disabled={Object.keys(formErrors).length > 0 || saving}
+            >
+              {saving ? <CircularProgress size={24} /> : 'Save'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={handleSave}
-            disabled={Object.keys(formErrors).length > 0 || saving}
-          >
-            {saving ? <CircularProgress size={24} /> : 'Save'}
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );

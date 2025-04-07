@@ -2,9 +2,10 @@ import React from 'react';
 import { Button } from '../../../components/ui/button';
 import { DataTable } from '../../../components/ui/data-table';
 import { columns } from './columns';
+import type { Invoice } from './columns';
 
-export default function Invoices() {
-  const data = [
+export const Invoices = () => {
+  const data: Invoice[] = [
     {
       id: '1',
       invoiceNumber: 'INV-001',
@@ -29,7 +30,11 @@ export default function Invoices() {
         <h1 className="text-3xl font-bold">Invoices</h1>
         <Button>Create New Invoice</Button>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable 
+        columns={columns} 
+        data={data} 
+        searchKey="invoiceNumber"
+      />
     </div>
   );
-} 
+}; 
