@@ -5,14 +5,29 @@ const router = express.Router();
 
 router.post('/signup', signup);
 router.post('/login', login);
-router.get('/logout', logout);
+router.post('/logout', logout);
 
 // Protected routes
 router.get('/me', protect, (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'User not found'
+    });
+  }
+
+  const { _id, username, role, isAuthorized, isActive } = req.user;
+  
   res.status(200).json({
     status: 'success',
     data: {
-      user: req.user
+      user: {
+        id: _id,
+        username,
+        role,
+        isAuthorized,
+        isActive
+      }
     }
   });
 });

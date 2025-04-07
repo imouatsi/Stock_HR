@@ -1,18 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/utils/api';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
+import { api } from '../services/api';
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -34,12 +28,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
       setLoading(true);
-      // TODO: Implement actual login logic
-      const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
+      const response = await api.post('/auth/login', { username, password });
+      const { token, data: { user } } = response.data;
       localStorage.setItem('token', token);
       setUser(user);
       navigate('/');

@@ -20,7 +20,7 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk<
   { token: string; data: { user: UserProfile } },
-  { email: string; password: string },
+  { username: string; password: string },
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
@@ -33,7 +33,7 @@ export const login = createAsyncThunk<
 
 export const register = createAsyncThunk<
   { token: string; data: { user: UserProfile } },
-  { email: string; password: string; firstName: string; lastName: string },
+  { username: string; password: string; role: string },
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {

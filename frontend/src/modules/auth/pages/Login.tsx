@@ -7,26 +7,48 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useDispatch } from 'react-redux';
+import { login } from '@/features/auth/authSlice';
+import { useToast } from '@/components/ui/use-toast';
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function Login() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // TODO: Implement login logic
-      navigate('/');
+      const resultAction = await dispatch(login(data));
+      if (login.fulfilled.match(resultAction)) {
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+        });
+        navigate('/');
+      } else if (login.rejected.match(resultAction)) {
+        toast({
+          title: "Error",
+          description: resultAction.payload || "Login failed",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error('Login failed:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
     }
   };
 
@@ -39,15 +61,15 @@ export function Login() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                {...register('email')}
-                placeholder="Enter your email"
+                id="username"
+                type="text"
+                {...register('username')}
+                placeholder="Enter your username"
               />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+              {errors.username && (
+                <p className="text-sm text-red-500">{errors.username.message}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -62,8 +84,8 @@ export function Login() {
                 <p className="text-sm text-red-500">{errors.password.message}</p>
               )}
             </div>
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>

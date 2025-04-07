@@ -1,23 +1,23 @@
 import { Response } from 'express';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt, { SignOptions, Secret } from 'jsonwebtoken';
+import { promisify } from 'util';
 import { config } from '../config';
 import { IUser } from '../interfaces/user.interface';
 
 interface JwtPayload {
   id: string;
-  iat: number;
+  iat?: number;
 }
 
-const signToken = (id: string): string => {
-  const payload: JwtPayload = { 
-    id,
-    iat: Math.floor(Date.now() / 1000)
-  };
-  const options: SignOptions = {
-    expiresIn: '24h' // Hardcoded value since config.jwtExpiresIn is causing type issues
-  };
+const JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_EXPIRES_IN = '90d';
 
-  return jwt.sign(payload, config.jwtSecret, options);
+export const signToken = (id: string): string => {
+  const payload: JwtPayload = { id };
+  const options: SignOptions = {
+    expiresIn: JWT_EXPIRES_IN
+  };
+  return jwt.sign(payload, JWT_SECRET, options);
 };
 
 export const createSendToken = (user: IUser, statusCode: number, res: Response): void => {
@@ -38,9 +38,8 @@ export const createSendToken = (user: IUser, statusCode: number, res: Response):
 
 export const verifyToken = (token: string): JwtPayload | null => {
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload;
-    return decoded;
-  } catch (error) {
+    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+  } catch (err) {
     return null;
   }
 }; 

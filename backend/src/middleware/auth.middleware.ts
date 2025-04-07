@@ -37,8 +37,11 @@ export const authMiddleware = {
       }
 
       // 4) Check if user changed password after the token was issued
-      if (currentUser.changedPasswordAfter(decoded.iat)) {
-        return next(new AppError('User recently changed password! Please log in again.', 401));
+      if (currentUser.passwordChangedAt) {
+        const changedTimestamp = currentUser.passwordChangedAt.getTime() / 1000;
+        if (decoded.iat < changedTimestamp) {
+          return next(new AppError('User recently changed password! Please log in again.', 401));
+        }
       }
 
       // Grant access to protected route

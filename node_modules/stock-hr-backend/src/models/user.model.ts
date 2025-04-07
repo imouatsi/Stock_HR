@@ -1,24 +1,23 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { IUser } from '../interfaces/user.interface';
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<IUser>({
   username: {
     type: String,
     required: [true, 'Please provide a username'],
     unique: true,
-    trim: true,
-    minlength: [3, 'Username must be at least 3 characters long']
+    trim: true
   },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
-    minlength: [8, 'Password must be at least 8 characters long'],
+    minlength: 8,
     select: false
   },
   role: {
     type: String,
-    enum: ['admin', 'user'],
+    enum: ['user', 'admin', 'superadmin'],
     default: 'user'
   },
   isAuthorized: {
@@ -29,24 +28,30 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  lastLogin: {
-    type: Date
-  },
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
+  lastLogin: Date
 }, {
   timestamps: true
 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+  // Only run this function if password was actually modified
   if (!this.isModified('password')) return next();
 
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
+  try {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 12);
+    }
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
 });
 
-// Compare password method
+// Instance method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  if (!this.password) return false;
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -59,4 +64,6 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp: number): boolea
   return false;
 };
 
-export const User = mongoose.model<IUser>('User', userSchema); 
+const User = mongoose.model<IUser>('User', userSchema);
+
+export default User; 
