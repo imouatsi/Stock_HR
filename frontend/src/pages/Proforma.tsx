@@ -40,7 +40,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../hooks/useTranslation';
-import api from '../services/api';
+import { api } from '../services/api';
 
 interface ProformaInvoice {
   id: string;

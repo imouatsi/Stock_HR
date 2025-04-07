@@ -4,6 +4,7 @@ interface Notification {
   id: string;
   message: string;
   type: 'success' | 'error' | 'info' | 'warning';
+  duration?: number;
 }
 
 interface NotificationState {
@@ -33,4 +34,4 @@ const notificationSlice = createSlice({
 });
 
 export const { addNotification, removeNotification, clearNotifications } = notificationSlice.actions;
-export default notificationSlice.reducer; 
+export const notificationReducer = notificationSlice.reducer; 

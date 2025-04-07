@@ -71,6 +71,18 @@ export interface DashboardData {
   };
 }
 
+export interface SystemStats {
+    users: number;
+    employees: number;
+    departments: number;
+    assets: number;
+    stock: number;
+    invoices: number;
+    expenses: number;
+    reports: number;
+    alerts: number;
+}
+
 class DashboardService {
   private static instance: DashboardService;
 

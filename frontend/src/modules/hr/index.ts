@@ -7,4 +7,6 @@ export * from './DepartmentForm';
 export * from './DepartmentService';
 export * from './PositionList';
 export * from './PositionForm';
-export * from './PositionService'; 
+export * from './PositionService';
+export * from './pages/Dashboard';
+export * from './routes'; 

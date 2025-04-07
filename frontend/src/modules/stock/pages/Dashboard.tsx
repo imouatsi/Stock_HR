@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from '../../../hooks/useTranslation';
-import stockService from '../../../services/stockService';
+import { stockService } from '../../../services/stockService';
 import { format } from 'date-fns';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({

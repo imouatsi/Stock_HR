@@ -14,7 +14,7 @@ import {
   InputLabel
 } from '@mui/material';
 import { RootState } from '../store';
-import authService from '../services/authService';
+import { authService } from '../services/authService';
 
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();

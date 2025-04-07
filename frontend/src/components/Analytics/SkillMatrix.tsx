@@ -21,6 +21,7 @@ import { useAnimation } from 'framer-motion'; // Fix incorrect import
 import { AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../features/store';
+import { UserProfile } from '../../types/user';
 
 interface Skill {
   skill: string;
@@ -33,9 +34,25 @@ interface SkillMatrix {
   soft: Skill[];
 }
 
+interface AnalyticsSettings {
+  workspace?: {
+    analytics?: {
+      kpis?: {
+        performance?: {
+          skillMatrix?: any;
+        };
+      };
+    };
+  };
+}
+
+interface ExtendedUserProfile extends UserProfile {
+  settings?: AnalyticsSettings;
+}
+
 export const SkillMatrix: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const skillMatrix = user?.settings?.workspace?.analytics?.kpis?.performance?.skillMatrix;
+  const skillMatrix = (user as ExtendedUserProfile)?.settings?.workspace?.analytics?.kpis?.performance?.skillMatrix;
 
   const radarData = skillMatrix?.technical.map((skill: Skill) => ({
     skill: skill.skill,

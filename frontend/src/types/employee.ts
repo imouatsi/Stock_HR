@@ -3,11 +3,14 @@ export interface Employee {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
-  department: string;
-  position: string;
+  phone?: string;
+  departmentId: string;
+  positionId: string;
   hireDate: string;
-  status: 'active' | 'inactive';
+  salary: number;
+  status: 'active' | 'inactive' | 'on_leave';
   createdAt: string;
   updatedAt: string;
-} 
+}
+
+export type EmployeeFormData = Omit<Employee, 'id' | 'createdAt' | 'updatedAt'>; 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { DataTable } from '@/components/ui/data-table';
+import { DataTable } from '../../components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Position } from '@/types/position';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const columns: ColumnDef<Position>[] = [

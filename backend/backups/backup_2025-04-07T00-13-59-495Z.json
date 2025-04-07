@@ -1,0 +1,80 @@
+{
+  "users": [
+    {
+      "_id": "67ede6a3ae73fdc854f039ec",
+      "email": "superadmin@stockhr.com",
+      "password": "$2a$10$.YzYW0yBc9ssQfaCAcZ5ruZVn/zaH5HSUkBoh5ETQ2.PLVGpV4hUG",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "role": "SUPERADMIN",
+      "isActive": true,
+      "createdAt": "2025-04-03T01:38:43.691Z",
+      "updatedAt": "2025-04-05T13:53:01.433Z",
+      "__v": 1,
+      "lastLogin": "2025-04-04T16:34:39.492Z",
+      "active": true,
+      "auditLog": [],
+      "loginAttempts": 0,
+      "mfa": {
+        "backupCodes": [],
+        "enabled": false
+      },
+      "permissions": [],
+      "preferences": {
+        "language": "en",
+        "notifications": true,
+        "theme": "light",
+        "twoFactorEnabled": false
+      },
+      "securityQuestions": [],
+      "sessions": [],
+      "settings": {
+        "accessibility": {
+          "animations": true,
+          "contrast": "normal",
+          "fontSize": "medium"
+        },
+        "emailNotifications": {
+          "marketing": false,
+          "security": true,
+          "updates": true
+        },
+        "workspace": {
+          "customShortcuts": [],
+          "defaultLanguage": "en",
+          "defaultView": "grid",
+          "favorites": [],
+          "recentItems": []
+        }
+      },
+      "webauthnKeys": []
+    },
+    {
+      "_id": "67ede808a66622a4363c1141",
+      "email": "mmanouni@gmail.com",
+      "password": "$2a$10$XsUgtSmInUYGawKpMRKu4eubP9AVFLPzdfltTJyQ3Dtb8Tx5Tt/fa",
+      "firstName": "Moha",
+      "lastName": "Med",
+      "role": "admin",
+      "isActive": true,
+      "createdAt": "2025-04-03T01:44:40.136Z",
+      "updatedAt": "2025-04-04T11:57:01.914Z",
+      "__v": 0,
+      "lastLogin": "2025-04-04T11:57:01.910Z"
+    }
+  ],
+  "inventoryitems": [
+    {
+      "_id": "67ede743a66622a4363c112b",
+      "name": "HP Pro290 G9 MT",
+      "description": "HP 290",
+      "quantity": 20,
+      "unitPrice": 190000,
+      "category": "PC",
+      "supplier": "Tandjaoui",
+      "createdAt": "2025-04-03T01:41:23.234Z",
+      "updatedAt": "2025-04-03T01:41:23.234Z",
+      "__v": 0
+    }
+  ]
+}

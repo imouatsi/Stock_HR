@@ -2,14 +2,12 @@ import { api } from '../../services/api';
 import { eventService, EventType } from './EventService';
 
 export enum ReportType {
-  EMPLOYEE = 'employee',
-  DEPARTMENT = 'department',
-  ASSET = 'asset',
-  STOCK = 'stock',
-  INVOICE = 'invoice',
-  EXPENSE = 'expense',
-  AUDIT = 'audit',
-  BACKUP = 'backup'
+  INVENTORY = 'inventory',
+  SALES = 'sales',
+  PURCHASES = 'purchases',
+  EXPENSES = 'expenses',
+  EMPLOYEES = 'employees',
+  AUDIT = 'audit'
 }
 
 export enum ReportFormat {

@@ -1,0 +1,31 @@
+{
+  "backups": [
+    {
+      "id": "backup_2025-04-07T00-11-22-158Z",
+      "timestamp": "2025-04-07T00:11:22.158Z",
+      "size": 2120,
+      "collections": [
+        "users",
+        "inventoryitems"
+      ]
+    },
+    {
+      "id": "backup_2025-04-07T00-12-49-319Z",
+      "timestamp": "2025-04-07T00:12:49.319Z",
+      "size": 2120,
+      "collections": [
+        "users",
+        "inventoryitems"
+      ]
+    },
+    {
+      "id": "backup_2025-04-07T00-13-59-495Z",
+      "timestamp": "2025-04-07T00:13:59.495Z",
+      "size": 2120,
+      "collections": [
+        "users",
+        "inventoryitems"
+      ]
+    }
+  ]
+}

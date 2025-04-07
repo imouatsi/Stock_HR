@@ -1,115 +1,48 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { CircularProgress, Box } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { RootState } from './features/store';
-import { createAppTheme } from './theme';
-import Layout from './components/Layout';
-import ProtectedRoute from './modules/shared/components/ProtectedRoute';
-import { publicRoutes, protectedRoutes } from './modules/shared/config/routes';
-import { HRRoutes } from './modules/hr/routes';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from './components/ui/toaster';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Dashboard } from './modules/dashboard/pages/Dashboard';
+import { Login } from './modules/auth/pages/Login';
+import { UserList } from './modules/user/pages/UserList';
+import { UserForm } from './modules/user/pages/UserForm';
+import { StockList } from './modules/stock/pages/StockList';
+import { StockForm } from './modules/stock/pages/StockForm';
+import { Analytics } from './modules/analytics/pages/Analytics';
+import { Settings } from './modules/settings/pages/Settings';
+import { NotFound } from './components/NotFound';
+import { Layout } from './components/Layout';
 
 const App: React.FC = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { settings } = useSelector((state: RootState) => state.settings);
-  const theme = createAppTheme(settings.theme);
-
-  const renderRoutes = (routes: typeof protectedRoutes) => {
-    return routes.map((route) => {
-      const Component = route.component;
-      return (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={
-            <ProtectedRoute route={route}>
-              <Suspense
-                fallback={
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    minHeight="100vh"
-                  >
-                    <CircularProgress />
-                  </Box>
-                }
-              >
-                <Component />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        >
-          {route.children && renderRoutes(route.children)}
-        </Route>
-      );
-    });
-  };
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          {/* Public routes */}
-          {publicRoutes.map((route) => {
-            const Component = route.component;
-            return (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={
-                  <Suspense
-                    fallback={
-                      <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        minHeight="100vh"
-                      >
-                        <CircularProgress />
-                      </Box>
-                    }
-                  >
-                    <Component />
-                  </Suspense>
-                }
-              />
-            );
-          })}
-
-          {/* Protected routes */}
-          <Route
-            element={
-              <ProtectedRoute
-                route={{
-                  path: '/',
-                  component: React.lazy(() => import('./components/Layout')),
-                }}
-              >
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            {renderRoutes(protectedRoutes)}
-            <Route path="/hr/*" element={<HRRoutes />} />
-          </Route>
-
-          {/* Catch all route */}
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to={isAuthenticated ? '/dashboard' : '/login'}
-                replace
-              />
-            }
-          />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<Layout />}>
+                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/users" element={<ProtectedRoute><UserList /></ProtectedRoute>} />
+                <Route path="/users/new" element={<ProtectedRoute><UserForm /></ProtectedRoute>} />
+                <Route path="/users/:id" element={<ProtectedRoute><UserForm /></ProtectedRoute>} />
+                <Route path="/stock" element={<ProtectedRoute><StockList /></ProtectedRoute>} />
+                <Route path="/stock/new" element={<ProtectedRoute><StockForm /></ProtectedRoute>} />
+                <Route path="/stock/:id" element={<ProtectedRoute><StockForm /></ProtectedRoute>} />
+                <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </Provider>
   );
 };
 

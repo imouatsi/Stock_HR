@@ -5,7 +5,7 @@ export interface AccessToken {
   expiresAt: string;
 }
 
-class StockAccessTokenService {
+export class StockAccessTokenService {
   private static instance: StockAccessTokenService;
   private tokens: Map<string, AccessToken> = new Map();
 
@@ -74,4 +74,8 @@ class StockAccessTokenService {
   }
 }
 
-export const stockAccessTokenService = StockAccessTokenService.getInstance(); 
+// Create and export a singleton instance
+export const stockAccessTokenService = StockAccessTokenService.getInstance();
+
+// Default export
+export default stockAccessTokenService; 

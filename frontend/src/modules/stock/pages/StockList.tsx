@@ -47,7 +47,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../../../hooks/useTranslation';
 import GradientButton from '../../../components/ui/GradientButton';
-import { api } from '../../../utils/api';
+import api, { getApiResponse, handleApiError } from '../../../utils/api';
 import {
   gradientText,
   pageContainer,
@@ -125,9 +125,9 @@ const StockList: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get('/stock', { params: filters });
-      setItems(response.data.data.items);
-    } catch (err) {
-      setError('Failed to fetch stock items');
+      setItems(getApiResponse<StockItem[]>(response));
+    } catch (error) {
+      setError(handleApiError(error).message);
     } finally {
       setLoading(false);
     }

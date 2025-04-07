@@ -80,7 +80,7 @@ export interface PurchaseOrderAccessToken {
   }[];
 }
 
-class StockService {
+export class StockService {
   private static instance: StockService;
   private activeTokens: Map<string, StockAccessToken> = new Map();
   private activePurchaseOrderTokens: Map<string, PurchaseOrderAccessToken> = new Map();
@@ -245,60 +245,37 @@ class StockService {
   }
 
   // Update createMovement to use access token
-  async createMovement(data: Omit<StockMovement, 'id' | 'status' | 'user' | 'timestamp'>): Promise<StockMovement> {
+  async createMovement(data: Omit<StockMovement, 'id' | 'status' | 'user' | 'timestamp'>) {
     try {
-      // Request access token for outgoing movements
       if (data.type === 'out') {
-        const token = await stockAccessTokenService.requestAccessToken(
-          data.inventoryItem,
-          'sale',
-          data.quantity
-        );
-        if (token) {
-          data = { ...data, accessToken: token.token };
-        }
+        // Create an expense for outgoing stock
+        await this.createExpense({
+          amount: data.quantity * data.unitPrice,
+          category: 'stock',
+          description: `Stock movement: ${data.movementId}`,
+        });
       }
 
       const response = await api.post('/stock/movements', data);
       return response.data;
     } catch (error) {
-      if (data.type === 'out' && (data as any).accessToken) {
-        try {
-          await stockAccessTokenService.cancelAccessToken((data as any).accessToken);
-        } catch (tokenError) {
-          console.error('Error canceling access token:', tokenError);
-        }
-      }
       throw error;
     }
   }
 
-  // Update updateMovement to use access token
   async updateMovement(id: string, data: Partial<StockMovement>): Promise<StockMovement> {
     try {
       const response = await api.patch(`/stock/movements/${id}`, data);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      throw error;
+      this.handleError(error);
     }
   }
 
   async deleteMovement(id: string, reason: string, userId: string): Promise<void> {
     try {
-      // Instead of deleting, change status to cancelled
-      await statusManagementService.changeStatus(
-        'stock_movements',
-        id,
-        'cancelled',
-        'STOCK_MOVEMENT_CANCELLED',
-        reason,
-        userId
-      );
-      
-      // Update the movement in the database
-      await api.patch(`/stock/movements/${id}`, {
-        status: 'cancelled',
-        reason
+      await api.delete(`/stock/movements/${id}`, {
+        data: { reason, userId }
       });
     } catch (error) {
       this.handleError(error);
@@ -307,18 +284,10 @@ class StockService {
 
   async cancelMovement(id: string, reason: string, userId: string): Promise<StockMovement> {
     try {
-      // Use status management service
-      await statusManagementService.changeStatus(
-        'stock_movements',
-        id,
-        'cancelled',
-        'STOCK_MOVEMENT_CANCELLED',
+      const response = await api.patch(`/stock/movements/${id}/cancel`, {
         reason,
         userId
-      );
-      
-      // Update the movement in the database
-      const response = await api.post(`/stock/movements/${id}/cancel`, { reason });
+      });
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -358,7 +327,6 @@ class StockService {
     }
   }
 
-  // Add method to request purchase order access token
   async requestPurchaseOrderAccessToken(
     purchaseOrderId: string,
     operation: 'receive' | 'cancel' | 'approve',
@@ -371,7 +339,7 @@ class StockService {
         items
       });
       
-      const token = response.data.data.token;
+      const token = response.data.data;
       this.activePurchaseOrderTokens.set(purchaseOrderId, token);
       
       // Set up auto-expiration
@@ -386,7 +354,6 @@ class StockService {
     }
   }
 
-  // Add method to release purchase order access token
   async releasePurchaseOrderAccessToken(purchaseOrderId: string): Promise<void> {
     const token = this.activePurchaseOrderTokens.get(purchaseOrderId);
     if (token) {
@@ -399,20 +366,19 @@ class StockService {
     }
   }
 
-  // Update updatePurchaseOrderStatus to use access token
   async updatePurchaseOrderStatus(
     id: string,
     status: string,
     receivedItems?: { product: string; quantity: number }[]
   ): Promise<PurchaseOrder> {
     try {
-      const response = await api.patch(`/stock/purchase-orders/${id}`, {
+      const response = await api.patch(`/stock/purchase-orders/${id}/status`, {
         status,
         receivedItems
       });
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      throw error;
+      this.handleError(error);
     }
   }
 
@@ -480,7 +446,6 @@ class StockService {
     }
   }
 
-  // Add method to handle stock item status changes
   async updateStockItemStatus(
     id: string, 
     newStatus: StockItemStatus, 
@@ -488,20 +453,10 @@ class StockService {
     userId: string
   ): Promise<InventoryItem> {
     try {
-      // Use status management service
-      await statusManagementService.changeStatus(
-        'stock',
-        id,
-        newStatus,
-        `STOCK_${newStatus.toUpperCase()}`,
+      const response = await api.patch(`/stock/inventory/${id}/status`, {
+        status: newStatus,
         reason,
         userId
-      );
-      
-      // Update the item in the database
-      const response = await api.patch(`/stock/inventory/${id}`, {
-        status: newStatus,
-        reason
       });
       return response.data.data;
     } catch (error) {
@@ -509,7 +464,6 @@ class StockService {
     }
   }
 
-  // Add method to handle stock loss incidents
   async reportStockLoss(
     itemIds: string[], 
     incidentType: 'flood' | 'fire' | 'theft' | 'damage' | 'other',
@@ -517,54 +471,24 @@ class StockService {
     userId: string
   ): Promise<void> {
     try {
-      // Determine the appropriate status based on incident type
-      let status: StockItemStatus;
-      let reasonCode: string;
-      
-      switch (incidentType) {
-        case 'flood':
-          status = StockItemStatus.DAMAGED;
-          reasonCode = 'STOCK_FLOOD_DAMAGE';
-          break;
-        case 'fire':
-          status = StockItemStatus.DAMAGED;
-          reasonCode = 'STOCK_FIRE_DAMAGE';
-          break;
-        case 'theft':
-          status = StockItemStatus.STOLEN;
-          reasonCode = 'STOCK_THEFT';
-          break;
-        case 'damage':
-          status = StockItemStatus.DAMAGED;
-          reasonCode = 'STOCK_DAMAGE';
-          break;
-        default:
-          status = StockItemStatus.LOST;
-          reasonCode = 'STOCK_LOST';
-      }
-      
-      // Update each affected item
-      for (const itemId of itemIds) {
-        await this.updateStockItemStatus(itemId, status, description, userId);
-      }
-      
-      // Create a report of the incident
-      await api.post('/stock/incidents', {
-        type: incidentType,
+      await api.post('/stock/inventory/loss', {
+        itemIds,
+        incidentType,
         description,
-        affectedItems: itemIds,
-        reportedBy: userId,
-        reportedAt: new Date()
+        userId
       });
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  // Event Handlers
   private async handleExpenseApproved(data: { expenseId: string; amount: number; category: string; createdBy: string; departmentId: string }) {
-    // Implementation
+    // Handle expense approval logic
   }
 }
 
-export const stockService = StockService.getInstance(); 
+// Create and export a singleton instance
+export const stockService = StockService.getInstance();
+
+// Default export
+export default stockService; 

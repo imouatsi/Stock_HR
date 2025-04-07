@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock HR - Backup Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .backup-card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .backup-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .btn-action {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Backup Management</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card backup-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Create New Backup</h5>
+                        <button id="createBackup" class="btn btn-primary">Create Backup</button>
+                        <div id="createStatus" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card backup-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Backups</h5>
+                        <div class="backup-list" id="backupList">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/backup';
+        let backups = [];
+
+        // Helper function to show alerts
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        // Load backups
+        async function loadBackups() {
+            try {
+                const response = await fetch(`${API_BASE}/list`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    backups = data.backups;
+                    renderBackups();
+                } else {
+                    showAlert('Failed to load backups', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error loading backups', 'danger');
+                console.error(error);
+            }
+        }
+
+        // Render backups list
+        function renderBackups() {
+            const backupList = document.getElementById('backupList');
+            if (backups.length === 0) {
+                backupList.innerHTML = '<p class="text-muted">No backups available</p>';
+                return;
+            }
+
+            backupList.innerHTML = backups.map(backup => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${new Date(backup.timestamp).toLocaleString()}</h6>
+                                <small class="text-muted">Size: ${formatFileSize(backup.size)}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-success btn-action" onclick="restoreBackup('${backup.backupPath}')">
+                                    Restore
+                                </button>
+                                <button class="btn btn-sm btn-danger btn-action" onclick="deleteBackup('${backup.backupPath}')">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper function to format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Create backup
+        async function createBackup() {
+            const button = document.getElementById('createBackup');
+            const status = document.getElementById('createStatus');
+            
+            button.disabled = true;
+            status.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Creating backup...';
+
+            try {
+                const response = await fetch(`${API_BASE}/create`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Backup created successfully');
+                    loadBackups();
+                } else {
+                    showAlert('Failed to create backup', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error creating backup', 'danger');
+                console.error(error);
+            } finally {
+                button.disabled = false;
+                status.innerHTML = '';
+            }
+        }
+
+        // Restore backup
+        async function restoreBackup(backupPath) {
+            if (!confirm('Are you sure you want to restore this backup? This will overwrite current data.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ backupPath })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Backup restored successfully');
+                } else {
+                    showAlert('Failed to restore backup', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error restoring backup', 'danger');
+                console.error(error);
+            }
+        }
+
+        // Delete backup
+        async function deleteBackup(backupPath) {
+            if (!confirm('Are you sure you want to delete this backup?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ backupPath })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Backup deleted successfully');
+                    loadBackups();
+                } else {
+                    showAlert('Failed to delete backup', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error deleting backup', 'danger');
+                console.error(error);
+            }
+        }
+
+        // Initialize
+        document.getElementById('createBackup').addEventListener('click', createBackup);
+        loadBackups();
+    </script>
+</body>
+</html> 

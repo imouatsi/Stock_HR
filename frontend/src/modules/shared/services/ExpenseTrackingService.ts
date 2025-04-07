@@ -29,7 +29,7 @@ export interface ExpenseCategory {
   type: 'operational' | 'capital' | 'personnel';
 }
 
-class ExpenseTrackingService {
+export class ExpenseTrackingService {
   private static instance: ExpenseTrackingService;
 
   private constructor() {
@@ -188,4 +188,8 @@ class ExpenseTrackingService {
   }
 }
 
-export const expenseTrackingService = ExpenseTrackingService.getInstance(); 
+// Create and export a singleton instance
+export const expenseTrackingService = ExpenseTrackingService.getInstance();
+
+// Default export
+export default expenseTrackingService; 

@@ -54,7 +54,7 @@ const RoleBasedRoute: React.FC<{
     return <Navigate to="/login" replace />;
   }
 
-  const hasAccess = allowedRoles.includes(user.role);
+  const hasAccess = allowedRoles.includes(user.role as UserRole);
   
   if (!hasAccess) {
     return <Navigate to="/dashboard" replace />;
@@ -92,7 +92,7 @@ const ModuleRoute: React.FC<{
     }
   };
 
-  const hasAccess = hasModuleAccess(user.role, module);
+  const hasAccess = hasModuleAccess(user.role as UserRole, module);
   
   if (!hasAccess) {
     return <Navigate to="/dashboard" replace />;

@@ -50,6 +50,9 @@ export interface ErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-export * from './employee';
+// Re-export all types
+export * from './user';
 export * from './department';
-export * from './position'; 
+export * from './employee';
+export * from './position';
+export * from './stock'; 

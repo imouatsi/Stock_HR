@@ -33,4 +33,8 @@ api.interceptors.response.use(
   }
 );
 
+// Named export
 export { api };
+
+// Default export
+export default api;

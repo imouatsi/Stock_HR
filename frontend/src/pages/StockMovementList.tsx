@@ -33,6 +33,13 @@ import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import StockMovementForm from '../components/StockMovementForm';
 
+interface StockMovementFilters {
+  type?: 'in' | 'out';
+  itemId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 const StockMovementList: React.FC = () => {
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +70,7 @@ const StockMovementList: React.FC = () => {
   }, [filters]);
 
   const handleFilterChange = (field: keyof StockMovementFilters, value: string | null) => {
-    setFilters(prev => ({
+    setFilters((prev: StockMovementFilters) => ({
       ...prev,
       [field]: value || undefined,
     }));

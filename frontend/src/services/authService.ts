@@ -1,80 +1,51 @@
-import { api } from './api';
-import { UserRole } from '../types/user';
+import { UserProfile } from '../types/user';
+import api, { getApiResponse, handleApiError } from '../utils/api';
 
 export interface LoginCredentials {
   username: string;
   password: string;
-  role: UserRole;
 }
 
-export interface UserProfile {
-  id: string;
-  username: string;
-  role: UserRole;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  department?: string;
-  position?: string;
-  settings?: {
-    workspace?: {
-      analytics?: {
-        kpis?: {
-          performance?: {
-            skillMatrix?: {
-              technical: Array<{ skill: string; level: number }>;
-              soft: Array<{ skill: string; level: number }>;
-            };
-          };
-        };
-        gamification?: {
-          enabled: boolean;
-          points: number;
-        };
-      };
-      collaboration?: {
-        teams: Array<{
-          id: string;
-          name: string;
-          members: string[];
-        }>;
-      };
-    };
-  };
-  subscription?: {
-    features: string[];
-  };
+export interface ResetPasswordData {
+  targetUsername: string;
+  newPassword: string;
 }
 
 class AuthService {
-  private static instance: AuthService;
-
-  private constructor() {}
-
-  public static getInstance(): AuthService {
-    if (!AuthService.instance) {
-      AuthService.instance = new AuthService();
-    }
-    return AuthService.instance;
-  }
-
   async login(credentials: LoginCredentials): Promise<UserProfile> {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
+    try {
+      const response = await api.post('/auth/login', credentials);
+      return getApiResponse<UserProfile>(response);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 
   async getProfile(): Promise<UserProfile> {
-    const response = await api.get('/auth/profile');
-    return response.data;
+    try {
+      const response = await api.get('/auth/profile');
+      return getApiResponse<UserProfile>(response);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  async resetPassword(data: ResetPasswordData): Promise<void> {
+    try {
+      await api.post('/auth/reset-password', data);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 
   async logout(): Promise<void> {
-    await api.post('/auth/logout');
-  }
-
-  async resetPassword(email: string): Promise<void> {
-    await api.post('/auth/reset-password', { email });
+    try {
+      await api.post('/auth/logout');
+      localStorage.removeItem('token');
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 }
 
-export const authService = AuthService.getInstance(); 
+export const authService = new AuthService(); 

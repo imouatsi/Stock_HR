@@ -1,9 +1,11 @@
 export interface Department {
   id: string;
   name: string;
-  description: string;
-  manager: string;
-  status: 'active' | 'inactive';
+  description?: string;
+  managerId?: string;
+  parentId?: string;
   createdAt: string;
   updatedAt: string;
-} 
+}
+
+export type DepartmentFormData = Omit<Department, 'id' | 'createdAt' | 'updatedAt'>; 

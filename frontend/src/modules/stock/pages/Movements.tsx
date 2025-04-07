@@ -35,7 +35,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../../../hooks/useTranslation';
 import GradientButton from '../../../components/ui/GradientButton';
-import stockService, { StockMovement, InventoryItem } from '../../../services/stockService';
+import { stockService, type StockMovement, type InventoryItem } from '../../../services/stockService';
 import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';

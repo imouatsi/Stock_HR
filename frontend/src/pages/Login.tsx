@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, TextField, Typography, Paper } from '@mui/material';
 import { login } from '../store/slices/authSlice';
-import authService from '../services/authService';
+import { authService } from '../services/authService';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();

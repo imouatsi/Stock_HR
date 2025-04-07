@@ -7,6 +7,8 @@ export enum AssetStatus {
   ASSIGNED = 'assigned',
   MAINTENANCE = 'maintenance',
   RETIRED = 'retired',
+  LOST = 'lost',
+  STOLEN = 'stolen',
   DAMAGED = 'damaged'
 }
 

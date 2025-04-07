@@ -27,7 +27,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../../../hooks/useTranslation';
 import GradientButton from '../../../components/ui/GradientButton';
-import stockService, { StockCategory } from '../../../services/stockService';
+import { stockService, type StockCategory } from '../../../services/stockService';
 import { useAuth } from '../../../hooks/useAuth';
 
 const Categories: React.FC = () => {

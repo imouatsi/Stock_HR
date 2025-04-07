@@ -282,6 +282,66 @@ class AccountingService {
     }
     throw error;
   }
+
+  async cancelInvoice(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'invoices',
+        id,
+        'CANCELLED',
+        'INVOICE_CANCELLED'
+      );
+
+      // Update the invoice in the database
+      await api.patch(`/accounting/invoices/${id}`, {
+        status: 'CANCELLED',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateInvoiceStatus(id: string, newStatus: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'invoices',
+        id,
+        newStatus,
+        `INVOICE_${newStatus.toUpperCase()}`
+      );
+
+      // Update the invoice in the database
+      await api.patch(`/accounting/invoices/${id}`, {
+        status: newStatus,
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async voidInvoice(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'invoices',
+        id,
+        'VOID',
+        'INVOICE_VOID'
+      );
+
+      // Update the invoice in the database
+      await api.patch(`/accounting/invoices/${id}`, {
+        status: 'VOID',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const accountingService = AccountingService.getInstance(); 

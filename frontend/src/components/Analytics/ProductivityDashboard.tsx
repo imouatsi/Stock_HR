@@ -17,10 +17,28 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../features/store';
 import { ResponsivePie } from '@nivo/pie';
 import { motion } from 'framer-motion';
+import { UserProfile } from '../../types/user';
+
+interface AnalyticsSettings {
+  workspace?: {
+    analytics?: {
+      kpis?: {
+        performance?: {
+          skillMatrix?: any;
+        };
+      };
+      gamification?: any;
+    };
+  };
+}
+
+interface ExtendedUserProfile extends UserProfile {
+  settings?: AnalyticsSettings;
+}
 
 export const ProductivityDashboard: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { kpis, gamification } = user?.settings?.workspace?.analytics || {};
+  const { kpis, gamification } = (user as ExtendedUserProfile)?.settings?.workspace?.analytics || {};
 
   const variants = {
     hidden: { opacity: 0, y: 20 },

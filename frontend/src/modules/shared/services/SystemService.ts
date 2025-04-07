@@ -69,6 +69,19 @@ enum AlertLevel {
   CRITICAL = 'CRITICAL'
 }
 
+export enum SystemModuleType {
+    USER = 'USER',
+    EMPLOYEE = 'EMPLOYEE',
+    DEPARTMENT = 'DEPARTMENT',
+    ASSET = 'ASSET',
+    STOCK = 'STOCK',
+    INVOICE = 'INVOICE',
+    EXPENSE = 'EXPENSE',
+    REPORT = 'REPORT',
+    AUDIT = 'AUDIT',
+    SETTINGS = 'SETTINGS'
+}
+
 class SystemService {
   private static instance: SystemService;
 

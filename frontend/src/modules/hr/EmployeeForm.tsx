@@ -2,10 +2,16 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  TextField,
+  Button,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box
+} from '@mui/material';
 import { Employee } from '@/types/employee';
 
 const employeeSchema = z.object({
@@ -37,86 +43,86 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSubmi
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="firstName">First Name</Label>
-          <Input
-            id="firstName"
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="First Name"
             {...register('firstName')}
-            error={errors.firstName?.message}
+            error={!!errors.firstName}
+            helperText={errors.firstName?.message}
           />
-        </div>
-        <div>
-          <Label htmlFor="lastName">Last Name</Label>
-          <Input
-            id="lastName"
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Last Name"
             {...register('lastName')}
-            error={errors.lastName?.message}
+            error={!!errors.lastName}
+            helperText={errors.lastName?.message}
           />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          {...register('email')}
-          error={errors.email?.message}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="phone">Phone</Label>
-        <Input
-          id="phone"
-          {...register('phone')}
-          error={errors.phone?.message}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="department">Department</Label>
-        <Select
-          onValueChange={(value) => setValue('department', value)}
-          defaultValue={initialData?.department}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select department" />
-          </SelectTrigger>
-          <SelectContent>
-            {/* TODO: Add department options */}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="position">Position</Label>
-        <Select
-          onValueChange={(value) => setValue('position', value)}
-          defaultValue={initialData?.position}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select position" />
-          </SelectTrigger>
-          <SelectContent>
-            {/* TODO: Add position options */}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="hireDate">Hire Date</Label>
-        <Input
-          id="hireDate"
-          type="date"
-          {...register('hireDate')}
-          error={errors.hireDate?.message}
-        />
-      </div>
-
-      <Button type="submit">Save Employee</Button>
-    </form>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Phone"
+            {...register('phone')}
+            error={!!errors.phone}
+            helperText={errors.phone?.message}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl fullWidth error={!!errors.department}>
+            <InputLabel>Department</InputLabel>
+            <Select
+              label="Department"
+              {...register('department')}
+              defaultValue={initialData?.department}
+            >
+              {/* TODO: Add department options */}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl fullWidth error={!!errors.position}>
+            <InputLabel>Position</InputLabel>
+            <Select
+              label="Position"
+              {...register('position')}
+              defaultValue={initialData?.position}
+            >
+              {/* TODO: Add position options */}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Hire Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            {...register('hireDate')}
+            error={!!errors.hireDate}
+            helperText={errors.hireDate?.message}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">
+            Save Employee
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }; 

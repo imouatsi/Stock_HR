@@ -214,6 +214,106 @@ class HRService {
     }
     throw error;
   }
+
+  async terminateEmployee(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'employees',
+        id,
+        'TERMINATED',
+        'EMPLOYEE_TERMINATED'
+      );
+
+      // Update the employee in the database
+      await api.patch(`/hr/employees/${id}`, {
+        status: 'TERMINATED',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateEmployeeStatus(id: string, newStatus: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'employees',
+        id,
+        newStatus,
+        `EMPLOYEE_${newStatus.toUpperCase()}`
+      );
+
+      // Update the employee in the database
+      await api.patch(`/hr/employees/${id}`, {
+        status: newStatus,
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async retireEmployee(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'employees',
+        id,
+        'RETIRED',
+        'EMPLOYEE_RETIRED'
+      );
+
+      // Update the employee in the database
+      await api.patch(`/hr/employees/${id}`, {
+        status: 'RETIRED',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async suspendEmployee(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'employees',
+        id,
+        'SUSPENDED',
+        'EMPLOYEE_SUSPENDED'
+      );
+
+      // Update the employee in the database
+      await api.patch(`/hr/employees/${id}`, {
+        status: 'SUSPENDED',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async markEmployeeDeceased(id: string, reason: string, userId: string) {
+    try {
+      // Create audit log entry
+      await this.createAuditLog(
+        'employees',
+        id,
+        'DECEASED',
+        'EMPLOYEE_DECEASED'
+      );
+
+      // Update the employee in the database
+      await api.patch(`/hr/employees/${id}`, {
+        status: 'DECEASED',
+        reason
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const hrService = HRService.getInstance(); 

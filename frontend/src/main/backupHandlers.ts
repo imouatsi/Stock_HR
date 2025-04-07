@@ -2,19 +2,27 @@ import { ipcMain } from 'electron';
 import backupService from '../services/backupService';
 
 export const setupBackupHandlers = () => {
-  ipcMain.handle('perform-backup', async () => {
-    return await backupService.performBackup();
+  ipcMain.handle('backup:list', async () => {
+    return await backupService.listBackups();
   });
 
-  ipcMain.handle('restore-backup', async (_, backupPath: string) => {
-    return await backupService.restoreBackup(backupPath);
+  ipcMain.handle('backup:create', async () => {
+    return await backupService.createBackup();
   });
 
-  ipcMain.handle('get-backup-config', () => {
+  ipcMain.handle('backup:restore', async (_, backupId: string) => {
+    return await backupService.restoreBackup(backupId);
+  });
+
+  ipcMain.handle('backup:delete', async (_, backupId: string) => {
+    return await backupService.deleteBackup(backupId);
+  });
+
+  ipcMain.handle('backup:get-config', () => {
     return backupService.getConfig();
   });
 
-  ipcMain.handle('update-backup-config', (_, newConfig: Partial<BackupConfig>) => {
+  ipcMain.handle('backup:set-config', (_, newConfig: Partial<BackupConfig>) => {
     backupService.updateConfig(newConfig);
     return backupService.getConfig();
   });

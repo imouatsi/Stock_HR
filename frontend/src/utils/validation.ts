@@ -1,10 +1,13 @@
 import * as yup from 'yup';
-import { LoginCredentials, RegisterData, UserProfile } from '../services/authService';
+import { LoginCredentials, RegisterData, UserProfile } from '@/types/user';
 
 // Password validation configuration
 const PASSWORD_CONFIG = {
   minLength: 8,
-  maxLength: 128,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumbers: true,
+  requireSpecialChars: true
 };
 
 // Common weak passwords to check against
@@ -14,26 +17,49 @@ const COMMON_PASSWORDS = [
   'football', 'baseball', 'master', 'login', 'admin123'
 ];
 
-// Password validation schema with enhanced security checks
-const passwordSchema = yup.string()
-  .required('Password is required')
+// Email validation schema
+export const emailSchema = yup
+  .string()
+  .email('Invalid email address')
+  .required('Email is required');
+
+// Password validation schema
+export const passwordSchema = yup
+  .string()
   .min(PASSWORD_CONFIG.minLength, `Password must be at least ${PASSWORD_CONFIG.minLength} characters`)
-  .max(PASSWORD_CONFIG.maxLength, `Password cannot be longer than ${PASSWORD_CONFIG.maxLength} characters`)
   .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
   .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
   .matches(/[0-9]/, 'Password must contain at least one number')
-  .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
-  .test('no-spaces', 'Password cannot contain spaces', 
-    value => value === undefined || !/\s/.test(value))
-  .test('not-common', 'This password is too common. Please choose a stronger password',
-    value => value === undefined || !COMMON_PASSWORDS.includes(value.toLowerCase()));
+  .matches(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+  .required('Password is required');
+
+// Login validation schema
+export const loginSchema = yup.object().shape({
+  email: emailSchema,
+  password: passwordSchema
+});
+
+// Registration validation schema
+export const registerSchema = yup.object().shape({
+  email: emailSchema,
+  password: passwordSchema,
+  firstName: yup.string().required('First name is required'),
+  lastName: yup.string().required('Last name is required'),
+  role: yup.string().oneOf(['admin', 'manager', 'employee', 'guest']).required('Role is required')
+});
+
+// User profile validation schema
+export const userProfileSchema = yup.object().shape({
+  firstName: yup.string().required('First name is required'),
+  lastName: yup.string().required('Last name is required'),
+  email: emailSchema,
+  phone: yup.string().nullable(),
+  address: yup.string().nullable(),
+  departmentId: yup.string().nullable(),
+  positionId: yup.string().nullable()
+});
 
 // Common validation schemas
-const emailSchema = yup.string()
-  .email('Invalid email address')
-  .required('Email is required')
-  .trim();
-
 const nameSchema = yup.string()
   .min(2, 'Must be at least 2 characters')
   .max(50, 'Must be at most 50 characters')
@@ -43,27 +69,9 @@ const nameSchema = yup.string()
 
 // Type-safe schemas
 export const schemas = {
-  login: yup.object<LoginCredentials>({
-    email: emailSchema,
-    password: yup.string().required('Password is required'), // Less strict for login
-  }),
-
-  register: yup.object<RegisterData>({
-    email: emailSchema,
-    password: passwordSchema,
-    firstName: nameSchema,
-    lastName: nameSchema,
-    role: yup.string()
-      .oneOf(['admin', 'manager', 'seller', 'user'], 'Invalid role')
-      .required('Role is required'),
-  }),
-
-  updateProfile: yup.object<Partial<UserProfile>>({
-    email: emailSchema,
-    firstName: nameSchema,
-    lastName: nameSchema,
-  }),
-
+  login: loginSchema,
+  register: registerSchema,
+  updateProfile: userProfileSchema,
   changePassword: yup.object({
     currentPassword: yup.string().required('Current password is required'),
     newPassword: passwordSchema,
@@ -71,7 +79,6 @@ export const schemas = {
       .oneOf([yup.ref('newPassword')], 'Passwords must match')
       .required('Please confirm your password'),
   }),
-
   inventory: yup.object({
     name: yup.string()
       .min(3, 'Name must be at least 3 characters')
@@ -137,11 +144,11 @@ export const validateForm = async <T extends Record<string, any>>(
   }
 };
 
-// Helper function to validate a single field
-export const validateField = async <T>(
-  schema: yup.ObjectSchema<any>,
-  fieldName: keyof T,
-  value: any
+// Generic validation function
+export const validateField = async (
+  schema: yup.AnySchema,
+  fieldName: string,
+  value: unknown
 ): Promise<string | null> => {
   try {
     await schema.validateAt(fieldName, { [fieldName]: value });
@@ -150,6 +157,6 @@ export const validateField = async <T>(
     if (error instanceof yup.ValidationError) {
       return error.message;
     }
-    return 'Validation failed';
+    return 'An unexpected error occurred';
   }
 };
