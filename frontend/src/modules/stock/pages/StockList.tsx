@@ -1,66 +1,47 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../hooks/useTranslation';
+import api, { getApiResponse, handleApiError } from '../../../utils/api';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
 import {
-  Box,
-  Typography,
-  Paper,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../components/ui/dialog';
+import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Button,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Tooltip,
-  Chip,
-  Fade,
-  Zoom,
-  CircularProgress,
-  Alert,
-  Collapse,
-  Grow,
-  Slide,
-  useTheme,
-  InputAdornment,
-  MenuItem,
+} from '../../../components/ui/table';
+import {
   Select,
-  FormControl,
-  InputLabel,
-  Grid,
-  SelectChangeEvent,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Inventory as InventoryIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-  Search as SearchIcon,
-  FilterList as FilterListIcon,
-  Sort as SortIcon,
-} from '@mui/icons-material';
-import { useTranslation } from '../../../hooks/useTranslation';
-import GradientButton from '../../../components/ui/GradientButton';
-import api, { getApiResponse, handleApiError } from '../../../utils/api';
-import {
-  gradientText,
-  pageContainer,
-  tableContainer,
-  tableHeader,
-  dialogTitle,
-  dialogPaper,
-} from '../../../theme/gradientStyles';
-import { useTranslation as useTranslationUI } from '../../../hooks/useTranslation';
-import { Input } from '../../../components/ui/input';
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TableHeader as TableHeaderUI, TableBody as TableBodyUI, TableRow as TableRowUI } from '../../../components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Package,
+  ChevronDown,
+  ChevronUp,
+  Search,
+  Filter,
+  ArrowUpDown,
+} from 'lucide-react';
 
 interface StockItem {
   _id: string;
@@ -97,8 +78,6 @@ interface Filters {
 
 export function StockList() {
   const { t } = useTranslation();
-  const { t: tUI } = useTranslationUI();
-  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -165,8 +144,7 @@ export function StockList() {
     }));
   };
 
-  const handleSelectChange = (e: SelectChangeEvent) => {
-    const { name, value } = e.target;
+  const handleSelectChange = (value: string, name: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -181,8 +159,7 @@ export function StockList() {
     }));
   };
 
-  const handleFilterSelectChange = (e: SelectChangeEvent) => {
-    const { name, value } = e.target;
+  const handleFilterSelectChange = (value: string, name: string) => {
     setFilters(prev => ({
       ...prev,
       [name]: value
@@ -254,424 +231,224 @@ export function StockList() {
 
   if (loading) {
     return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          gap: 2
-        }}
-      >
-        <CircularProgress size={60} thickness={4} />
-        <Typography
-          variant="h6"
-          sx={{
-            opacity: 0,
-            animation: 'fadeInOut 1.5s infinite',
-            '@keyframes fadeInOut': {
-              '0%': { opacity: 0 },
-              '50%': { opacity: 1 },
-              '100%': { opacity: 0 },
-            },
-          }}
-        >
+      <div className="flex items-center justify-center h-[100vh] gap-4">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+        <p className="text-2xl font-bold opacity-0 animate-fadeInOut">
           {t('common.loading')}
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Stock Management</h1>
-        <Button onClick={handleClickOpen}>Add New Item</Button>
+    <div className="space-y-4 p-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">{t('stock.title')}</h1>
+        <Button onClick={handleClickOpen} className="gap-2">
+          <Plus className="h-4 w-4" />
+          {t('stock.addNew')}
+        </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
+          <CardTitle>{t('stock.filters')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <Input placeholder="Search items..." className="max-w-sm" value={filters.search} onChange={handleFilterTextChange} />
-            <Button variant="outline">Filter</Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('stock.search')}</label>
+              <Input
+                name="search"
+                value={filters.search}
+                onChange={handleFilterTextChange}
+                placeholder={t('stock.searchPlaceholder')}
+                className="w-full"
+                icon={<Search className="h-4 w-4" />}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('stock.category')}</label>
+              <Select
+                value={filters.category}
+                onValueChange={(value) => handleFilterSelectChange(value, 'category')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('stock.selectCategory')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{t('stock.allCategories')}</SelectItem>
+                  {/* Add your categories here */}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('stock.sortBy')}</label>
+              <Select
+                value={filters.sortBy}
+                onValueChange={(value) => handleFilterSelectChange(value, 'sortBy')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('stock.selectSortField')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">{t('stock.name')}</SelectItem>
+                  <SelectItem value="quantity">{t('stock.quantity')}</SelectItem>
+                  <SelectItem value="category">{t('stock.category')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Stock Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => (
-                <TableRowUI key={item._id}>
-                  <TableBodyUI>
-                    <TableRowUI 
-                      onClick={() => handleRowClick(item._id)}
-                      onMouseEnter={() => setHoveredRow(item._id)}
-                      onMouseLeave={() => setHoveredRow(null)}
-                      sx={{
-                        transition: 'all 0.2s ease-in-out',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: 'action.hover',
-                          transform: 'scale(1.01)',
-                          '& .row-actions': {
-                            transform: 'translateX(0)',
-                            opacity: 1,
-                          },
-                        },
-                        ...(expandedRow === item._id && {
-                          backgroundColor: 'action.selected',
-                        }),
-                      }}
-                    >
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.category}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.unitPrice.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusColor(item.quantity, item.reorderPoint)}>
-                          {item.quantity <= 0 ? 'Out of Stock' : 
-                           item.quantity <= item.reorderPoint ? 'Low Stock' : 'In Stock'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Box 
-                          className="row-actions"
-                          sx={{
-                            display: 'flex',
-                            gap: 1,
-                            transform: 'translateX(20px)',
-                            opacity: 0,
-                            transition: 'all 0.3s ease-in-out',
-                          }}
-                        >
-                          <Tooltip title={t('common.edit')} arrow TransitionComponent={Zoom}>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle edit
-                              }}
-                              sx={{
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                  transform: 'scale(1.1) rotate(-8deg)',
-                                  color: 'info.main',
-                                },
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')} arrow TransitionComponent={Zoom}>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteConfirm(item._id);
-                              }}
-                              sx={{
-                                transition: 'all 0.2s ease-in-out',
-                                '&:hover': {
-                                  transform: 'scale(1.1) rotate(8deg)',
-                                  color: 'error.main',
-                                },
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRowUI>
-                    {expandedRow === item._id && (
-                      <TableRowUI>
-                        <TableCell colSpan={6} sx={{ p: 0 }}>
-                          <Collapse in={expandedRow === item._id} timeout="auto" unmountOnExit>
-                            <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
-                              <Paper 
-                                elevation={0}
-                                sx={{ 
-                                  p: 2,
-                                  backgroundColor: 'background.paper',
-                                  borderRadius: 2,
-                                  transition: 'all 0.3s ease-in-out',
-                                  '&:hover': {
-                                    boxShadow: (theme) => theme.shadows[2],
-                                  },
-                                }}
-                              >
-                                <Typography variant="subtitle1" gutterBottom>
-                                  {t('stock.details')}
-                                </Typography>
-                                <Grid container spacing={2}>
-                                  <Grid item xs={12} md={6}>
-                                    <Box>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {t('stock.description')}
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {item.description}
-                                      </Typography>
-                                    </Box>
-                                  </Grid>
-                                  <Grid item xs={12} md={6}>
-                                    <Box>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {t('stock.supplier')}
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {item.supplier}
-                                      </Typography>
-                                    </Box>
-                                  </Grid>
-                                  <Grid item xs={12} md={6}>
-                                    <Box>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {t('stock.reorderPoint')}
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {item.reorderPoint}
-                                      </Typography>
-                                    </Box>
-                                  </Grid>
-                                  <Grid item xs={12} md={6}>
-                                    <Box>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {t('stock.lastRestocked')}
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {new Date(item.lastRestocked).toLocaleDateString()}
-                                      </Typography>
-                                    </Box>
-                                  </Grid>
-                                </Grid>
-                              </Paper>
-                            </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRowUI>
-                    )}
-                    {deleteConfirm === item._id && (
-                      <TableRowUI>
-                        <TableCell colSpan={6} sx={{ p: 0 }}>
-                          <Collapse in={true} timeout="auto">
-                            <Box sx={{ p: 2, backgroundColor: 'error.light' }}>
-                              <Typography variant="body2" color="error" gutterBottom>
-                                {t('stock.confirmDelete')}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                                <Button
-                                  size="small"
-                                  variant="contained"
-                                  color="error"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(item._id);
-                                  }}
-                                  sx={{
-                                    animation: 'shake 0.5s ease-in-out',
-                                    '@keyframes shake': {
-                                      '0%, 100%': { transform: 'translateX(0)' },
-                                      '25%': { transform: 'translateX(-5px)' },
-                                      '75%': { transform: 'translateX(5px)' },
-                                    },
-                                  }}
-                                >
-                                  {t('common.confirm')}
-                                </Button>
-                                <Button
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDeleteConfirm(null);
-                                  }}
-                                >
-                                  {t('common.cancel')}
-                                </Button>
-                              </Box>
-                            </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRowUI>
-                    )}
-                  </TableBodyUI>
-                </TableRowUI>
-              ))}
-            </TableBody>
-          </Table>
+        <CardContent className="p-0">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                    {t('stock.name')}
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </TableHead>
+                  <TableHead>{t('stock.description')}</TableHead>
+                  <TableHead onClick={() => handleSort('quantity')} className="cursor-pointer">
+                    {t('stock.quantity')}
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </TableHead>
+                  <TableHead>{t('stock.unitPrice')}</TableHead>
+                  <TableHead onClick={() => handleSort('category')} className="cursor-pointer">
+                    {t('stock.category')}
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </TableHead>
+                  <TableHead>{t('stock.actions')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => (
+                  <TableRow key={item._id}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusColor(item.quantity, item.reorderPoint)}>
+                        {item.quantity}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="icon">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" className="text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
-      <Dialog 
-        open={open} 
-        onClose={handleClose}
-        TransitionComponent={Zoom}
-        PaperProps={{
-          sx: dialogPaper
-        }}
-      >
-        <DialogTitle sx={dialogTitle}>
-          {t('stock.addItem')}
-        </DialogTitle>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <Box sx={{ 
-            pt: 2,
-            '& .MuiTextField-root': {
-              mb: 2,
-              '& .MuiOutlinedInput-root': {
-                transition: 'all 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateX(4px)',
-                  '& fieldset': {
-                    borderColor: 'primary.main',
-                    borderWidth: '2px',
-                  },
-                },
-              },
-            },
-          }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  autoFocus
+          <DialogHeader>
+            <DialogTitle>{t('stock.addNewItem')}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('stock.name')}</label>
+                <Input
                   name="name"
-                  label={t('stock.name')}
                   value={formData.name}
                   onChange={handleTextChange}
-                  fullWidth
-                  required
+                  placeholder={t('stock.namePlaceholder')}
                 />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="quantity"
-                  label={t('stock.quantity')}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('stock.category')}</label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => handleSelectChange(value, 'category')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('stock.selectCategory')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Add your categories here */}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('stock.description')}</label>
+              <Input
+                name="description"
+                value={formData.description}
+                onChange={handleTextChange}
+                placeholder={t('stock.descriptionPlaceholder')}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('stock.quantity')}</label>
+                <Input
                   type="number"
+                  name="quantity"
                   value={formData.quantity}
                   onChange={handleTextChange}
-                  fullWidth
-                  required
+                  placeholder={t('stock.quantityPlaceholder')}
                 />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="unitPrice"
-                  label={t('stock.unitPrice')}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('stock.unitPrice')}</label>
+                <Input
                   type="number"
+                  name="unitPrice"
                   value={formData.unitPrice}
                   onChange={handleTextChange}
-                  fullWidth
-                  required
+                  placeholder={t('stock.unitPricePlaceholder')}
                 />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>{t('stock.category')}</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleSelectChange}
-                    label={t('stock.category')}
-                  >
-                    <MenuItem value="raw_materials">Raw Materials</MenuItem>
-                    <MenuItem value="finished_goods">Finished Goods</MenuItem>
-                    <MenuItem value="packaging">Packaging</MenuItem>
-                    <MenuItem value="spare_parts">Spare Parts</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="location"
-                  label={t('stock.location')}
-                  value={formData.location}
-                  onChange={handleTextChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="reorderPoint"
-                  label={t('stock.reorderPoint')}
-                  type="number"
-                  value={formData.reorderPoint}
-                  onChange={handleTextChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="supplier"
-                  label={t('stock.supplier')}
-                  value={formData.supplier}
-                  onChange={handleTextChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="description"
-                  label={t('stock.description')}
-                  value={formData.description}
-                  onChange={handleTextChange}
-                  multiline
-                  rows={3}
-                  fullWidth
-                  required
-                />
-              </Grid>
-            </Grid>
-          </Box>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleClose}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handleSubmit}>
+              {t('common.save')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button 
-            onClick={handleClose}
-            sx={{
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'scale(1.05)',
-              },
-            }}
-          >
-            {t('common.cancel')}
-          </Button>
-          <GradientButton onClick={handleSubmit}>
-            {t('common.submit')}
-          </GradientButton>
-        </DialogActions>
       </Dialog>
 
-      <style>
-        {`
-          @keyframes fadeInOut {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-          }
-        `}
-      </style>
+      {deleteConfirm && (
+        <Dialog open={true} onOpenChange={() => setDeleteConfirm(null)}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t('stock.confirmDelete')}</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              {t('stock.confirmDeleteDescription')}
+            </DialogDescription>
+            <div className="flex justify-end gap-4">
+              <Button variant="outline" onClick={() => handleDelete(deleteConfirm)}>
+                {t('common.confirm')}
+              </Button>
+              <Button variant="destructive" onClick={() => setDeleteConfirm(null)}>
+                {t('common.cancel')}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 } 

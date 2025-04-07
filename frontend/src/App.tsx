@@ -18,8 +18,8 @@ import { NotFound } from './components/NotFound';
 const App: React.FC = () => {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <AuthProvider>
-        <Router>
+      <Router>
+        <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<Layout />}>
@@ -36,8 +36,8 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
-        </Router>
-      </AuthProvider>
+        </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 };

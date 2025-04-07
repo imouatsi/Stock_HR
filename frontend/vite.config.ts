@@ -4,14 +4,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react({
-      jsxImportSource: '@emotion/react',
-      babel: {
-        plugins: ['@emotion/babel-plugin']
-      }
-    })
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -37,8 +30,19 @@ export default defineConfig({
       'react-dom',
       'react-router-dom',
       'lucide-react',
-      '@emotion/react',
-      '@emotion/styled'
+      '@reduxjs/toolkit',
+      'react-redux',
+      'axios',
+      'recharts',
+      'react-hook-form',
+      'zod',
+      '@hookform/resolvers/zod',
+      'class-variance-authority',
+      'clsx',
+      'tailwind-merge',
     ],
+  },
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
   },
 }); 

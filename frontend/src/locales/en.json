@@ -17,6 +17,62 @@
     "enableNotifications": "Enable Notifications"
   },
   "common": {
-    "noData": "No data available"
+    "noData": "No data available",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "stock": "Stock",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Submit",
+    "error": "Invalid email or password"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Stock & HR Management System"
+  },
+  "users": {
+    "title": "Users",
+    "create": "Create User",
+    "edit": "Edit User",
+    "delete": "Delete User",
+    "list": "User List"
+  },
+  "stock": {
+    "title": "Stock",
+    "create": "Create Item",
+    "edit": "Edit Item",
+    "delete": "Delete Item",
+    "list": "Stock List"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "overview": "Overview",
+    "reports": "Reports"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "language": "Language",
+    "theme": "Theme"
   }
 }

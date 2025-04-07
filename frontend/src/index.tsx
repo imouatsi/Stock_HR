@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './features/store';
 import App from './App';
+import './i18n';
 import './index.css';
 // i18n is now handled in App.tsx with our custom provider
 
