@@ -1,4 +1,4 @@
-import { api } from './api';
+import apiService from "./api.service";
 import { eventService, EventType } from '../modules/shared/services/EventService';
 import { assetTrackingService } from '../modules/shared/services/AssetTrackingService';
 import { expenseTrackingService } from '../modules/shared/services/ExpenseTrackingService';
@@ -107,7 +107,7 @@ export class StockService {
   // Categories
   async getAllCategories(): Promise<StockCategory[]> {
     try {
-      const response = await api.get('/stock/categories');
+      const response = await apiService.get('/stock/categories');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -116,7 +116,7 @@ export class StockService {
 
   async createCategory(data: { name: string; description?: string }): Promise<StockCategory> {
     try {
-      const response = await api.post('/stock/categories', data);
+      const response = await apiService.post('/stock/categories', data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -125,7 +125,7 @@ export class StockService {
 
   async updateCategory(id: string, data: { name: string; description?: string }): Promise<StockCategory> {
     try {
-      const response = await api.patch(`/stock/categories/${id}`, data);
+      const response = await apiService.patch(`/stock/categories/${id}`, data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -134,7 +134,7 @@ export class StockService {
 
   async deleteCategory(id: string): Promise<void> {
     try {
-      await api.delete(`/stock/categories/${id}`);
+      await apiService.delete(`/stock/categories/${id}`);
     } catch (error) {
       this.handleError(error);
     }
@@ -143,7 +143,7 @@ export class StockService {
   // Suppliers
   async getAllSuppliers(): Promise<Supplier[]> {
     try {
-      const response = await api.get('/stock/suppliers');
+      const response = await apiService.get('/stock/suppliers');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -159,7 +159,7 @@ export class StockService {
     taxId?: string;
   }): Promise<Supplier> {
     try {
-      const response = await api.post('/stock/suppliers', data);
+      const response = await apiService.post('/stock/suppliers', data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -168,7 +168,7 @@ export class StockService {
 
   async updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
     try {
-      const response = await api.patch(`/stock/suppliers/${id}`, data);
+      const response = await apiService.patch(`/stock/suppliers/${id}`, data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -177,7 +177,7 @@ export class StockService {
 
   async toggleSupplierStatus(id: string): Promise<Supplier> {
     try {
-      const response = await api.patch(`/stock/suppliers/${id}/toggle-status`);
+      const response = await apiService.patch(`/stock/suppliers/${id}/toggle-status`);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -187,7 +187,7 @@ export class StockService {
   // Stock Movements
   async getAllMovements(): Promise<StockMovement[]> {
     try {
-      const response = await api.get('/stock/movements');
+      const response = await apiService.get('/stock/movements');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -196,7 +196,7 @@ export class StockService {
 
   async getMovement(id: string): Promise<StockMovement> {
     try {
-      const response = await api.get(`/stock/movements/${id}`);
+      const response = await apiService.get(`/stock/movements/${id}`);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -210,7 +210,7 @@ export class StockService {
     quantity: number
   ): Promise<StockAccessToken> {
     try {
-      const response = await api.post('/stock/access-token', {
+      const response = await apiService.post('/stock/access-token', {
         inventoryItem: inventoryItemId,
         operation,
         quantity
@@ -236,7 +236,7 @@ export class StockService {
     const token = this.activeTokens.get(inventoryItemId);
     if (token) {
       try {
-        await api.post(`/stock/access-token/${token.token}/release`);
+        await apiService.post(`/stock/access-token/${token.token}/release`);
         this.activeTokens.delete(inventoryItemId);
       } catch (error) {
         console.error('Failed to release access token:', error);
@@ -256,7 +256,7 @@ export class StockService {
         });
       }
 
-      const response = await api.post('/stock/movements', data);
+      const response = await apiService.post('/stock/movements', data);
       return response.data;
     } catch (error) {
       throw error;
@@ -265,7 +265,7 @@ export class StockService {
 
   async updateMovement(id: string, data: Partial<StockMovement>): Promise<StockMovement> {
     try {
-      const response = await api.patch(`/stock/movements/${id}`, data);
+      const response = await apiService.patch(`/stock/movements/${id}`, data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -274,7 +274,7 @@ export class StockService {
 
   async deleteMovement(id: string, reason: string, userId: string): Promise<void> {
     try {
-      await api.delete(`/stock/movements/${id}`, {
+      await apiService.delete(`/stock/movements/${id}`, {
         data: { reason, userId }
       });
     } catch (error) {
@@ -284,7 +284,7 @@ export class StockService {
 
   async cancelMovement(id: string, reason: string, userId: string): Promise<StockMovement> {
     try {
-      const response = await api.patch(`/stock/movements/${id}/cancel`, {
+      const response = await apiService.patch(`/stock/movements/${id}/cancel`, {
         reason,
         userId
       });
@@ -297,7 +297,7 @@ export class StockService {
   // Purchase Orders
   async getAllPurchaseOrders(): Promise<PurchaseOrder[]> {
     try {
-      const response = await api.get('/stock/purchase-orders');
+      const response = await apiService.get('/stock/purchase-orders');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -306,7 +306,7 @@ export class StockService {
 
   async getPurchaseOrderById(id: string): Promise<PurchaseOrder> {
     try {
-      const response = await api.get(`/stock/purchase-orders/${id}`);
+      const response = await apiService.get(`/stock/purchase-orders/${id}`);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -320,7 +320,7 @@ export class StockService {
     expectedDeliveryDate: string;
   }): Promise<PurchaseOrder> {
     try {
-      const response = await api.post('/stock/purchase-orders', data);
+      const response = await apiService.post('/stock/purchase-orders', data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -333,7 +333,7 @@ export class StockService {
     items?: { product: string; quantity: number }[]
   ): Promise<PurchaseOrderAccessToken> {
     try {
-      const response = await api.post('/stock/purchase-orders/access-token', {
+      const response = await apiService.post('/stock/purchase-orders/access-token', {
         purchaseOrder: purchaseOrderId,
         operation,
         items
@@ -358,7 +358,7 @@ export class StockService {
     const token = this.activePurchaseOrderTokens.get(purchaseOrderId);
     if (token) {
       try {
-        await api.post(`/stock/purchase-orders/access-token/${token.token}/release`);
+        await apiService.post(`/stock/purchase-orders/access-token/${token.token}/release`);
         this.activePurchaseOrderTokens.delete(purchaseOrderId);
       } catch (error) {
         console.error('Failed to release purchase order access token:', error);
@@ -372,7 +372,7 @@ export class StockService {
     receivedItems?: { product: string; quantity: number }[]
   ): Promise<PurchaseOrder> {
     try {
-      const response = await api.patch(`/stock/purchase-orders/${id}/status`, {
+      const response = await apiService.patch(`/stock/purchase-orders/${id}/status`, {
         status,
         receivedItems
       });
@@ -384,7 +384,7 @@ export class StockService {
 
   async deletePurchaseOrder(id: string): Promise<void> {
     try {
-      await api.delete(`/stock/purchase-orders/${id}`);
+      await apiService.delete(`/stock/purchase-orders/${id}`);
     } catch (error) {
       this.handleError(error);
     }
@@ -393,7 +393,7 @@ export class StockService {
   // Inventory Items
   async getAllInventoryItems(): Promise<InventoryItem[]> {
     try {
-      const response = await api.get('/stock/inventory');
+      const response = await apiService.get('/stock/inventory');
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -402,7 +402,7 @@ export class StockService {
 
   async getInventoryItemById(id: string): Promise<InventoryItem> {
     try {
-      const response = await api.get(`/stock/inventory/${id}`);
+      const response = await apiService.get(`/stock/inventory/${id}`);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -422,7 +422,7 @@ export class StockService {
     location?: string;
   }): Promise<InventoryItem> {
     try {
-      const response = await api.post('/stock/inventory', data);
+      const response = await apiService.post('/stock/inventory', data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -431,7 +431,7 @@ export class StockService {
 
   async updateInventoryItem(id: string, data: Partial<InventoryItem>): Promise<InventoryItem> {
     try {
-      const response = await api.patch(`/stock/inventory/${id}`, data);
+      const response = await apiService.patch(`/stock/inventory/${id}`, data);
       return response.data.data;
     } catch (error) {
       this.handleError(error);
@@ -440,7 +440,7 @@ export class StockService {
 
   async deleteInventoryItem(id: string): Promise<void> {
     try {
-      await api.delete(`/stock/inventory/${id}`);
+      await apiService.delete(`/stock/inventory/${id}`);
     } catch (error) {
       this.handleError(error);
     }
@@ -453,7 +453,7 @@ export class StockService {
     userId: string
   ): Promise<InventoryItem> {
     try {
-      const response = await api.patch(`/stock/inventory/${id}/status`, {
+      const response = await apiService.patch(`/stock/inventory/${id}/status`, {
         status: newStatus,
         reason,
         userId
@@ -471,7 +471,7 @@ export class StockService {
     userId: string
   ): Promise<void> {
     try {
-      await api.post('/stock/inventory/loss', {
+      await apiService.post('/stock/inventory/loss', {
         itemIds,
         incidentType,
         description,

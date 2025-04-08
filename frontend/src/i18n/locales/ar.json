@@ -1,89 +1,251 @@
 {
   "common": {
-    "dashboard": "لوحة التحكم",
-    "navigation": "قائمة التنقل",
-    "notifications": "الإشعارات",
-    "search": "بحث",
-    "loading": "جاري التحميل",
-    "error": "خطأ",
-    "success": "نجاح",
-    "save": "حفظ",
-    "cancel": "إلغاء",
-    "delete": "حذف",
-    "edit": "تعديل",
-    "add": "إضافة",
-    "view": "عرض",
-    "back": "رجوع",
-    "next": "التالي",
-    "previous": "السابق"
-  },
-  "dashboard": {
-    "title": "لوحة التحكم",
-    "welcome": "مرحباً بك في لوحة التحكم",
-    "summary": "ملخص النظام",
-    "recentActivity": "النشاط الأخير",
-    "statistics": "الإحصائيات",
+    "navigation": {
+      "title": "التنقل",
+      "dashboard": "لوحة التحكم",
+      "collapse": "طي الشريط الجانبي",
+      "expand": "توسيع الشريط الجانبي"
+    },
+    "actions": {
+      "add": "إضافة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "search": "بحث",
+      "filter": "تصفية",
+      "refresh": "تحديث",
+      "back": "رجوع",
+      "next": "التالي",
+      "submit": "إرسال",
+      "export": "تصدير",
+      "import": "استيراد",
+      "download": "تحميل",
+      "upload": "رفع",
+      "print": "طباعة"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "error": "خطأ",
+      "success": "نجاح",
+      "warning": "تحذير",
+      "info": "معلومات"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "markAllRead": "تعليم الكل كمقروء",
+      "noNotifications": "لا توجد إشعارات",
+      "viewAll": "عرض الكل"
+    },
+    "search": {
+      "placeholder": "بحث...",
+      "noResults": "لم يتم العثور على نتائج",
+      "searching": "جاري البحث..."
+    },
+    "loading": {
+      "default": "جاري التحميل...",
+      "data": "جاري تحميل البيانات...",
+      "page": "جاري تحميل الصفحة..."
+    },
     "errors": {
-      "fetchFailed": "تعذر جلب بيانات لوحة التحكم. جاري استخدام البيانات المخزنة."
+      "default": "حدث خطأ",
+      "notFound": "غير موجود",
+      "unauthorized": "غير مصرح",
+      "forbidden": "ممنوع",
+      "serverError": "خطأ في الخادم",
+      "networkError": "خطأ في الشبكة",
+      "validationError": "خطأ في التحقق"
+    },
+    "success": {
+      "saved": "تم الحفظ بنجاح",
+      "updated": "تم التحديث بنجاح",
+      "deleted": "تم الحذف بنجاح",
+      "created": "تم الإنشاء بنجاح"
+    },
+    "dashboard": "لوحة التحكم"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "تسجيل",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "changePassword": "تغيير كلمة المرور",
+    "profile": {
+      "title": "الملف الشخصي",
+      "edit": "تعديل الملف الشخصي",
+      "settings": "إعدادات الملف الشخصي"
     }
   },
+  "dashboard": {
+    "welcome": "مرحباً",
+    "summary": "ملخص",
+    "recentActivity": "النشاط الأخير",
+    "statistics": "الإحصائيات",
+    "quickActions": "إجراءات سريعة",
+    "error": "خطأ في تحميل بيانات لوحة التحكم"
+  },
   "stock": {
-    "title": "المخزون",
+    "title": "إدارة المخزون",
     "inventory": "المخزون",
     "categories": "الفئات",
-    "suppliers": "الموردين",
+    "suppliers": "الموردون",
     "movements": "حركات المخزون",
     "purchaseOrders": "طلبات الشراء",
-    "totalItems": "إجمالي العناصر",
-    "itemsChange": "التغيير في العناصر",
-    "errors": {
-      "fetchFailed": "فشل في جلب بيانات المخزون"
+    "dashboard": {
+      "title": "لوحة تحكم المخزون",
+      "totalItems": "إجمالي العناصر",
+      "lowStock": "عناصر منخفضة المخزون",
+      "outOfStock": "نفذ من المخزون",
+      "itemsChange": "تغيير العناصر",
+      "acrossCategories": "عبر جميع الفئات",
+      "belowThreshold": "عناصر أقل من الحد الأدنى",
+      "pendingOrders": "الطلبات المعلقة",
+      "awaitingDelivery": "في انتظار التسليم",
+      "totalValue": "القيمة الإجمالية",
+      "currentValue": "قيمة المخزون الحالية",
+      "recentMovements": "حركات المخزون الأخيرة"
+    },
+    "items": {
+      "title": "العناصر",
+      "add": "إضافة عنصر",
+      "edit": "تعديل عنصر",
+      "delete": "حذف عنصر",
+      "details": "تفاصيل العنصر",
+      "name": "الاسم",
+      "description": "الوصف",
+      "category": "الفئة",
+      "supplier": "المورد",
+      "quantity": "الكمية",
+      "price": "السعر",
+      "status": "الحالة"
+    },
+    "movements": {
+      "date": "التاريخ",
+      "type": "النوع",
+      "quantity": "الكمية",
+      "status": "الحالة"
     }
   },
   "hr": {
-    "title": "الموارد البشرية",
-    "employees": "الموظفين",
-    "departments": "الأقسام",
+    "title": "إدارة الموارد البشرية",
+    "employees": "الموظفون",
+    "departments": "الإدارات",
     "positions": "المناصب",
     "leaveRequests": "طلبات الإجازة",
     "performanceReviews": "تقييمات الأداء",
-    "employeesChange": "التغيير في عدد الموظفين"
+    "dashboard": {
+      "title": "لوحة تحكم الموارد البشرية",
+      "totalEmployees": "إجمالي الموظفين",
+      "departments": "الإدارات",
+      "newHires": "الموظفون الجدد",
+      "employeesChange": "تغيير الموظفين",
+      "activeDepartments": "الإدارات النشطة",
+      "pendingLeaveRequests": "طلبات الإجازة المعلقة"
+    },
+    "employee": {
+      "add": "إضافة موظف",
+      "edit": "تعديل موظف",
+      "details": "تفاصيل الموظف",
+      "name": "الاسم",
+      "position": "المنصب",
+      "department": "الإدارة",
+      "status": "الحالة",
+      "contact": "معلومات الاتصال"
+    }
   },
   "accounting": {
     "title": "المحاسبة",
     "invoices": "الفواتير",
     "contracts": "العقود",
     "proformas": "الفواتير الأولية",
-    "journalEntries": "القيود المحاسبية",
+    "journalEntries": "قيود اليومية",
     "chartOfAccounts": "دليل الحسابات",
     "financialStatements": "القوائم المالية",
-    "revenueChange": "التغيير في الإيرادات",
-    "contractsChange": "التغيير في العقود"
+    "dashboard": {
+      "title": "لوحة تحكم المحاسبة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "expenses": "المصروفات",
+      "profit": "الربح",
+      "openContracts": "العقود المفتوحة",
+      "revenueChange": "تغيير الإيرادات",
+      "contractsChange": "تغيير العقود",
+      "totalExpenses": "إجمالي المصروفات",
+      "pendingInvoices": "الفواتير المعلقة"
+    },
+    "invoice": {
+      "add": "إضافة فاتورة",
+      "edit": "تعديل فاتورة",
+      "details": "تفاصيل الفاتورة",
+      "number": "رقم الفاتورة",
+      "date": "التاريخ",
+      "dueDate": "تاريخ الاستحقاق",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "client": "العميل"
+    },
+    "journalEntries": {
+      "date": "التاريخ",
+      "reference": "المرجع",
+      "description": "الوصف",
+      "account": "الحساب",
+      "debit": "مدين",
+      "credit": "دائن"
+    },
+    "financialStatements": {
+      "type": "النوع",
+      "period": "الفترة",
+      "date": "التاريخ",
+      "status": "الحالة"
+    },
+    "chartOfAccounts": {
+      "title": "دليل الحسابات",
+      "addAccount": "إضافة حساب"
+    }
   },
   "settings": {
     "title": "الإعدادات",
-    "general": "إعدادات عامة",
-    "appearance": "المظهر",
-    "notifications": "الإشعارات",
-    "security": "الأمان",
-    "language": "اللغة",
-    "theme": {
-      "light": "فاتح",
-      "dark": "داكن",
-      "system": "النظام"
+    "general": {
+      "title": "الإعدادات العامة",
+      "language": "اللغة",
+      "timezone": "المنطقة الزمنية",
+      "dateFormat": "تنسيق التاريخ"
+    },
+    "appearance": {
+      "title": "المظهر",
+      "theme": {
+        "title": "المظهر",
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+      },
+      "layout": "التخطيط",
+      "colors": "الألوان"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "email": "إشعارات البريد الإلكتروني",
+      "push": "إشعارات الدفع",
+      "inApp": "الإشعارات داخل التطبيق"
+    },
+    "security": {
+      "title": "الأمان",
+      "password": "كلمة المرور",
+      "twoFactor": "المصادقة الثنائية",
+      "sessions": "الجلسات النشطة"
     }
   },
   "profile": {
     "title": "الملف الشخصي",
     "personalInfo": "المعلومات الشخصية",
     "changePassword": "تغيير كلمة المرور",
-    "preferences": "التفضيلات"
-  },
-  "auth": {
-    "login": "تسجيل الدخول",
-    "logout": "تسجيل الخروج",
-    "register": "تسجيل جديد",
-    "forgotPassword": "نسيت كلمة المرور",
-    "resetPassword": "إعادة تعيين كلمة المرور"
+    "preferences": "التفضيلات",
+    "activity": "النشاط الأخير",
+    "security": "إعدادات الأمان"
   }
 } 

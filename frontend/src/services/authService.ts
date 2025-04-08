@@ -1,5 +1,5 @@
 import { UserProfile } from '../types/user';
-import api, { getApiResponse, handleApiError } from '../utils/api';
+import api, { getApiResponse, handleApiError } from '../lib/api';
 
 export interface LoginCredentials {
   username: string;

@@ -6,7 +6,7 @@ import { Input } from '../../../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/useToast';
-import { api } from '../../../services/api';
+import apiService from "../../../services/api.service";
 
 interface Category {
   _id: string;
@@ -38,7 +38,7 @@ export const Categories: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/categories');
+      const response = await apiService.get('/categories');
       setCategories(response.data);
       setError(null);
     } catch (err) {
@@ -57,13 +57,13 @@ export const Categories: React.FC = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await api.put(`/categories/${editingCategory._id}`, formData);
+        await apiService.put(`/categories/${editingCategory._id}`, formData);
         showToast({
           title: t('common.success'),
           description: t('stock.categories.updateSuccess')
         });
       } else {
-        await api.post('/categories', formData);
+        await apiService.post('/categories', formData);
         showToast({
           title: t('common.success'),
           description: t('stock.categories.createSuccess')
@@ -86,7 +86,7 @@ export const Categories: React.FC = () => {
     if (!window.confirm(t('stock.categories.confirmDelete'))) return;
     
     try {
-      await api.delete(`/categories/${id}`);
+      await apiService.delete(`/categories/${id}`);
       showToast({
         title: t('common.success'),
         description: t('stock.categories.deleteSuccess')

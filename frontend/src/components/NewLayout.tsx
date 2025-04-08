@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../features/store';
@@ -131,6 +131,12 @@ function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const savedWidth = localStorage.getItem('sidebarWidth');
+    return savedWidth ? parseInt(savedWidth) : 240;
+  });
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const isResizing = useRef(false);
   const { theme, setTheme } = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -167,6 +173,10 @@ function Layout() {
     document.documentElement.classList.toggle('rtl', isRTL);
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);
+
+  useEffect(() => {
+    localStorage.setItem('sidebarWidth', sidebarWidth.toString());
+  }, [sidebarWidth]);
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -257,6 +267,36 @@ function Layout() {
     );
   };
 
+  const handleResizeStart = (e: React.MouseEvent) => {
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!isResizing.current || !sidebarRef.current) return;
+    
+    const newWidth = e.clientX;
+    if (newWidth >= 200 && newWidth <= 400) {
+      setSidebarWidth(newWidth);
+    }
+  };
+
+  const handleResizeEnd = () => {
+    isResizing.current = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, []);
+
   return (
     <div className={`flex h-screen ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
       {/* Mobile Sidebar */}
@@ -286,9 +326,9 @@ function Layout() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden md:flex flex-col border-r transition-all duration-300 ${
-          isCollapsed ? 'w-[65px]' : 'w-[240px]'
-        }`}
+        ref={sidebarRef}
+        className={`hidden md:flex flex-col border-r transition-all duration-300 relative`}
+        style={{ width: isCollapsed ? '65px' : `${sidebarWidth}px` }}
       >
         <div className="flex h-14 items-center justify-between px-4">
           {!isCollapsed && <h1 className="text-lg font-semibold">{t('common.dashboard')}</h1>}
@@ -306,6 +346,12 @@ function Layout() {
             {menuItems.map(renderMenuItem)}
           </div>
         </ScrollArea>
+        {!isCollapsed && (
+          <div
+            className="absolute right-0 top-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
+            onMouseDown={handleResizeStart}
+          />
+        )}
       </div>
 
       {/* Main Content */}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import apiService from '../services/api.service';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (username: string, password: string) => {
     try {
       setLoading(true);
-      const response = await api.post('/auth/login', { username, password });
+      const response = await apiService.post('/auth/login', { username, password });
       const { token, data: { user } } = response.data;
       localStorage.setItem('token', token);
       setUser(user);

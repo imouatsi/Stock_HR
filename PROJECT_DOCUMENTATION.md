@@ -556,6 +556,7 @@ export function UserForm() {
 ```typescript
 // api.ts
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import axiosRetry from 'axios-retry';
 
 class ApiService {
   private api: AxiosInstance;
@@ -573,24 +574,20 @@ class ApiService {
   }
 
   private setupInterceptors() {
-    this.api.interceptors.request.use(
-      this.handleRequest,
-      this.handleRequestError
-    );
-
-    this.api.interceptors.response.use(
-      this.handleResponse,
-      this.handleResponseError
-    );
+    axiosRetry(this.api, {
+      retries: 3,
+      retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: (error) => {
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+               (error.response?.status ? error.response.status >= 500 : false);
+      },
+      onRetry: (retryCount, error, requestConfig) => {
+        console.warn(
+          `Retry attempt ${retryCount} for ${requestConfig.url}: ${error.message}`
+        );
+      },
+    });
   }
-
-  private handleRequest = (config: any) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  };
 
   // ... other handler methods
 }

@@ -102,7 +102,14 @@
       "totalItems": "Total Items",
       "lowStock": "Low Stock Items",
       "outOfStock": "Out of Stock",
-      "itemsChange": "Items Change"
+      "itemsChange": "Items Change",
+      "acrossCategories": "Across all categories",
+      "belowThreshold": "Items below threshold",
+      "pendingOrders": "Pending Orders",
+      "awaitingDelivery": "Awaiting delivery",
+      "totalValue": "Total Value",
+      "currentValue": "Current inventory value",
+      "recentMovements": "Recent Stock Movements"
     },
     "items": {
       "title": "Items",
@@ -117,22 +124,30 @@
       "quantity": "Quantity",
       "price": "Price",
       "status": "Status"
+    },
+    "movements": {
+      "date": "Date",
+      "type": "Type",
+      "quantity": "Quantity",
+      "status": "Status"
     }
   },
   "hr": {
     "title": "HR Management",
-    "dashboard": {
-      "title": "HR Dashboard",
-      "totalEmployees": "Total Employees",
-      "departments": "Departments",
-      "newHires": "New Hires",
-      "employeesChange": "Employees Change"
-    },
     "employees": "Employees",
     "departments": "Departments",
     "positions": "Positions",
     "leaveRequests": "Leave Requests",
     "performanceReviews": "Performance Reviews",
+    "dashboard": {
+      "title": "HR Dashboard",
+      "totalEmployees": "Total Employees",
+      "departments": "Departments",
+      "newHires": "New Hires",
+      "employeesChange": "Employees Change",
+      "activeDepartments": "Active Departments",
+      "pendingLeaveRequests": "Pending Leave Requests"
+    },
     "employee": {
       "add": "Add Employee",
       "edit": "Edit Employee",
@@ -146,6 +161,12 @@
   },
   "accounting": {
     "title": "Accounting",
+    "invoices": "Invoices",
+    "contracts": "Contracts",
+    "proformas": "Proforma Invoices",
+    "journalEntries": "Journal Entries",
+    "chartOfAccounts": "Chart of Accounts",
+    "financialStatements": "Financial Statements",
     "dashboard": {
       "title": "Accounting Dashboard",
       "totalRevenue": "Total Revenue",
@@ -153,14 +174,10 @@
       "profit": "Profit",
       "openContracts": "Open Contracts",
       "revenueChange": "Revenue Change",
-      "contractsChange": "Contracts Change"
+      "contractsChange": "Contracts Change",
+      "totalExpenses": "Total Expenses",
+      "pendingInvoices": "Pending Invoices"
     },
-    "invoices": "Invoices",
-    "contracts": "Contracts",
-    "proformas": "Proforma Invoices",
-    "journalEntries": "Journal Entries",
-    "chartOfAccounts": "Chart of Accounts",
-    "financialStatements": "Financial Statements",
     "invoice": {
       "add": "Add Invoice",
       "edit": "Edit Invoice",
@@ -171,6 +188,24 @@
       "amount": "Amount",
       "status": "Status",
       "client": "Client"
+    },
+    "journalEntries": {
+      "date": "Date",
+      "reference": "Reference",
+      "description": "Description",
+      "account": "Account",
+      "debit": "Debit",
+      "credit": "Credit"
+    },
+    "financialStatements": {
+      "type": "Type",
+      "period": "Period",
+      "date": "Date",
+      "status": "Status"
+    },
+    "chartOfAccounts": {
+      "title": "Chart of Accounts",
+      "addAccount": "Add Account"
     }
   },
   "settings": {

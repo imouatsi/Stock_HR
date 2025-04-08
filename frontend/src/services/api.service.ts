@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
 import { ApiResponse, ValidationError } from '@/types/core.types';
 
 class ApiService {
@@ -13,6 +14,22 @@ class ApiService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
+      },
+    });
+
+    // Configure retry behavior
+    axiosRetry(this.api, {
+      retries: 3, // number of retries
+      retryDelay: axiosRetry.exponentialDelay, // exponential back-off
+      retryCondition: (error) => {
+        // Retry on network errors or 5xx errors
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+               (error.response?.status ? error.response.status >= 500 : false);
+      },
+      onRetry: (retryCount, error, requestConfig) => {
+        console.warn(
+          `Retry attempt ${retryCount} for ${requestConfig.url}: ${error.message}`
+        );
       },
     });
 
@@ -118,6 +135,75 @@ class ApiService {
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  async healthCheck(): Promise<{ status: string; message: string }> {
+    try {
+      const start = performance.now();
+      const response = await this.get<{ serverTime: string }>('/health');
+      const end = performance.now();
+      
+      return {
+        status: 'success',
+        message: `API is reachable. Response time: ${Math.round(end - start)}ms. Server time: ${response.data.serverTime}`
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return {
+        status: 'error',
+        message: `API is not reachable: ${errorMessage}`
+      };
+    }
+  }
+
+  async testAuthentication(): Promise<{ status: string; message: string }> {
+    try {
+      const response = await this.get<{ user: any }>('/auth/me');
+      return {
+        status: 'success',
+        message: `Authentication successful. User: ${JSON.stringify(response.data.user)}`
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return {
+        status: 'error',
+        message: `Authentication failed: ${errorMessage}`
+      };
+    }
+  }
+
+  async testEndpoints(): Promise<Array<{ endpoint: string; status: string; message: string }>> {
+    const endpoints = [
+      { path: '/categories', method: 'get' },
+      { path: '/suppliers', method: 'get' },
+      { path: '/employees', method: 'get' },
+      { path: '/stock', method: 'get' }
+    ];
+
+    const results = [];
+
+    for (const endpoint of endpoints) {
+      try {
+        const start = performance.now();
+        await this[endpoint.method](endpoint.path);
+        const end = performance.now();
+
+        results.push({
+          endpoint: endpoint.path,
+          status: 'success',
+          message: `Response time: ${Math.round(end - start)}ms`
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        results.push({
+          endpoint: endpoint.path,
+          status: 'error',
+          message: errorMessage
+        });
+      }
+    }
+
+    return results;
   }
 }
 

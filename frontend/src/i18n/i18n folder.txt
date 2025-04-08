@@ -1,0 +1,740 @@
+===== FOLDER STRUCTURE =====
+
+Structure du dossier
+Le num�ro de s�rie du volume est 66D3-2B7A
+C:.
+|   config.ts
+|   index.ts
+|   project_dump.txt
+|   script.ps1
+|   
+\---locales
+        ar.json
+        en.json
+        fr.json
+        
+
+
+===== FILE CONTENTS =====
+
+===== C:\Stock_HR\frontend\src\i18n\config.ts =====
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+const resources = {
+  en: {
+    translation: {
+      // Document Form
+      'document.type': 'Document Type',
+      'document.type.proforma': 'Proforma Invoice',
+      'document.type.final': 'Final Invoice',
+      'document.status': 'Status',
+      'document.status.draft': 'Draft',
+      'document.status.pending': 'Pending',
+      'document.status.approved': 'Approved',
+      'document.status.rejected': 'Rejected',
+      'document.client': 'Client Information',
+      'document.client.name': 'Name',
+      'document.client.address': 'Address',
+      'document.client.nif': 'NIF',
+      'document.items': 'Items',
+      'document.items.description': 'Description',
+      'document.items.quantity': 'Quantity',
+      'document.items.unitPrice': 'Unit Price',
+      'document.items.barcode': 'Barcode',
+      'document.items.add': 'Add Item',
+      'document.items.remove': 'Remove Item',
+      'document.paymentTerms': 'Payment Terms',
+      'document.dueDate': 'Due Date',
+      'document.actions.save': 'Save',
+      'document.actions.reset': 'Reset',
+      'document.actions.cancel': 'Cancel',
+      'document.actions.delete': 'Delete',
+      'document.actions.preview': 'Preview',
+      'document.actions.download': 'Download PDF',
+      'document.errors.required': 'This field is required',
+      'document.errors.minQuantity': 'Quantity must be at least 1',
+      'document.errors.minPrice': 'Price must be non-negative',
+      'document.errors.minItems': 'At least one item is required',
+    },
+  },
+  ar: {
+    translation: {
+      // Document Form
+      'document.type': 'نوع المستند',
+      'document.type.proforma': 'فاتورة مؤقتة',
+      'document.type.final': 'فاتورة نهائية',
+      'document.status': 'الحالة',
+      'document.status.draft': 'مسودة',
+      'document.status.pending': 'قيد الانتظار',
+      'document.status.approved': 'موافق عليه',
+      'document.status.rejected': 'مرفوض',
+      'document.client': 'معلومات العميل',
+      'document.client.name': 'الاسم',
+      'document.client.address': 'العنوان',
+      'document.client.nif': 'الرقم الضريبي',
+      'document.items': 'العناصر',
+      'document.items.description': 'الوصف',
+      'document.items.quantity': 'الكمية',
+      'document.items.unitPrice': 'سعر الوحدة',
+      'document.items.barcode': 'الباركود',
+      'document.items.add': 'إضافة عنصر',
+      'document.items.remove': 'حذف عنصر',
+      'document.paymentTerms': 'شروط الدفع',
+      'document.dueDate': 'تاريخ الاستحقاق',
+      'document.actions.save': 'حفظ',
+      'document.actions.reset': 'إعادة تعيين',
+      'document.actions.cancel': 'إلغاء',
+      'document.actions.delete': 'حذف',
+      'document.actions.preview': 'معاينة',
+      'document.actions.download': 'تحميل PDF',
+      'document.errors.required': 'هذا الحقل مطلوب',
+      'document.errors.minQuantity': 'يجب أن تكون الكمية 1 على الأقل',
+      'document.errors.minPrice': 'يجب أن يكون السعر غير سالب',
+      'document.errors.minItems': 'مطلوب عنصر واحد على الأقل',
+    },
+  },
+  fr: {
+    translation: {
+      // Document Form
+      'document.type': 'Type de Document',
+      'document.type.proforma': 'Facture Proforma',
+      'document.type.final': 'Facture Finale',
+      'document.status': 'Statut',
+      'document.status.draft': 'Brouillon',
+      'document.status.pending': 'En Attente',
+      'document.status.approved': 'Approuvé',
+      'document.status.rejected': 'Rejeté',
+      'document.client': 'Informations Client',
+      'document.client.name': 'Nom',
+      'document.client.address': 'Adresse',
+      'document.client.nif': 'NIF',
+      'document.items': 'Articles',
+      'document.items.description': 'Description',
+      'document.items.quantity': 'Quantité',
+      'document.items.unitPrice': 'Prix Unitaire',
+      'document.items.barcode': 'Code-barres',
+      'document.items.add': 'Ajouter Article',
+      'document.items.remove': 'Supprimer Article',
+      'document.paymentTerms': 'Conditions de Paiement',
+      'document.dueDate': 'Date d\'Échéance',
+      'document.actions.save': 'Enregistrer',
+      'document.actions.reset': 'Réinitialiser',
+      'document.actions.cancel': 'Annuler',
+      'document.actions.delete': 'Supprimer',
+      'document.actions.preview': 'Aperçu',
+      'document.actions.download': 'Télécharger PDF',
+      'document.errors.required': 'Ce champ est requis',
+      'document.errors.minQuantity': 'La quantité doit être d\'au moins 1',
+      'document.errors.minPrice': 'Le prix doit être non négatif',
+      'document.errors.minItems': 'Au moins un article est requis',
+    },
+  },
+};
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+
+export default i18n; 
+
+===== C:\Stock_HR\frontend\src\i18n\index.ts =====
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+import en from './locales/en.json';
+import fr from './locales/fr.json';
+
+export const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'Français' }
+];
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: { translation: en },
+      fr: { translation: fr }
+    },
+    fallbackLng: 'en',
+    supportedLngs: ['en', 'fr'],
+    interpolation: {
+      escapeValue: false
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage']
+    }
+  });
+
+// Function to set document direction based on language
+export const setDocumentDirection = (language: string) => {
+  document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = language;
+};
+
+// Set initial direction
+setDocumentDirection(i18n.language);
+
+// Listen for language changes
+i18n.on('languageChanged', (lng) => {
+  setDocumentDirection(lng);
+});
+
+export default i18n; 
+
+===== C:\Stock_HR\frontend\src\i18n\project_dump.txt =====
+
+
+===== C:\Stock_HR\frontend\src\i18n\script.ps1 =====
+# Output file
+$outFile = "project_dump.txt"
+
+# Step 1: Write folder architecture
+"===== FOLDER STRUCTURE =====`r`n" | Set-Content $outFile
+tree /F /A | Out-String | Add-Content $outFile
+"`r`n===== FILE CONTENTS =====`r`n" | Add-Content $outFile
+
+# Step 2: Append file contents
+Get-ChildItem -Recurse -File | ForEach-Object {
+    "===== $($_.FullName) =====" + "`r`n" + (Get-Content $_.FullName -Raw) + "`r`n"
+} | Add-Content $outFile
+
+
+===== C:\Stock_HR\frontend\src\i18n\locales\ar.json =====
+{
+  "common": {
+    "dashboard": "لوحة التحكم",
+    "navigation": "قائمة التنقل",
+    "notifications": "الإشعارات",
+    "search": "بحث",
+    "loading": "جاري التحميل",
+    "error": "خطأ",
+    "success": "نجاح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "view": "عرض",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بك في لوحة التحكم",
+    "summary": "ملخص النظام",
+    "recentActivity": "النشاط الأخير",
+    "statistics": "الإحصائيات",
+    "errors": {
+      "fetchFailed": "تعذر جلب بيانات لوحة التحكم. جاري استخدام البيانات المخزنة."
+    }
+  },
+  "stock": {
+    "title": "المخزون",
+    "inventory": "المخزون",
+    "categories": "الفئات",
+    "suppliers": "الموردين",
+    "movements": "حركات المخزون",
+    "purchaseOrders": "طلبات الشراء",
+    "totalItems": "إجمالي العناصر",
+    "itemsChange": "التغيير في العناصر",
+    "errors": {
+      "fetchFailed": "فشل في جلب بيانات المخزون"
+    }
+  },
+  "hr": {
+    "title": "الموارد البشرية",
+    "employees": "الموظفين",
+    "departments": "الأقسام",
+    "positions": "المناصب",
+    "leaveRequests": "طلبات الإجازة",
+    "performanceReviews": "تقييمات الأداء",
+    "employeesChange": "التغيير في عدد الموظفين"
+  },
+  "accounting": {
+    "title": "المحاسبة",
+    "invoices": "الفواتير",
+    "contracts": "العقود",
+    "proformas": "الفواتير الأولية",
+    "journalEntries": "القيود المحاسبية",
+    "chartOfAccounts": "دليل الحسابات",
+    "financialStatements": "القوائم المالية",
+    "revenueChange": "التغيير في الإيرادات",
+    "contractsChange": "التغيير في العقود"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "general": "إعدادات عامة",
+    "appearance": "المظهر",
+    "notifications": "الإشعارات",
+    "security": "الأمان",
+    "language": "اللغة",
+    "theme": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "changePassword": "تغيير كلمة المرور",
+    "preferences": "التفضيلات"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "تسجيل جديد",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور"
+  }
+} 
+
+===== C:\Stock_HR\frontend\src\i18n\locales\en.json =====
+{
+  "common": {
+    "navigation": {
+      "title": "Navigation",
+      "dashboard": "Dashboard",
+      "collapse": "Collapse Sidebar",
+      "expand": "Expand Sidebar"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "search": "Search",
+      "filter": "Filter",
+      "refresh": "Refresh",
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "print": "Print"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "noNotifications": "No notifications",
+      "viewAll": "View all"
+    },
+    "search": {
+      "placeholder": "Search...",
+      "noResults": "No results found",
+      "searching": "Searching..."
+    },
+    "loading": {
+      "default": "Loading...",
+      "data": "Loading data...",
+      "page": "Loading page..."
+    },
+    "errors": {
+      "default": "An error occurred",
+      "notFound": "Not found",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "serverError": "Server error",
+      "networkError": "Network error",
+      "validationError": "Validation error"
+    },
+    "success": {
+      "saved": "Successfully saved",
+      "updated": "Successfully updated",
+      "deleted": "Successfully deleted",
+      "created": "Successfully created"
+    },
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "profile": {
+      "title": "Profile",
+      "edit": "Edit Profile",
+      "settings": "Profile Settings"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "summary": "Summary",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics",
+    "quickActions": "Quick Actions",
+    "error": "Error loading dashboard data"
+  },
+  "stock": {
+    "title": "Stock Management",
+    "inventory": "Inventory",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "movements": "Stock Movements",
+    "purchaseOrders": "Purchase Orders",
+    "dashboard": {
+      "title": "Stock Dashboard",
+      "totalItems": "Total Items",
+      "lowStock": "Low Stock Items",
+      "outOfStock": "Out of Stock",
+      "itemsChange": "Items Change"
+    },
+    "items": {
+      "title": "Items",
+      "add": "Add Item",
+      "edit": "Edit Item",
+      "delete": "Delete Item",
+      "details": "Item Details",
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "supplier": "Supplier",
+      "quantity": "Quantity",
+      "price": "Price",
+      "status": "Status"
+    }
+  },
+  "hr": {
+    "title": "HR Management",
+    "dashboard": {
+      "title": "HR Dashboard",
+      "totalEmployees": "Total Employees",
+      "departments": "Departments",
+      "newHires": "New Hires",
+      "employeesChange": "Employees Change"
+    },
+    "employees": "Employees",
+    "departments": "Departments",
+    "positions": "Positions",
+    "leaveRequests": "Leave Requests",
+    "performanceReviews": "Performance Reviews",
+    "employee": {
+      "add": "Add Employee",
+      "edit": "Edit Employee",
+      "details": "Employee Details",
+      "name": "Name",
+      "position": "Position",
+      "department": "Department",
+      "status": "Status",
+      "contact": "Contact Information"
+    }
+  },
+  "accounting": {
+    "title": "Accounting",
+    "dashboard": {
+      "title": "Accounting Dashboard",
+      "totalRevenue": "Total Revenue",
+      "expenses": "Expenses",
+      "profit": "Profit",
+      "openContracts": "Open Contracts",
+      "revenueChange": "Revenue Change",
+      "contractsChange": "Contracts Change"
+    },
+    "invoices": "Invoices",
+    "contracts": "Contracts",
+    "proformas": "Proforma Invoices",
+    "journalEntries": "Journal Entries",
+    "chartOfAccounts": "Chart of Accounts",
+    "financialStatements": "Financial Statements",
+    "invoice": {
+      "add": "Add Invoice",
+      "edit": "Edit Invoice",
+      "details": "Invoice Details",
+      "number": "Invoice Number",
+      "date": "Date",
+      "dueDate": "Due Date",
+      "amount": "Amount",
+      "status": "Status",
+      "client": "Client"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": {
+      "title": "General Settings",
+      "language": "Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": {
+        "title": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "layout": "Layout",
+      "colors": "Colors"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "push": "Push Notifications",
+      "inApp": "In-App Notifications"
+    },
+    "security": {
+      "title": "Security",
+      "password": "Password",
+      "twoFactor": "Two-Factor Authentication",
+      "sessions": "Active Sessions"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "preferences": "Preferences",
+    "activity": "Recent Activity",
+    "security": "Security Settings"
+  }
+} 
+
+===== C:\Stock_HR\frontend\src\i18n\locales\fr.json =====
+{
+  "common": {
+    "navigation": {
+      "title": "Navigation",
+      "dashboard": "Tableau de bord",
+      "collapse": "Réduire la barre latérale",
+      "expand": "Développer la barre latérale"
+    },
+    "actions": {
+      "add": "Ajouter",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "refresh": "Actualiser",
+      "back": "Retour",
+      "next": "Suivant",
+      "submit": "Soumettre",
+      "export": "Exporter",
+      "import": "Importer",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "print": "Imprimer"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "pending": "En attente",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "error": "Erreur",
+      "success": "Succès",
+      "warning": "Avertissement",
+      "info": "Information"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Tout marquer comme lu",
+      "noNotifications": "Aucune notification",
+      "viewAll": "Voir tout"
+    },
+    "search": {
+      "placeholder": "Rechercher...",
+      "noResults": "Aucun résultat trouvé",
+      "searching": "Recherche en cours..."
+    },
+    "loading": {
+      "default": "Chargement...",
+      "data": "Chargement des données...",
+      "page": "Chargement de la page..."
+    },
+    "errors": {
+      "default": "Une erreur est survenue",
+      "notFound": "Non trouvé",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Interdit",
+      "serverError": "Erreur serveur",
+      "networkError": "Erreur réseau",
+      "validationError": "Erreur de validation"
+    },
+    "success": {
+      "saved": "Enregistré avec succès",
+      "updated": "Mis à jour avec succès",
+      "deleted": "Supprimé avec succès",
+      "created": "Créé avec succès"
+    }
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "forgotPassword": "Mot de passe oublié",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "changePassword": "Changer le mot de passe",
+    "profile": {
+      "title": "Profil",
+      "edit": "Modifier le profil",
+      "settings": "Paramètres du profil"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenue",
+    "summary": "Résumé",
+    "recentActivity": "Activité récente",
+    "statistics": "Statistiques",
+    "quickActions": "Actions rapides",
+    "error": "Erreur lors du chargement des données"
+  },
+  "stock": {
+    "title": "Gestion des stocks",
+    "inventory": "Inventaire",
+    "categories": "Catégories",
+    "suppliers": "Fournisseurs",
+    "movements": "Mouvements de stock",
+    "purchaseOrders": "Bons de commande",
+    "dashboard": {
+      "title": "Tableau de bord des stocks",
+      "totalItems": "Total des articles",
+      "lowStock": "Articles en stock faible",
+      "outOfStock": "Articles en rupture",
+      "itemsChange": "Variation des articles"
+    },
+    "items": {
+      "title": "Articles",
+      "add": "Ajouter un article",
+      "edit": "Modifier l'article",
+      "delete": "Supprimer l'article",
+      "details": "Détails de l'article",
+      "name": "Nom",
+      "description": "Description",
+      "category": "Catégorie",
+      "supplier": "Fournisseur",
+      "quantity": "Quantité",
+      "price": "Prix",
+      "status": "État"
+    }
+  },
+  "hr": {
+    "title": "Gestion RH",
+    "dashboard": {
+      "title": "Tableau de bord RH",
+      "totalEmployees": "Total des employés",
+      "departments": "Départements",
+      "newHires": "Nouvelles embauches",
+      "employeesChange": "Variation des employés"
+    },
+    "employees": "Employés",
+    "departments": "Départements",
+    "positions": "Postes",
+    "leaveRequests": "Demandes de congé",
+    "performanceReviews": "Évaluations de performance",
+    "employee": {
+      "add": "Ajouter un employé",
+      "edit": "Modifier l'employé",
+      "details": "Détails de l'employé",
+      "name": "Nom",
+      "position": "Poste",
+      "department": "Département",
+      "status": "État",
+      "contact": "Informations de contact"
+    }
+  },
+  "accounting": {
+    "title": "Comptabilité",
+    "dashboard": {
+      "title": "Tableau de bord comptable",
+      "totalRevenue": "Revenu total",
+      "expenses": "Dépenses",
+      "profit": "Bénéfice",
+      "openContracts": "Contrats ouverts",
+      "revenueChange": "Variation des revenus",
+      "contractsChange": "Variation des contrats"
+    },
+    "invoices": "Factures",
+    "contracts": "Contrats",
+    "proformas": "Factures proforma",
+    "journalEntries": "Écritures comptables",
+    "chartOfAccounts": "Plan comptable",
+    "financialStatements": "États financiers",
+    "invoice": {
+      "add": "Ajouter une facture",
+      "edit": "Modifier la facture",
+      "details": "Détails de la facture",
+      "number": "Numéro de facture",
+      "date": "Date",
+      "dueDate": "Date d'échéance",
+      "amount": "Montant",
+      "status": "État",
+      "client": "Client"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": {
+      "title": "Paramètres généraux",
+      "language": "Langue",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date"
+    },
+    "appearance": {
+      "title": "Apparence",
+      "theme": {
+        "title": "Thème",
+        "light": "Clair",
+        "dark": "Sombre",
+        "system": "Système"
+      },
+      "layout": "Mise en page",
+      "colors": "Couleurs"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Notifications par email",
+      "push": "Notifications push",
+      "inApp": "Notifications dans l'application"
+    },
+    "security": {
+      "title": "Sécurité",
+      "password": "Mot de passe",
+      "twoFactor": "Authentification à deux facteurs",
+      "sessions": "Sessions actives"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Informations personnelles",
+    "changePassword": "Changer le mot de passe",
+    "preferences": "Préférences",
+    "activity": "Activité récente",
+    "security": "Paramètres de sécurité"
+  }
+} 
+

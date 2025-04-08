@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useToast } from '../../../hooks/useToast';
-import api, { getApiResponse, handleApiError } from '../../../utils/api';
+import apiService from "../../../services/api.service";
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
 import {
@@ -125,7 +125,7 @@ export function StockList() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/stock', { params: filters });
+      const response = await apiService.get('/stock', { params: filters });
       setItems(response.data);
       setError(null);
     } catch (error) {
@@ -143,7 +143,7 @@ export function StockList() {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/stock/categories');
+      const response = await apiService.get('/stock/categories');
       setCategories(response.data || MOCK_CATEGORIES);
     } catch (error) {
       // Silently fall back to mock data
@@ -153,7 +153,7 @@ export function StockList() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await api.get('/stock/suppliers');
+      const response = await apiService.get('/stock/suppliers');
       setSuppliers(response.data || MOCK_SUPPLIERS);
     } catch (error) {
       // Silently fall back to mock data
@@ -229,13 +229,13 @@ export function StockList() {
       validateForm();
 
       if (selectedItem) {
-        await api.put(`/stock/${selectedItem._id}`, formData);
+        await apiService.put(`/stock/${selectedItem._id}`, formData);
         toast({
           title: t('common.success'),
           description: t('stock.messages.updateSuccess'),
         });
       } else {
-        await api.post('/stock', formData);
+        await apiService.post('/stock', formData);
         toast({
           title: t('common.success'),
           description: t('stock.messages.createSuccess'),
@@ -282,7 +282,7 @@ export function StockList() {
 
     try {
       setLoading(true);
-      await api.delete(`/stock/${selectedItem._id}`);
+      await apiService.delete(`/stock/${selectedItem._id}`);
       toast({
         title: t('common.success'),
         description: t('stock.messages.deleteSuccess'),

@@ -40,7 +40,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
 import { useToast } from '../../../hooks/useToast';
-import { api } from '../../../services/api';
+import apiService from "../../../services/api.service";
 import { Input } from '../../../components/ui/input';
 import {
   DialogDescription,
@@ -132,7 +132,7 @@ export const Movements: React.FC = () => {
   const fetchMovements = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/movements');
+      const response = await apiService.get('/movements');
       setMovements(response.data);
       setError(null);
     } catch (err) {
@@ -149,7 +149,7 @@ export const Movements: React.FC = () => {
 
   const fetchStockItems = async () => {
     try {
-      const response = await api.get('/stock');
+      const response = await apiService.get('/stock');
       setStockItems(response.data);
     } catch (err) {
       showToast({
@@ -242,7 +242,7 @@ export const Movements: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/movements', formData);
+      await apiService.post('/movements', formData);
       showToast({
         title: t('common.success'),
         description: t('stock.movements.createSuccess')
@@ -273,13 +273,13 @@ export const Movements: React.FC = () => {
     try {
       setLoading(true);
       if (actionType === 'delete') {
-        await api.delete(`/movements/${selectedMovement._id}`);
+        await apiService.delete(`/movements/${selectedMovement._id}`);
         showToast({
           title: t('common.success'),
           description: t('stock.movements.deleteSuccess')
         });
       } else if (actionType === 'cancel') {
-        await api.put(`/movements/${selectedMovement._id}/cancel`);
+        await apiService.put(`/movements/${selectedMovement._id}/cancel`);
         showToast({
           title: t('common.success'),
           description: t('stock.movements.cancelSuccess')

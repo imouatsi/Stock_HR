@@ -1,127 +1,33 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import enTranslations from './locales/en.json';
+import arTranslations from './locales/ar.json';
 
-const resources = {
-  en: {
-    translation: {
-      // Document Form
-      'document.type': 'Document Type',
-      'document.type.proforma': 'Proforma Invoice',
-      'document.type.final': 'Final Invoice',
-      'document.status': 'Status',
-      'document.status.draft': 'Draft',
-      'document.status.pending': 'Pending',
-      'document.status.approved': 'Approved',
-      'document.status.rejected': 'Rejected',
-      'document.client': 'Client Information',
-      'document.client.name': 'Name',
-      'document.client.address': 'Address',
-      'document.client.nif': 'NIF',
-      'document.items': 'Items',
-      'document.items.description': 'Description',
-      'document.items.quantity': 'Quantity',
-      'document.items.unitPrice': 'Unit Price',
-      'document.items.barcode': 'Barcode',
-      'document.items.add': 'Add Item',
-      'document.items.remove': 'Remove Item',
-      'document.paymentTerms': 'Payment Terms',
-      'document.dueDate': 'Due Date',
-      'document.actions.save': 'Save',
-      'document.actions.reset': 'Reset',
-      'document.actions.cancel': 'Cancel',
-      'document.actions.delete': 'Delete',
-      'document.actions.preview': 'Preview',
-      'document.actions.download': 'Download PDF',
-      'document.errors.required': 'This field is required',
-      'document.errors.minQuantity': 'Quantity must be at least 1',
-      'document.errors.minPrice': 'Price must be non-negative',
-      'document.errors.minItems': 'At least one item is required',
-    },
-  },
-  ar: {
-    translation: {
-      // Document Form
-      'document.type': 'نوع المستند',
-      'document.type.proforma': 'فاتورة مؤقتة',
-      'document.type.final': 'فاتورة نهائية',
-      'document.status': 'الحالة',
-      'document.status.draft': 'مسودة',
-      'document.status.pending': 'قيد الانتظار',
-      'document.status.approved': 'موافق عليه',
-      'document.status.rejected': 'مرفوض',
-      'document.client': 'معلومات العميل',
-      'document.client.name': 'الاسم',
-      'document.client.address': 'العنوان',
-      'document.client.nif': 'الرقم الضريبي',
-      'document.items': 'العناصر',
-      'document.items.description': 'الوصف',
-      'document.items.quantity': 'الكمية',
-      'document.items.unitPrice': 'سعر الوحدة',
-      'document.items.barcode': 'الباركود',
-      'document.items.add': 'إضافة عنصر',
-      'document.items.remove': 'حذف عنصر',
-      'document.paymentTerms': 'شروط الدفع',
-      'document.dueDate': 'تاريخ الاستحقاق',
-      'document.actions.save': 'حفظ',
-      'document.actions.reset': 'إعادة تعيين',
-      'document.actions.cancel': 'إلغاء',
-      'document.actions.delete': 'حذف',
-      'document.actions.preview': 'معاينة',
-      'document.actions.download': 'تحميل PDF',
-      'document.errors.required': 'هذا الحقل مطلوب',
-      'document.errors.minQuantity': 'يجب أن تكون الكمية 1 على الأقل',
-      'document.errors.minPrice': 'يجب أن يكون السعر غير سالب',
-      'document.errors.minItems': 'مطلوب عنصر واحد على الأقل',
-    },
-  },
-  fr: {
-    translation: {
-      // Document Form
-      'document.type': 'Type de Document',
-      'document.type.proforma': 'Facture Proforma',
-      'document.type.final': 'Facture Finale',
-      'document.status': 'Statut',
-      'document.status.draft': 'Brouillon',
-      'document.status.pending': 'En Attente',
-      'document.status.approved': 'Approuvé',
-      'document.status.rejected': 'Rejeté',
-      'document.client': 'Informations Client',
-      'document.client.name': 'Nom',
-      'document.client.address': 'Adresse',
-      'document.client.nif': 'NIF',
-      'document.items': 'Articles',
-      'document.items.description': 'Description',
-      'document.items.quantity': 'Quantité',
-      'document.items.unitPrice': 'Prix Unitaire',
-      'document.items.barcode': 'Code-barres',
-      'document.items.add': 'Ajouter Article',
-      'document.items.remove': 'Supprimer Article',
-      'document.paymentTerms': 'Conditions de Paiement',
-      'document.dueDate': 'Date d\'Échéance',
-      'document.actions.save': 'Enregistrer',
-      'document.actions.reset': 'Réinitialiser',
-      'document.actions.cancel': 'Annuler',
-      'document.actions.delete': 'Supprimer',
-      'document.actions.preview': 'Aperçu',
-      'document.actions.download': 'Télécharger PDF',
-      'document.errors.required': 'Ce champ est requis',
-      'document.errors.minQuantity': 'La quantité doit être d\'au moins 1',
-      'document.errors.minPrice': 'Le prix doit être non négatif',
-      'document.errors.minItems': 'Au moins un article est requis',
-    },
-  },
+const languages = {
+  en: { code: 'en', label: 'English', dir: 'ltr' },
+  fr: { code: 'fr', label: 'Français', dir: 'ltr' },
+  ar: { code: 'ar', label: 'العربية', dir: 'rtl' }
 };
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
+    resources: {
+      en: { translation: enTranslations },
+      ar: { translation: arTranslations }
+    },
     fallbackLng: 'en',
+    debug: process.env.NODE_ENV === 'development',
     interpolation: {
       escapeValue: false,
     },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
+    }
   });
 
+export { languages };
 export default i18n; 

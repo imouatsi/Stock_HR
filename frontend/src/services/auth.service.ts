@@ -1,27 +1,14 @@
 import { api } from '@/lib/api';
-
-export type User = {
-  id: string;
-  username: string;
-  email: string;
-  role: 'admin' | 'user' | 'manager';
-  firstName?: string;
-  lastName?: string;
-};
+import { UserProfile, LoginCredentials } from '@/types/user';
 
 export const authService = {
-  async login(username: string, password: string): Promise<User> {
+  async login(credentials: LoginCredentials): Promise<{ user: UserProfile; token: string }> {
     try {
-      const response = await api.post<{ user: User; token: string }>('/auth/login', {
-        username,
-        password,
-      });
-
+      const response = await api.post('/auth/login', credentials);
       const { user, token } = response.data;
       this.setToken(token);
       this.setUser(user);
-
-      return user;
+      return { user, token };
     } catch (error) {
       console.error('Error logging in:', error);
       throw new Error('Invalid credentials');
@@ -38,9 +25,9 @@ export const authService = {
     }
   },
 
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<UserProfile | null> {
     try {
-      const response = await api.get<User>('/auth/me');
+      const response = await api.get<UserProfile>('/auth/me');
       return response.data;
     } catch (error) {
       console.error('Error fetching current user:', error);
@@ -56,11 +43,11 @@ export const authService = {
     return localStorage.getItem('token');
   },
 
-  setUser(user: User): void {
+  setUser(user: UserProfile): void {
     localStorage.setItem('user', JSON.stringify(user));
   },
 
-  getUser(): User | null {
+  getUser(): UserProfile | null {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   },
@@ -72,10 +59,5 @@ export const authService = {
 
   isAuthenticated(): boolean {
     return !!this.getToken();
-  },
-
-  hasRole(role: User['role']): boolean {
-    const user = this.getUser();
-    return user?.role === role || user?.role === 'admin';
   },
 }; 

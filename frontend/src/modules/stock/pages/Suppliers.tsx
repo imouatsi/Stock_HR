@@ -6,7 +6,7 @@ import { Input } from '../../../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/useToast';
-import { api } from '../../../services/api';
+import apiService from "../../../services/api.service";
 
 interface Supplier {
   _id: string;
@@ -44,7 +44,7 @@ export const Suppliers: React.FC = () => {
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/suppliers');
+      const response = await apiService.get('/suppliers');
       setSuppliers(response.data);
       setError(null);
     } catch (err) {
@@ -63,13 +63,13 @@ export const Suppliers: React.FC = () => {
     e.preventDefault();
     try {
       if (editingSupplier) {
-        await api.put(`/suppliers/${editingSupplier._id}`, formData);
+        await apiService.put(`/suppliers/${editingSupplier._id}`, formData);
         showToast({
           title: t('common.success'),
           description: t('stock.suppliers.updateSuccess')
         });
       } else {
-        await api.post('/suppliers', formData);
+        await apiService.post('/suppliers', formData);
         showToast({
           title: t('common.success'),
           description: t('stock.suppliers.createSuccess')
@@ -98,7 +98,7 @@ export const Suppliers: React.FC = () => {
     if (!window.confirm(t('stock.suppliers.confirmDelete'))) return;
     
     try {
-      await api.delete(`/suppliers/${id}`);
+      await apiService.delete(`/suppliers/${id}`);
       showToast({
         title: t('common.success'),
         description: t('stock.suppliers.deleteSuccess')

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../services/api';
+import apiService from '../../services/api.service';
 
 interface AnalyticsData {
   totalStockValue: number;
@@ -39,7 +39,7 @@ export const fetchAnalyticsData = createAsyncThunk(
   'analytics/fetchData',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/analytics/dashboard');
+      const response = await apiService.get('/analytics/dashboard');
       return response.data;
     } catch (error: any) {
       return rejectWithValue(

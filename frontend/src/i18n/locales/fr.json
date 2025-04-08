@@ -66,7 +66,8 @@
       "updated": "Mis à jour avec succès",
       "deleted": "Supprimé avec succès",
       "created": "Créé avec succès"
-    }
+    },
+    "dashboard": "Tableau de bord"
   },
   "auth": {
     "login": "Connexion",
@@ -101,7 +102,14 @@
       "totalItems": "Total des articles",
       "lowStock": "Articles en stock faible",
       "outOfStock": "Articles en rupture",
-      "itemsChange": "Variation des articles"
+      "itemsChange": "Variation des articles",
+      "acrossCategories": "Dans toutes les catégories",
+      "belowThreshold": "Articles sous le seuil",
+      "pendingOrders": "Commandes en attente",
+      "awaitingDelivery": "En attente de livraison",
+      "totalValue": "Valeur totale",
+      "currentValue": "Valeur actuelle du stock",
+      "recentMovements": "Mouvements récents"
     },
     "items": {
       "title": "Articles",
@@ -116,6 +124,12 @@
       "quantity": "Quantité",
       "price": "Prix",
       "status": "État"
+    },
+    "movements": {
+      "date": "Date",
+      "type": "Type",
+      "quantity": "Quantité",
+      "status": "État"
     }
   },
   "hr": {
@@ -125,7 +139,9 @@
       "totalEmployees": "Total des employés",
       "departments": "Départements",
       "newHires": "Nouvelles embauches",
-      "employeesChange": "Variation des employés"
+      "employeesChange": "Variation des employés",
+      "activeDepartments": "Départements actifs",
+      "pendingLeaveRequests": "Demandes de congé en attente"
     },
     "employees": "Employés",
     "departments": "Départements",
@@ -152,7 +168,9 @@
       "profit": "Bénéfice",
       "openContracts": "Contrats ouverts",
       "revenueChange": "Variation des revenus",
-      "contractsChange": "Variation des contrats"
+      "contractsChange": "Variation des contrats",
+      "totalExpenses": "Total des dépenses",
+      "pendingInvoices": "Factures en attente"
     },
     "invoices": "Factures",
     "contracts": "Contrats",
@@ -170,6 +188,24 @@
       "amount": "Montant",
       "status": "État",
       "client": "Client"
+    },
+    "journalEntries": {
+      "date": "Date",
+      "reference": "Référence",
+      "description": "Description",
+      "account": "Compte",
+      "debit": "Débit",
+      "credit": "Crédit"
+    },
+    "financialStatements": {
+      "type": "Type",
+      "period": "Période",
+      "date": "Date",
+      "status": "État"
+    },
+    "chartOfAccounts": {
+      "title": "Plan comptable",
+      "addAccount": "Ajouter un compte"
     }
   },
   "settings": {

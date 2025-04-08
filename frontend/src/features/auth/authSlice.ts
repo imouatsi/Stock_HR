@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../services/api';
+import apiService from '../../services/api.service';
 import { UserProfile } from '../../types';
 
 interface AuthState {
@@ -19,12 +19,12 @@ const initialState: AuthState = {
 };
 
 export const login = createAsyncThunk<
-  { token: string; data: { user: UserProfile } },
+  { user: UserProfile; token: string },
   { username: string; password: string },
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await api.post('/auth/login', credentials);
+    const response = await apiService.post('/auth/login', credentials);
     return response.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Login failed');
@@ -37,7 +37,7 @@ export const register = createAsyncThunk<
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {
-    const response = await api.post('/auth/register', userData);
+    const response = await apiService.post('/auth/register', userData);
     return response.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Registration failed');
@@ -46,7 +46,7 @@ export const register = createAsyncThunk<
 
 export const logout = createAsyncThunk('auth/logout', async () => {
   try {
-    await api.post('/auth/logout');
+    await apiService.post('/auth/logout');
   } catch (err) {
     console.error('Logout error:', err);
   }
@@ -58,7 +58,7 @@ export const getCurrentUser = createAsyncThunk<
   { rejectValue: string }
 >('auth/getCurrentUser', async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get('/auth/me');
+    const response = await apiService.get('/auth/me');
     return response.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Failed to fetch user');
@@ -91,7 +91,7 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data.user;
+        state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
         localStorage.setItem('token', action.payload.token);
