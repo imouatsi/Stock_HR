@@ -7,6 +7,12 @@ import enTranslation from './locales/en.json';
 import frTranslation from './locales/fr.json';
 import arTranslation from './locales/ar.json';
 
+export const languages = [
+  { code: 'en', label: 'English', dir: 'ltr' },
+  { code: 'fr', label: 'Français', dir: 'ltr' },
+  { code: 'ar', label: 'العربية', dir: 'rtl' }
+];
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

@@ -22,38 +22,106 @@ import { Contracts } from './modules/accounting/pages/Contracts';
 import Invoices from './modules/accounting/pages/Invoices';
 import { ProformaInvoices } from './modules/accounting/pages/ProformaInvoices';
 
+// Define role constants
+const ROLES = {
+  ADMIN: 'admin',
+  SUPERADMIN: 'superadmin',
+  HR_MANAGER: 'hr_manager',
+  ACCOUNTANT: 'accountant',
+  STOCK_MANAGER: 'stock_manager'
+} as const;
+
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" forceDark>
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<Layout />}>
+              {/* Dashboard - accessible to all authenticated users */}
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               
-              {/* User Management Routes */}
-              <Route path="/users" element={<ProtectedRoute><UserList /></ProtectedRoute>} />
-              <Route path="/users/new" element={<ProtectedRoute><UserForm /></ProtectedRoute>} />
-              <Route path="/users/:id" element={<ProtectedRoute><UserForm /></ProtectedRoute>} />
+              {/* User Management Routes - Admin & Superadmin only */}
+              <Route path="/users" element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <UserList />
+                </ProtectedRoute>
+              } />
+              <Route path="/users/new" element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <UserForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/users/:id" element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <UserForm />
+                </ProtectedRoute>
+              } />
               
-              {/* Stock Management Routes */}
-              <Route path="/stock" element={<ProtectedRoute><StockList /></ProtectedRoute>} />
-              <Route path="/stock/new" element={<ProtectedRoute><StockForm /></ProtectedRoute>} />
-              <Route path="/stock/:id" element={<ProtectedRoute><StockForm /></ProtectedRoute>} />
-              <Route path="/stock/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
-              <Route path="/stock/suppliers" element={<ProtectedRoute><Suppliers /></ProtectedRoute>} />
-              <Route path="/stock/movements" element={<ProtectedRoute><Movements /></ProtectedRoute>} />
-              <Route path="/stock/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+              {/* Stock Management Routes - Stock Manager, Admin & Superadmin */}
+              <Route path="/stock" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <StockList />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/new" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <StockForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/:id" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <StockForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/categories" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Categories />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/suppliers" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Suppliers />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/movements" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Movements />
+                </ProtectedRoute>
+              } />
+              <Route path="/stock/inventory" element={
+                <ProtectedRoute roles={[ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Inventory />
+                </ProtectedRoute>
+              } />
               
-              {/* Accounting Routes */}
-              <Route path="/contracts" element={<ProtectedRoute><Contracts /></ProtectedRoute>} />
-              <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
-              <Route path="/proforma-invoices" element={<ProtectedRoute><ProformaInvoices /></ProtectedRoute>} />
+              {/* Accounting Routes - Accountant, Admin & Superadmin */}
+              <Route path="/contracts" element={
+                <ProtectedRoute roles={[ROLES.ACCOUNTANT, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Contracts />
+                </ProtectedRoute>
+              } />
+              <Route path="/invoices" element={
+                <ProtectedRoute roles={[ROLES.ACCOUNTANT, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Invoices />
+                </ProtectedRoute>
+              } />
+              <Route path="/proforma-invoices" element={
+                <ProtectedRoute roles={[ROLES.ACCOUNTANT, ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <ProformaInvoices />
+                </ProtectedRoute>
+              } />
               
-              {/* Analytics and Settings */}
-              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              {/* Analytics - Admin & Superadmin only */}
+              <Route path="/analytics" element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPERADMIN]}>
+                  <Analytics />
+                </ProtectedRoute>
+              } />
+              
+              {/* Settings - accessible to all authenticated users */}
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />

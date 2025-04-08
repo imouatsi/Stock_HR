@@ -1,101 +1,216 @@
 {
+  "common": {
+    "navigation": {
+      "title": "Navigation",
+      "dashboard": "Dashboard",
+      "collapse": "Collapse Sidebar",
+      "expand": "Expand Sidebar"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "search": "Search",
+      "filter": "Filter",
+      "refresh": "Refresh",
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "print": "Print"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "noNotifications": "No notifications",
+      "viewAll": "View all"
+    },
+    "search": {
+      "placeholder": "Search...",
+      "noResults": "No results found",
+      "searching": "Searching..."
+    },
+    "loading": {
+      "default": "Loading...",
+      "data": "Loading data...",
+      "page": "Loading page..."
+    },
+    "errors": {
+      "default": "An error occurred",
+      "notFound": "Not found",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "serverError": "Server error",
+      "networkError": "Network error",
+      "validationError": "Validation error"
+    },
+    "success": {
+      "saved": "Successfully saved",
+      "updated": "Successfully updated",
+      "deleted": "Successfully deleted",
+      "created": "Successfully created"
+    },
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "profile": {
+      "title": "Profile",
+      "edit": "Edit Profile",
+      "settings": "Profile Settings"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "summary": "Summary",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics",
+    "quickActions": "Quick Actions",
+    "error": "Error loading dashboard data"
+  },
+  "stock": {
+    "title": "Stock Management",
+    "inventory": "Inventory",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "movements": "Stock Movements",
+    "purchaseOrders": "Purchase Orders",
+    "dashboard": {
+      "title": "Stock Dashboard",
+      "totalItems": "Total Items",
+      "lowStock": "Low Stock Items",
+      "outOfStock": "Out of Stock",
+      "itemsChange": "Items Change"
+    },
+    "items": {
+      "title": "Items",
+      "add": "Add Item",
+      "edit": "Edit Item",
+      "delete": "Delete Item",
+      "details": "Item Details",
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "supplier": "Supplier",
+      "quantity": "Quantity",
+      "price": "Price",
+      "status": "Status"
+    }
+  },
   "hr": {
+    "title": "HR Management",
     "dashboard": {
       "title": "HR Dashboard",
       "totalEmployees": "Total Employees",
-      "activeDepartments": "Active Departments",
-      "pendingLeaveRequests": "Pending Leave Requests",
-      "upcomingReviews": "Upcoming Reviews"
+      "departments": "Departments",
+      "newHires": "New Hires",
+      "employeesChange": "Employees Change"
     },
-    "employees": {
-      "title": "Employees",
-      "addEmployee": "Add Employee",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email",
-      "department": "Department",
+    "employees": "Employees",
+    "departments": "Departments",
+    "positions": "Positions",
+    "leaveRequests": "Leave Requests",
+    "performanceReviews": "Performance Reviews",
+    "employee": {
+      "add": "Add Employee",
+      "edit": "Edit Employee",
+      "details": "Employee Details",
+      "name": "Name",
       "position": "Position",
+      "department": "Department",
       "status": "Status",
-      "status": {
-        "active": "Active",
-        "inactive": "Inactive"
-      }
+      "contact": "Contact Information"
     }
   },
   "accounting": {
+    "title": "Accounting",
     "dashboard": {
       "title": "Accounting Dashboard",
       "totalRevenue": "Total Revenue",
-      "totalExpenses": "Total Expenses",
-      "pendingInvoices": "Pending Invoices",
-      "openContracts": "Open Contracts"
+      "expenses": "Expenses",
+      "profit": "Profit",
+      "openContracts": "Open Contracts",
+      "revenueChange": "Revenue Change",
+      "contractsChange": "Contracts Change"
     },
-    "invoices": {
-      "title": "Invoices",
-      "addInvoice": "Add Invoice",
+    "invoices": "Invoices",
+    "contracts": "Contracts",
+    "proformas": "Proforma Invoices",
+    "journalEntries": "Journal Entries",
+    "chartOfAccounts": "Chart of Accounts",
+    "financialStatements": "Financial Statements",
+    "invoice": {
+      "add": "Add Invoice",
+      "edit": "Edit Invoice",
+      "details": "Invoice Details",
       "number": "Invoice Number",
       "date": "Date",
       "dueDate": "Due Date",
-      "client": "Client",
       "amount": "Amount",
       "status": "Status",
-      "status": {
-        "paid": "Paid",
-        "pending": "Pending",
-        "overdue": "Overdue"
-      }
-    },
-    "proforma": {
-      "title": "Proforma Invoices",
-      "addProforma": "Add Proforma",
-      "number": "Proforma Number",
-      "date": "Date",
-      "client": "Client",
-      "amount": "Amount",
-      "status": "Status",
-      "status": {
-        "draft": "Draft",
-        "sent": "Sent",
-        "accepted": "Accepted",
-        "rejected": "Rejected"
-      }
-    },
-    "journalEntries": {
-      "title": "Journal Entries",
-      "addEntry": "Add Entry",
-      "date": "Date",
-      "reference": "Reference",
-      "description": "Description",
-      "account": "Account",
-      "debit": "Debit",
-      "credit": "Credit"
-    },
-    "chartOfAccounts": {
-      "title": "Chart of Accounts",
-      "addAccount": "Add Account",
-      "code": "Code",
-      "name": "Name",
-      "type": "Type",
-      "category": "Category",
-      "balance": "Balance"
-    },
-    "financialStatements": {
-      "title": "Financial Statements",
-      "generate": "Generate Statement",
-      "type": "Type",
-      "period": "Period",
-      "date": "Date",
-      "status": "Status",
-      "types": {
-        "balance_sheet": "Balance Sheet",
-        "income_statement": "Income Statement",
-        "cash_flow": "Cash Flow Statement"
-      },
-      "status": {
-        "draft": "Draft",
-        "final": "Final",
-        "approved": "Approved"
-      }
+      "client": "Client"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": {
+      "title": "General Settings",
+      "language": "Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": {
+        "title": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "layout": "Layout",
+      "colors": "Colors"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "push": "Push Notifications",
+      "inApp": "In-App Notifications"
+    },
+    "security": {
+      "title": "Security",
+      "password": "Password",
+      "twoFactor": "Two-Factor Authentication",
+      "sessions": "Active Sessions"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "preferences": "Preferences",
+    "activity": "Recent Activity",
+    "security": "Security Settings"
   }
 } 

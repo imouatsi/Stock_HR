@@ -1,101 +1,215 @@
 {
+  "common": {
+    "navigation": {
+      "title": "Navigation",
+      "dashboard": "Tableau de bord",
+      "collapse": "Réduire la barre latérale",
+      "expand": "Développer la barre latérale"
+    },
+    "actions": {
+      "add": "Ajouter",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "refresh": "Actualiser",
+      "back": "Retour",
+      "next": "Suivant",
+      "submit": "Soumettre",
+      "export": "Exporter",
+      "import": "Importer",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "print": "Imprimer"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "pending": "En attente",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "error": "Erreur",
+      "success": "Succès",
+      "warning": "Avertissement",
+      "info": "Information"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Tout marquer comme lu",
+      "noNotifications": "Aucune notification",
+      "viewAll": "Voir tout"
+    },
+    "search": {
+      "placeholder": "Rechercher...",
+      "noResults": "Aucun résultat trouvé",
+      "searching": "Recherche en cours..."
+    },
+    "loading": {
+      "default": "Chargement...",
+      "data": "Chargement des données...",
+      "page": "Chargement de la page..."
+    },
+    "errors": {
+      "default": "Une erreur est survenue",
+      "notFound": "Non trouvé",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Interdit",
+      "serverError": "Erreur serveur",
+      "networkError": "Erreur réseau",
+      "validationError": "Erreur de validation"
+    },
+    "success": {
+      "saved": "Enregistré avec succès",
+      "updated": "Mis à jour avec succès",
+      "deleted": "Supprimé avec succès",
+      "created": "Créé avec succès"
+    }
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "forgotPassword": "Mot de passe oublié",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "changePassword": "Changer le mot de passe",
+    "profile": {
+      "title": "Profil",
+      "edit": "Modifier le profil",
+      "settings": "Paramètres du profil"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenue",
+    "summary": "Résumé",
+    "recentActivity": "Activité récente",
+    "statistics": "Statistiques",
+    "quickActions": "Actions rapides",
+    "error": "Erreur lors du chargement des données"
+  },
+  "stock": {
+    "title": "Gestion des stocks",
+    "inventory": "Inventaire",
+    "categories": "Catégories",
+    "suppliers": "Fournisseurs",
+    "movements": "Mouvements de stock",
+    "purchaseOrders": "Bons de commande",
+    "dashboard": {
+      "title": "Tableau de bord des stocks",
+      "totalItems": "Total des articles",
+      "lowStock": "Articles en stock faible",
+      "outOfStock": "Articles en rupture",
+      "itemsChange": "Variation des articles"
+    },
+    "items": {
+      "title": "Articles",
+      "add": "Ajouter un article",
+      "edit": "Modifier l'article",
+      "delete": "Supprimer l'article",
+      "details": "Détails de l'article",
+      "name": "Nom",
+      "description": "Description",
+      "category": "Catégorie",
+      "supplier": "Fournisseur",
+      "quantity": "Quantité",
+      "price": "Prix",
+      "status": "État"
+    }
+  },
   "hr": {
+    "title": "Gestion RH",
     "dashboard": {
       "title": "Tableau de bord RH",
       "totalEmployees": "Total des employés",
-      "activeDepartments": "Départements actifs",
-      "pendingLeaveRequests": "Demandes de congé en attente",
-      "upcomingReviews": "Évaluations à venir"
+      "departments": "Départements",
+      "newHires": "Nouvelles embauches",
+      "employeesChange": "Variation des employés"
     },
-    "employees": {
-      "title": "Employés",
-      "addEmployee": "Ajouter un employé",
-      "firstName": "Prénom",
-      "lastName": "Nom",
-      "email": "Email",
-      "department": "Département",
+    "employees": "Employés",
+    "departments": "Départements",
+    "positions": "Postes",
+    "leaveRequests": "Demandes de congé",
+    "performanceReviews": "Évaluations de performance",
+    "employee": {
+      "add": "Ajouter un employé",
+      "edit": "Modifier l'employé",
+      "details": "Détails de l'employé",
+      "name": "Nom",
       "position": "Poste",
-      "status": "Statut",
-      "status": {
-        "active": "Actif",
-        "inactive": "Inactif"
-      }
+      "department": "Département",
+      "status": "État",
+      "contact": "Informations de contact"
     }
   },
   "accounting": {
+    "title": "Comptabilité",
     "dashboard": {
-      "title": "Tableau de bord Comptabilité",
+      "title": "Tableau de bord comptable",
       "totalRevenue": "Revenu total",
-      "totalExpenses": "Dépenses totales",
-      "pendingInvoices": "Factures en attente",
-      "openContracts": "Contrats ouverts"
+      "expenses": "Dépenses",
+      "profit": "Bénéfice",
+      "openContracts": "Contrats ouverts",
+      "revenueChange": "Variation des revenus",
+      "contractsChange": "Variation des contrats"
     },
-    "invoices": {
-      "title": "Factures",
-      "addInvoice": "Ajouter une facture",
+    "invoices": "Factures",
+    "contracts": "Contrats",
+    "proformas": "Factures proforma",
+    "journalEntries": "Écritures comptables",
+    "chartOfAccounts": "Plan comptable",
+    "financialStatements": "États financiers",
+    "invoice": {
+      "add": "Ajouter une facture",
+      "edit": "Modifier la facture",
+      "details": "Détails de la facture",
       "number": "Numéro de facture",
       "date": "Date",
       "dueDate": "Date d'échéance",
-      "client": "Client",
       "amount": "Montant",
-      "status": "Statut",
-      "status": {
-        "paid": "Payé",
-        "pending": "En attente",
-        "overdue": "En retard"
-      }
-    },
-    "proforma": {
-      "title": "Factures Proforma",
-      "addProforma": "Ajouter une facture proforma",
-      "number": "Numéro de facture proforma",
-      "date": "Date",
-      "client": "Client",
-      "amount": "Montant",
-      "status": "Statut",
-      "status": {
-        "draft": "Brouillon",
-        "sent": "Envoyé",
-        "accepted": "Accepté",
-        "rejected": "Rejeté"
-      }
-    },
-    "journalEntries": {
-      "title": "Écritures Comptables",
-      "addEntry": "Ajouter une écriture",
-      "date": "Date",
-      "reference": "Référence",
-      "description": "Description",
-      "account": "Compte",
-      "debit": "Débit",
-      "credit": "Crédit"
-    },
-    "chartOfAccounts": {
-      "title": "Plan Comptable",
-      "addAccount": "Ajouter un compte",
-      "code": "Code",
-      "name": "Nom",
-      "type": "Type",
-      "category": "Catégorie",
-      "balance": "Solde"
-    },
-    "financialStatements": {
-      "title": "États Financiers",
-      "generate": "Générer un état",
-      "type": "Type",
-      "period": "Période",
-      "date": "Date",
-      "status": "Statut",
-      "types": {
-        "balance_sheet": "Bilan",
-        "income_statement": "Compte de résultat",
-        "cash_flow": "Tableau de flux de trésorerie"
-      },
-      "status": {
-        "draft": "Brouillon",
-        "final": "Final",
-        "approved": "Approuvé"
-      }
+      "status": "État",
+      "client": "Client"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": {
+      "title": "Paramètres généraux",
+      "language": "Langue",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date"
+    },
+    "appearance": {
+      "title": "Apparence",
+      "theme": {
+        "title": "Thème",
+        "light": "Clair",
+        "dark": "Sombre",
+        "system": "Système"
+      },
+      "layout": "Mise en page",
+      "colors": "Couleurs"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Notifications par email",
+      "push": "Notifications push",
+      "inApp": "Notifications dans l'application"
+    },
+    "security": {
+      "title": "Sécurité",
+      "password": "Mot de passe",
+      "twoFactor": "Authentification à deux facteurs",
+      "sessions": "Sessions actives"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Informations personnelles",
+    "changePassword": "Changer le mot de passe",
+    "preferences": "Préférences",
+    "activity": "Activité récente",
+    "security": "Paramètres de sécurité"
   }
 } 

@@ -1,54 +1,83 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { BarChart, DollarSign, Users, Package } from 'lucide-react';
+import { useTranslation } from '../../../hooks/useTranslation';
+
+interface DashboardData {
+  totalRevenue: number;
+  activeContracts: number;
+  totalUsers: number;
+  inventoryItems: number;
+}
+
+const MOCK_DATA: DashboardData = {
+  totalRevenue: 45231.89,
+  activeContracts: 24,
+  totalUsers: 573,
+  inventoryItems: 1432
+};
 
 export const Dashboard = () => {
+  const { t } = useTranslation();
+  const data = MOCK_DATA;
+
+  const renderCardContent = (value: number | string, subtitle: string) => {
+    return (
+      <>
+        <div className="text-2xl font-bold">
+          {typeof value === 'number' && value.toLocaleString('en-US', {
+            style: value === data.totalRevenue ? 'currency' : 'decimal',
+            currency: 'USD',
+            minimumFractionDigits: value === data.totalRevenue ? 2 : 0
+          })}
+        </div>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <h1 className="text-3xl font-bold">{t('common.dashboard')}</h1>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('accounting.dashboard.totalRevenue')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            {renderCardContent(data.totalRevenue, t('accounting.dashboard.revenueChange'))}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('accounting.dashboard.openContracts')}</CardTitle>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">+2 from last month</p>
+            {renderCardContent(data.activeContracts, t('accounting.dashboard.contractsChange'))}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('hr.dashboard.totalEmployees')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">573</div>
-            <p className="text-xs text-muted-foreground">+201 since last year</p>
+            {renderCardContent(data.totalUsers, t('hr.dashboard.employeesChange'))}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inventory Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('stock.dashboard.totalItems')}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,432</div>
-            <p className="text-xs text-muted-foreground">+145 new items</p>
+            {renderCardContent(data.inventoryItems, t('stock.dashboard.itemsChange'))}
           </CardContent>
         </Card>
       </div>

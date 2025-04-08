@@ -41,6 +41,21 @@ import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
 import { useToast } from '../../../hooks/useToast';
 import { api } from '../../../services/api';
+import { Input } from '../../../components/ui/input';
+import {
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+} from '../../../components/ui/dialog';
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
+import { Label } from '../../../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { ScrollArea } from '../../../components/ui/scroll-area';
 
 interface MovementFilters {
   type: string;

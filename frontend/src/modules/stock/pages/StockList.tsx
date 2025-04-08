@@ -129,10 +129,11 @@ export function StockList() {
       setItems(response.data);
       setError(null);
     } catch (error) {
-      setError(t('common.error'));
+      const errorMessage = t('stock.errors.fetchFailed');
+      setError(errorMessage);
       toast({
         title: t('common.error'),
-        description: t('stock.errors.fetchFailed'),
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

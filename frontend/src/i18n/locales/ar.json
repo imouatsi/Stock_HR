@@ -1,0 +1,89 @@
+{
+  "common": {
+    "dashboard": "لوحة التحكم",
+    "navigation": "قائمة التنقل",
+    "notifications": "الإشعارات",
+    "search": "بحث",
+    "loading": "جاري التحميل",
+    "error": "خطأ",
+    "success": "نجاح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "view": "عرض",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بك في لوحة التحكم",
+    "summary": "ملخص النظام",
+    "recentActivity": "النشاط الأخير",
+    "statistics": "الإحصائيات",
+    "errors": {
+      "fetchFailed": "تعذر جلب بيانات لوحة التحكم. جاري استخدام البيانات المخزنة."
+    }
+  },
+  "stock": {
+    "title": "المخزون",
+    "inventory": "المخزون",
+    "categories": "الفئات",
+    "suppliers": "الموردين",
+    "movements": "حركات المخزون",
+    "purchaseOrders": "طلبات الشراء",
+    "totalItems": "إجمالي العناصر",
+    "itemsChange": "التغيير في العناصر",
+    "errors": {
+      "fetchFailed": "فشل في جلب بيانات المخزون"
+    }
+  },
+  "hr": {
+    "title": "الموارد البشرية",
+    "employees": "الموظفين",
+    "departments": "الأقسام",
+    "positions": "المناصب",
+    "leaveRequests": "طلبات الإجازة",
+    "performanceReviews": "تقييمات الأداء",
+    "employeesChange": "التغيير في عدد الموظفين"
+  },
+  "accounting": {
+    "title": "المحاسبة",
+    "invoices": "الفواتير",
+    "contracts": "العقود",
+    "proformas": "الفواتير الأولية",
+    "journalEntries": "القيود المحاسبية",
+    "chartOfAccounts": "دليل الحسابات",
+    "financialStatements": "القوائم المالية",
+    "revenueChange": "التغيير في الإيرادات",
+    "contractsChange": "التغيير في العقود"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "general": "إعدادات عامة",
+    "appearance": "المظهر",
+    "notifications": "الإشعارات",
+    "security": "الأمان",
+    "language": "اللغة",
+    "theme": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "changePassword": "تغيير كلمة المرور",
+    "preferences": "التفضيلات"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "تسجيل جديد",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور"
+  }
+} 

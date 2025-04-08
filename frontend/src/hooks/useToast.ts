@@ -1,4 +1,4 @@
-import { useToast as useToastUI } from '@/components/ui/use-toast';
+import { useToast as useToastUI } from '../components/ui/use-toast';
 import { ToastActionElement } from '@/components/ui/toast';
 
 interface ToastProps {
@@ -8,7 +8,7 @@ interface ToastProps {
   variant?: 'default' | 'destructive';
 }
 
-export function useToast() {
+export const useToast = () => {
   const { toast } = useToastUI();
 
   const showToast = ({
@@ -26,6 +26,9 @@ export function useToast() {
   };
 
   return {
-    toast: showToast
+    toast: showToast,
+    showToast
   };
-} 
+};
+
+export default useToast; 

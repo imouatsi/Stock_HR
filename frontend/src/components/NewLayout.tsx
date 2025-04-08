@@ -11,6 +11,9 @@ import {
   SheetContent,
   SheetTrigger,
   SheetClose,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
 } from './ui/sheet';
 import {
   NavigationMenu,
@@ -52,71 +55,90 @@ import {
   Receipt,
   Users,
   FileSpreadsheet,
+  ChevronDown,
 } from 'lucide-react';
+import { useTheme } from './theme-provider';
+import { cn } from '@/lib/utils';
+import { languages } from '@/i18n';
 
 const drawerWidth = 240;
 const collapsedDrawerWidth = 65;
 
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' },
-  { code: 'ar', name: 'العربية' },
-];
+const ROLES = {
+  ADMIN: 'admin',
+  SUPERADMIN: 'superadmin',
+  HR_MANAGER: 'hr_manager',
+  ACCOUNTANT: 'accountant',
+  STOCK_MANAGER: 'stock_manager'
+} as const;
 
-const menuItems = [
-  { text: 'common.dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: ['admin', 'superadmin', 'manager', 'inventory_clerk'] },
-  { 
-    text: 'stock.title', 
-    icon: <Package size={20} />, 
-    path: '/stock', 
-    roles: ['admin', 'superadmin', 'inventory_clerk'],
+interface MenuItem {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  path?: string;
+  roles?: string[];
+  children?: MenuItem[];
+}
+
+const menuItems: MenuItem[] = [
+  {
+    id: 'stock',
+    label: 'stock.title',
+    path: '/stock',
+    icon: <Package className="h-4 w-4" />,
+    roles: [ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { text: 'stock.inventory', path: '/stock/inventory' },
-      { text: 'stock.categories', path: '/stock/categories' },
-      { text: 'stock.suppliers', path: '/stock/suppliers' },
-      { text: 'stock.movements', path: '/stock/movements' },
-      { text: 'stock.purchaseOrders', path: '/stock/purchase-orders' },
-    ]
+      { id: 'stock-inventory', label: 'stock.inventory', path: '/stock/inventory', icon: <Package className="h-4 w-4" /> },
+      { id: 'stock-categories', label: 'stock.categories', path: '/stock/categories', icon: <FileText className="h-4 w-4" /> },
+      { id: 'stock-suppliers', label: 'stock.suppliers', path: '/stock/suppliers', icon: <Users className="h-4 w-4" /> },
+      { id: 'stock-movements', label: 'stock.movements', path: '/stock/movements', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'stock-purchase-orders', label: 'stock.purchaseOrders', path: '/stock/purchase-orders', icon: <Receipt className="h-4 w-4" /> },
+    ],
   },
-  { 
-    text: 'hr.title', 
-    icon: <Users size={20} />, 
-    path: '/hr/dashboard',
-    roles: ['admin', 'superadmin', 'hr_manager'],
+  {
+    id: 'hr',
+    label: 'hr.title',
+    path: '/hr',
+    icon: <Users className="h-4 w-4" />,
+    roles: [ROLES.HR_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { text: 'hr.employees', path: '/hr/employees' },
-      { text: 'hr.departments', path: '/hr/departments' },
-      { text: 'hr.positions', path: '/hr/positions' },
-      { text: 'hr.leaveRequests', path: '/hr/leave-requests' },
-      { text: 'hr.performanceReviews', path: '/hr/performance-reviews' },
-    ]
+      { id: 'hr-employees', label: 'hr.employees', path: '/hr/employees', icon: <Users className="h-4 w-4" /> },
+      { id: 'hr-departments', label: 'hr.departments', path: '/hr/departments', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-positions', label: 'hr.positions', path: '/hr/positions', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-leave-requests', label: 'hr.leaveRequests', path: '/hr/leave-requests', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-performance', label: 'hr.performanceReviews', path: '/hr/performance', icon: <FileText className="h-4 w-4" /> },
+    ],
   },
-  { 
-    text: 'accounting.title', 
-    icon: <FileText size={20} />, 
-    path: '/accounting/dashboard',
-    roles: ['admin', 'superadmin', 'accountant'],
+  {
+    id: 'accounting',
+    label: 'accounting.title',
+    path: '/accounting',
+    icon: <Receipt className="h-4 w-4" />,
+    roles: [ROLES.ACCOUNTANT, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { text: 'accounting.invoices', path: '/accounting/invoices' },
-      { text: 'accounting.contracts', path: '/accounting/contracts' },
-      { text: 'accounting.proformas', path: '/accounting/proformas' },
-      { text: 'accounting.journalEntries', path: '/accounting/journal-entries' },
-      { text: 'accounting.chartOfAccounts', path: '/accounting/chart-of-accounts' },
-      { text: 'accounting.financialStatements', path: '/accounting/financial-statements' },
-    ]
+      { id: 'accounting-invoices', label: 'accounting.invoices', path: '/accounting/invoices', icon: <Receipt className="h-4 w-4" /> },
+      { id: 'accounting-contracts', label: 'accounting.contracts', path: '/accounting/contracts', icon: <FileText className="h-4 w-4" /> },
+      { id: 'accounting-proformas', label: 'accounting.proformas', path: '/accounting/proformas', icon: <FileText className="h-4 w-4" /> },
+      { id: 'accounting-journal', label: 'accounting.journalEntries', path: '/accounting/journal', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-chart', label: 'accounting.chartOfAccounts', path: '/accounting/chart', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-statements', label: 'accounting.financialStatements', path: '/accounting/statements', icon: <FileSpreadsheet className="h-4 w-4" /> },
+    ],
   },
-  { text: 'settings.title', icon: <Settings size={20} />, path: '/settings', roles: ['admin', 'superadmin'] },
 ];
 
 function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { theme, setTheme } = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { settings } = useSelector((state: RootState) => state.settings);
   const { t, i18n } = useTranslation();
+
+  const isRTL = i18n.dir() === 'rtl';
 
   useEffect(() => {
     const checkMobile = () => {
@@ -140,6 +162,11 @@ function Layout() {
       }, 100);
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('rtl', isRTL);
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  }, [isRTL]);
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -167,39 +194,82 @@ function Layout() {
   };
 
   const handleThemeToggle = () => {
-    dispatch(toggleTheme());
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   const handleProfileClick = () => {
     navigate('/profile');
   };
 
-  const renderMenuItems = () => {
-    return menuItems.map((item) => {
-      if (!item.roles.includes(user?.role || '')) return null;
-      
-      return (
+  const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
+  const hasAccess = (item: MenuItem) => {
+    if (!item.roles) return true;
+    return item.roles.includes(user?.role || '');
+  };
+
+  const renderMenuItem = (item: MenuItem) => {
+    if (!hasAccess(item)) return null;
+
+    const hasChildren = item.children && item.children.length > 0;
+
+    return (
+      <div key={item.id} className="space-y-1">
         <Button
-          key={item.text}
           variant="ghost"
-          className="w-full justify-start"
-          onClick={() => handleNavigation(item.path)}
+          className={cn(
+            'w-full flex items-center justify-between',
+            hasChildren ? 'font-semibold' : 'pl-4'
+          )}
+          onClick={() => item.path && handleNavigation(item.path)}
         >
-          {item.icon}
-          {!isCollapsed && <span className="ml-2">{t(item.text)}</span>}
+          <div className="flex items-center gap-2">
+            {item.icon}
+            <span>{t(item.label)}</span>
+          </div>
+          {hasChildren && (
+            <ChevronRight 
+              className={cn(
+                'h-4 w-4 transition-transform',
+                isRTL && 'rotate-180'
+              )} 
+            />
+          )}
         </Button>
-      );
-    });
+        {hasChildren && (
+          <div className="pl-4 space-y-1">
+            {item.children.map((child) => (
+              <Button
+                key={child.id}
+                variant="ghost"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => child.path && handleNavigation(child.path)}
+              >
+                {child.icon}
+                <span>{t(child.label)}</span>
+              </Button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="flex h-screen">
+    <div className={`flex h-screen ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
       {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-[240px] p-0">
+        <SheetContent side={i18n.language === 'ar' ? 'right' : 'left'} className="w-[240px] p-0">
+          <SheetHeader>
+            <SheetTitle className="px-4">{t('common.dashboard')}</SheetTitle>
+            <SheetDescription className="sr-only">
+              {t('common.navigation')}
+            </SheetDescription>
+          </SheetHeader>
           <div className="flex h-full flex-col">
             <div className="flex h-14 items-center justify-between px-4">
-              <h1 className="text-lg font-semibold">Stock HR</h1>
               <SheetClose>
                 <X size={20} />
               </SheetClose>
@@ -207,7 +277,7 @@ function Layout() {
             <Separator />
             <ScrollArea className="flex-1">
               <div className="flex flex-col gap-1 p-4">
-                {renderMenuItems()}
+                {menuItems.map(renderMenuItem)}
               </div>
             </ScrollArea>
           </div>
@@ -221,7 +291,7 @@ function Layout() {
         }`}
       >
         <div className="flex h-14 items-center justify-between px-4">
-          {!isCollapsed && <h1 className="text-lg font-semibold">Stock HR</h1>}
+          {!isCollapsed && <h1 className="text-lg font-semibold">{t('common.dashboard')}</h1>}
           <Button
             variant="ghost"
             size="icon"
@@ -233,7 +303,7 @@ function Layout() {
         <Separator />
         <ScrollArea className="flex-1">
           <div className="flex flex-col gap-1 p-4">
-            {renderMenuItems()}
+            {menuItems.map(renderMenuItem)}
           </div>
         </ScrollArea>
       </div>
@@ -259,21 +329,36 @@ function Layout() {
               variant="ghost"
               size="icon"
               onClick={handleThemeToggle}
+              className={cn(
+                "transition-colors",
+                isRTL && "ml-4"
+              )}
             >
-              {settings.theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Languages size={20} />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className={cn(
+                    "transition-colors",
+                    isRTL && "ml-4"
+                  )}
+                >
+                  <Languages className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align={isRTL ? "start" : "end"}>
                 {languages.map((lang) => (
                   <DropdownMenuItem
                     key={lang.code}
                     onClick={() => handleLanguageSelect(lang.code)}
+                    className={cn(
+                      "flex items-center gap-2",
+                      i18n.language === lang.code && "bg-accent"
+                    )}
                   >
                     {lang.name}
                   </DropdownMenuItem>
@@ -283,13 +368,20 @@ function Layout() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={cn(
+                    "relative transition-colors",
+                    isRTL && "ml-4"
+                  )}
+                >
                   <Bell size={20} />
                   <Badge className="absolute -right-1 -top-1">3</Badge>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-80">
+                <DropdownMenuLabel>{t('common.notifications')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {/* Add notification items here */}
               </DropdownMenuContent>
@@ -297,7 +389,13 @@ function Layout() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2">
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "gap-2 transition-colors",
+                    isRTL && "ml-4"
+                  )}
+                >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.avatar} />
                     <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
@@ -305,18 +403,18 @@ function Layout() {
                   {!isMobile && <span>{user?.name}</span>}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align={isRTL ? "start" : "end"}>
                 <DropdownMenuItem onClick={handleProfileClick}>
-                  <User className="mr-2 h-4 w-4" />
+                  <User className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
                   <span>{t('profile.title')}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
+                <DropdownMenuItem onClick={handleSettingsClick}>
+                  <Settings className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
                   <span>{t('settings.title')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
                   <span>{t('auth.logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
