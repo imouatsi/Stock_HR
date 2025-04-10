@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export const WarehouseDetail: React.FC = () => {
+const WarehouseDetail: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ export const WarehouseDetail: React.FC = () => {
 
   const handleDelete = async () => {
     if (!warehouse) return;
-    
+
     if (window.confirm(t('stock.warehouses.confirmDelete'))) {
       try {
         await warehouseService.deleteWarehouse(warehouse._id);
@@ -170,7 +170,7 @@ export const WarehouseDetail: React.FC = () => {
               <TabsTrigger value="inventory">{t('stock.warehouses.inventory')}</TabsTrigger>
               <TabsTrigger value="movements">{t('stock.warehouses.movements')}</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="details">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -180,7 +180,7 @@ export const WarehouseDetail: React.FC = () => {
                     </h3>
                     <p>{warehouse.code}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.warehouses.name')}
@@ -191,7 +191,7 @@ export const WarehouseDetail: React.FC = () => {
                       <p>🇩🇿 {warehouse.name.ar}</p>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.warehouses.address')}
@@ -199,7 +199,7 @@ export const WarehouseDetail: React.FC = () => {
                     <p>{warehouse.address}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -207,7 +207,7 @@ export const WarehouseDetail: React.FC = () => {
                     </h3>
                     <p>{getManagerName(warehouse.manager)}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.warehouses.status')}
@@ -220,7 +220,7 @@ export const WarehouseDetail: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
@@ -235,7 +235,7 @@ export const WarehouseDetail: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                     {t('common.updatedInfo')}
@@ -251,13 +251,13 @@ export const WarehouseDetail: React.FC = () => {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="inventory">
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-md text-center">
                 <p>{t('stock.warehouses.inventoryTabComingSoon')}</p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="movements">
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-md text-center">
                 <p>{t('stock.warehouses.movementsTabComingSoon')}</p>
@@ -277,3 +277,5 @@ export const WarehouseDetail: React.FC = () => {
     </div>
   );
 };
+
+export default WarehouseDetail;

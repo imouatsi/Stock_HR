@@ -42,7 +42,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
-export const Products: React.FC = () => {
+const Products: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -338,3 +338,5 @@ export const Products: React.FC = () => {
     </div>
   );
 };
+
+export default Products;

@@ -5,7 +5,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { dashboardService, DashboardData } from '../../../services/dashboardService';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const Dashboard = () => {
+const Dashboard = () => {
   const { t } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -15,20 +15,16 @@ export const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        console.log('Dashboard component: Fetching data...');
         const dashboardData = await dashboardService.getDashboardData();
+        console.log('Dashboard component: Data received:', dashboardData);
         setData(dashboardData);
         // Clear any previous errors
         setError(null);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
         setError(t('dashboard.error.loading'));
-        // Use mock data as fallback
-        setData({
-          totalRevenue: 45231.89,
-          activeContracts: 24,
-          totalUsers: 573,
-          inventoryItems: 1432
-        });
+        // Don't set data to null, keep any previous data
       } finally {
         setLoading(false);
       }
@@ -113,3 +109,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+export default Dashboard;

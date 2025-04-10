@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 
 // SCF Chart of Accounts Component
-export const ChartOfAccounts: React.FC = () => {
+const ChartOfAccounts: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<SCFAccount[]>([]);
@@ -531,4 +531,6 @@ export const ChartOfAccounts: React.FC = () => {
     </div>
   );
 };
+
+export default ChartOfAccounts;
 

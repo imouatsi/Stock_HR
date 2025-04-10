@@ -40,7 +40,7 @@ import { stockService, type PurchaseOrder, type Supplier, type InventoryItem } f
 import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 
-export const PurchaseOrders: React.FC = () => {
+const PurchaseOrders: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
@@ -472,3 +472,4 @@ export const PurchaseOrders: React.FC = () => {
   );
 };
 
+export default PurchaseOrders;

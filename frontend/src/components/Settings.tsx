@@ -13,7 +13,7 @@ interface SettingsFormData {
   language: string;
 }
 
-export const Settings: React.FC = () => {
+const Settings: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [formData, setFormData] = useState<SettingsFormData>({
@@ -92,4 +92,6 @@ export const Settings: React.FC = () => {
       </Card>
     </div>
   );
-}; 
+};
+
+export default Settings;

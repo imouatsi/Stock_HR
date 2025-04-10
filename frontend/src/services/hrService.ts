@@ -83,51 +83,7 @@ class HRService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching employees:', error);
-      // Fallback to mock data if API fails
-      return [
-        {
-          _id: '1',
-          firstName: 'John',
-          lastName: 'Doe',
-          department: 'IT',
-          position: 'Software Developer',
-          status: 'ACTIVE',
-          hireDate: '2022-01-15',
-          salary: 75000,
-          phoneNumber: '+1-555-123-4567',
-          phone: '+1-555-123-4567',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          _id: '2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          department: 'HR',
-          position: 'HR Manager',
-          status: 'ACTIVE',
-          hireDate: '2021-06-10',
-          salary: 85000,
-          phoneNumber: '+1-555-987-6543',
-          phone: '+1-555-987-6543',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          _id: '3',
-          firstName: 'Michael',
-          lastName: 'Johnson',
-          department: 'Finance',
-          position: 'Accountant',
-          status: 'INACTIVE',
-          hireDate: '2020-03-22',
-          salary: 65000,
-          phoneNumber: '+1-555-456-7890',
-          phone: '+1-555-456-7890',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
+      throw error;
     }
   }
 
@@ -137,27 +93,10 @@ class HRService {
       if (response && response.data && response.data.data) {
         return response.data.data.employee;
       }
-
-      // If API call succeeds but doesn't return expected data format
-      // Create a mock response with the data we sent
-      const mockId = Math.random().toString(36).substring(2, 15);
-      return {
-        _id: mockId,
-        ...employeeData as any,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as Employee;
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error creating employee:', error);
-
-      // Create a mock response with the data we sent
-      const mockId = Math.random().toString(36).substring(2, 15);
-      return {
-        _id: mockId,
-        ...employeeData as any,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as Employee;
+      throw error;
     }
   }
 
@@ -187,36 +126,14 @@ class HRService {
   // Department methods
   async getAllDepartments(): Promise<any[]> {
     try {
-      // Return mock data for now
-      return [
-        {
-          id: '1',
-          name: 'IT',
-          description: 'Information Technology Department',
-          manager: 'John Doe',
-          employeeCount: 15,
-          status: 'active'
-        },
-        {
-          id: '2',
-          name: 'HR',
-          description: 'Human Resources Department',
-          manager: 'Jane Smith',
-          employeeCount: 8,
-          status: 'active'
-        },
-        {
-          id: '3',
-          name: 'Finance',
-          description: 'Finance and Accounting Department',
-          manager: 'Michael Johnson',
-          employeeCount: 12,
-          status: 'active'
-        }
-      ];
+      const response = await api.get('/hr/departments');
+      if (response && response.data && response.data.data) {
+        return response.data.data.departments || [];
+      }
+      throw new Error('Invalid response format');
     } catch (error) {
-      this.handleError(error);
-      return [];
+      console.error('Error fetching departments:', error);
+      throw error;
     }
   }
 
@@ -258,36 +175,14 @@ class HRService {
   // Position methods
   async getAllPositions(): Promise<any[]> {
     try {
-      // Return mock data for now
-      return [
-        {
-          id: '1',
-          title: 'Software Developer',
-          department: 'IT',
-          description: 'Develops software applications',
-          salaryRange: { min: 70000, max: 100000 },
-          status: 'active'
-        },
-        {
-          id: '2',
-          title: 'HR Manager',
-          department: 'HR',
-          description: 'Manages HR operations',
-          salaryRange: { min: 80000, max: 120000 },
-          status: 'active'
-        },
-        {
-          id: '3',
-          title: 'Accountant',
-          department: 'Finance',
-          description: 'Handles financial records and transactions',
-          salaryRange: { min: 60000, max: 90000 },
-          status: 'active'
-        }
-      ];
+      const response = await api.get('/hr/positions');
+      if (response && response.data && response.data.data) {
+        return response.data.data.positions || [];
+      }
+      throw new Error('Invalid response format');
     } catch (error) {
-      this.handleError(error);
-      return [];
+      console.error('Error fetching positions:', error);
+      throw error;
     }
   }
 
@@ -329,48 +224,14 @@ class HRService {
   // Leave Request methods
   async getAllLeaveRequests(): Promise<any[]> {
     try {
-      // Return mock data for now
-      return [
-        {
-          id: '1',
-          employee: {
-            id: '1',
-            name: 'John Doe'
-          },
-          type: 'vacation',
-          startDate: '2023-07-10',
-          endDate: '2023-07-15',
-          status: 'approved',
-          reason: 'Annual vacation'
-        },
-        {
-          id: '2',
-          employee: {
-            id: '2',
-            name: 'Jane Smith'
-          },
-          type: 'sick',
-          startDate: '2023-08-05',
-          endDate: '2023-08-07',
-          status: 'approved',
-          reason: 'Flu'
-        },
-        {
-          id: '3',
-          employee: {
-            id: '3',
-            name: 'Michael Johnson'
-          },
-          type: 'personal',
-          startDate: '2023-09-20',
-          endDate: '2023-09-22',
-          status: 'pending',
-          reason: 'Family event'
-        }
-      ];
+      const response = await api.get('/hr/leave-requests');
+      if (response && response.data && response.data.data) {
+        return response.data.data.leaveRequests || [];
+      }
+      throw new Error('Invalid response format');
     } catch (error) {
-      this.handleError(error);
-      return [];
+      console.error('Error fetching leave requests:', error);
+      throw error;
     }
   }
 
@@ -412,63 +273,14 @@ class HRService {
   // Performance Review methods
   async getAllPerformanceReviews(): Promise<any[]> {
     try {
-      // Return mock data for now
-      return [
-        {
-          id: '1',
-          employee: {
-            id: '1',
-            name: 'John Doe'
-          },
-          reviewer: {
-            id: '2',
-            name: 'Jane Smith'
-          },
-          reviewDate: '2023-06-15',
-          period: 'Q2 2023',
-          rating: 4.5,
-          status: 'completed',
-          strengths: 'Technical skills, teamwork',
-          areasForImprovement: 'Communication'
-        },
-        {
-          id: '2',
-          employee: {
-            id: '2',
-            name: 'Jane Smith'
-          },
-          reviewer: {
-            id: '3',
-            name: 'Michael Johnson'
-          },
-          reviewDate: '2023-06-20',
-          period: 'Q2 2023',
-          rating: 4.8,
-          status: 'completed',
-          strengths: 'Leadership, organization',
-          areasForImprovement: 'Delegation'
-        },
-        {
-          id: '3',
-          employee: {
-            id: '3',
-            name: 'Michael Johnson'
-          },
-          reviewer: {
-            id: '1',
-            name: 'John Doe'
-          },
-          reviewDate: '2023-07-05',
-          period: 'Q2 2023',
-          rating: 4.2,
-          status: 'in-progress',
-          strengths: 'Attention to detail, analytical skills',
-          areasForImprovement: 'Time management'
-        }
-      ];
+      const response = await api.get('/hr/performance-reviews');
+      if (response && response.data && response.data.data) {
+        return response.data.data.performanceReviews || [];
+      }
+      throw new Error('Invalid response format');
     } catch (error) {
-      this.handleError(error);
-      return [];
+      console.error('Error fetching performance reviews:', error);
+      throw error;
     }
   }
 

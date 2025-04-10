@@ -1,19 +1,37 @@
 import { Request, Response, NextFunction } from 'express';
 import { IUser } from '../interfaces/user.interface';
+import { verifyToken } from '../utils/auth';
+import User from '../models/user.model';
+import { AppError } from '../utils/appError';
 
-// This is a temporary middleware to bypass authentication
-// In a real application, this would verify the user's token and set req.user
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  // Set a dummy user for testing
-  // Using 'as any as IUser' to bypass TypeScript's strict type checking
-  // In a real application, we would create a proper IUser object
-  req.user = {
-    _id: '123456789012345678901234',
-    username: 'testuser',
-    role: 'admin',
-    isAuthorized: true,
-    isActive: true,
-    comparePassword: async () => true
-  } as any as IUser;
-  next();
+export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // 1) Getting token and check if it's there
+    let token;
+    if (req.headers.authorization?.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
+      return next(new AppError('You are not logged in! Please log in to get access.', 401));
+    }
+
+    // 2) Verification token
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return next(new AppError('Invalid token! Please log in again.', 401));
+    }
+
+    // 3) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next(new AppError('The user belonging to this token no longer exists.', 401));
+    }
+
+    // GRANT ACCESS TO PROTECTED ROUTE
+    req.user = currentUser;
+    next();
+  } catch (error) {
+    return next(new AppError('Authentication failed', 401));
+  }
 };

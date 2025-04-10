@@ -10,7 +10,7 @@ import { stockService, type StockCategory } from '../../../services/stockService
 
 // Using StockCategory from stockService
 
-export const Categories: React.FC = () => {
+const Categories: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -212,3 +212,5 @@ export const Categories: React.FC = () => {
     </div>
   );
 };
+
+export default Categories;

@@ -19,7 +19,7 @@ export type Department = {
   status: 'active' | 'inactive';
 };
 
-export const columns: ColumnDef<Department>[] = [
+export const columns: ColumnDef<Department, unknown>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
@@ -84,4 +84,4 @@ export const columns: ColumnDef<Department>[] = [
       );
     },
   },
-]; 
+];

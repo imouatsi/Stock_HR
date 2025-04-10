@@ -16,6 +16,7 @@ import suppliersRoutes from './routes/suppliers.routes';
 import movementsRoutes from './routes/movements.routes';
 import purchaseOrdersRoutes from './routes/purchase-orders.routes';
 import categoriesRoutes from './routes/categories.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 // New Stock Module Routes
 import productRoutes from './routes/product.routes';
@@ -32,12 +33,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 // Serve static files from the views directory
 app.use(express.static(path.join(__dirname, 'views')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/backup', backupRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/stock/purchase-orders', purchaseOrdersRoutes);
 app.use('/api/stock/categories', categoriesRoutes);
 app.use('/api/stock', stockRoutes);

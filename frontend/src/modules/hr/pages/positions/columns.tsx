@@ -20,7 +20,7 @@ export type Position = {
   status: 'active' | 'inactive';
 };
 
-export const columns: ColumnDef<Position>[] = [
+export const columns: ColumnDef<Position, unknown>[] = [
   {
     accessorKey: 'title',
     header: 'Title',
@@ -98,4 +98,4 @@ export const columns: ColumnDef<Position>[] = [
       );
     },
   },
-]; 
+];

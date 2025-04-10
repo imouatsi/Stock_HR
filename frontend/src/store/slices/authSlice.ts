@@ -9,6 +9,10 @@ interface AuthState {
   error: string | null;
 }
 
+// Clear any existing token to force login
+localStorage.removeItem('token');
+localStorage.removeItem('user');
+
 const initialState: AuthState = {
   user: null,
   token: null,
@@ -60,4 +64,4 @@ export const {
   setProfile,
 } = authSlice.actions;
 
-export const authReducer = authSlice.reducer; 
+export const authReducer = authSlice.reducer;

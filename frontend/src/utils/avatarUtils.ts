@@ -3,7 +3,7 @@
  */
 export function getRoleAvatar(role?: string): string {
   if (!role) return 'superadmin.png';
-  
+
   // Map role names to image filenames
   const roleImageMap: Record<string, string> = {
     'superadmin': 'superadmin.png',
@@ -17,7 +17,7 @@ export function getRoleAvatar(role?: string): string {
     'manager': 'admin.png', // Fallback to admin for manager
     'employee': 'admin.png', // Fallback to admin for employee
   };
-  
+
   // Return the mapped image or default to superadmin if no mapping exists
   return roleImageMap[role.toLowerCase()] || 'superadmin.png';
 }

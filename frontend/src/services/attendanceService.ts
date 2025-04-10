@@ -60,8 +60,7 @@ class AttendanceService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching attendance records:', error);
-      // Return mock data if API fails
-      return this.getMockAttendanceRecords();
+      throw error;
     }
   }
 
@@ -75,8 +74,7 @@ class AttendanceService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error(`Error fetching attendance records for employee ${employeeId}:`, error);
-      // Return mock data if API fails
-      return this.getMockAttendanceRecords().filter(record => record.employeeId === employeeId);
+      throw error;
     }
   }
 
@@ -90,7 +88,7 @@ class AttendanceService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error creating attendance record:', error);
-      
+
       // Create a mock response with the data we sent
       const mockId = Math.random().toString(36).substring(2, 15);
       return {
@@ -124,12 +122,12 @@ class AttendanceService {
   async recordCheckIn(employeeId: string, employeeName?: string): Promise<AttendanceRecord> {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    
+
     // Check if there's already a record for today
     try {
       const records = await this.getEmployeeAttendanceRecords(employeeId);
       const todayRecord = records.find(record => record.date.startsWith(today));
-      
+
       if (todayRecord) {
         // Update existing record
         return this.updateAttendanceRecord(todayRecord._id, {
@@ -156,19 +154,19 @@ class AttendanceService {
   async recordCheckOut(employeeId: string): Promise<AttendanceRecord> {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    
+
     // Find today's record
     try {
       const records = await this.getEmployeeAttendanceRecords(employeeId);
       const todayRecord = records.find(record => record.date.startsWith(today));
-      
+
       if (todayRecord) {
         // Calculate working hours and overtime
         const checkIn = todayRecord.checkIn ? new Date(todayRecord.checkIn) : new Date(today + 'T09:00:00');
         const workingHours = this.calculateWorkingHours(checkIn, now);
         const overtime = Math.max(0, workingHours - STANDARD_WORKING_HOURS);
         const overtimeRateType = this.getOvertimeRateType(now);
-        
+
         // Update record
         return this.updateAttendanceRecord(todayRecord._id, {
           checkOut: now.toISOString(),
@@ -202,16 +200,16 @@ class AttendanceService {
   // Get overtime rate type based on day
   getOvertimeRateType(date: Date): OvertimeRateType {
     const day = date.getDay();
-    
+
     // In Algeria, the weekend is Friday and Saturday
     if (day === 5 || day === 6) {
       return OvertimeRateType.WEEKEND;
     }
-    
+
     // Check if it's a public holiday
     const dateString = date.toISOString().split('T')[0];
     const isHoliday = this.isPublicHoliday(dateString);
-    
+
     return isHoliday ? OvertimeRateType.HOLIDAY : OvertimeRateType.REGULAR;
   }
 
@@ -232,7 +230,7 @@ class AttendanceService {
       '2023-07-19', // Islamic New Year
       '2023-09-27', // Mawlid
     ];
-    
+
     return publicHolidays.includes(dateString);
   }
 
@@ -266,70 +264,9 @@ class AttendanceService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error(`Error fetching attendance summary for employee ${employeeId}:`, error);
-      
-      // Calculate from mock data if API fails
-      const records = this.getMockAttendanceRecords().filter(record => {
-        const recordDate = new Date(record.date);
-        return record.employeeId === employeeId && 
-               recordDate.getFullYear() === year && 
-               recordDate.getMonth() === month - 1;
-      });
-      
-      return {
-        present: records.filter(r => r.status === AttendanceStatus.PRESENT).length,
-        absent: records.filter(r => r.status === AttendanceStatus.ABSENT).length,
-        late: records.filter(r => r.status === AttendanceStatus.LATE).length,
-        leave: records.filter(r => r.status === AttendanceStatus.LEAVE).length,
-        totalWorkingHours: records.reduce((sum, r) => sum + (r.workingHours || 0), 0),
-        totalOvertimeHours: records.reduce((sum, r) => sum + (r.overtime || 0), 0)
-      };
-    }
-  }
 
-  // Mock data for testing
-  private getMockAttendanceRecords(): AttendanceRecord[] {
-    return [
-      {
-        _id: '1',
-        employeeId: '1',
-        employeeName: 'John Doe',
-        date: '2023-08-01',
-        checkIn: '2023-08-01T08:55:00Z',
-        checkOut: '2023-08-01T17:05:00Z',
-        status: AttendanceStatus.PRESENT,
-        workingHours: 8.17,
-        overtime: 0.17,
-        overtimeRateType: OvertimeRateType.REGULAR,
-        createdAt: '2023-08-01T08:55:00Z',
-        updatedAt: '2023-08-01T17:05:00Z'
-      },
-      {
-        _id: '2',
-        employeeId: '1',
-        employeeName: 'John Doe',
-        date: '2023-08-02',
-        checkIn: '2023-08-02T09:10:00Z',
-        checkOut: '2023-08-02T17:00:00Z',
-        status: AttendanceStatus.LATE,
-        workingHours: 7.83,
-        createdAt: '2023-08-02T09:10:00Z',
-        updatedAt: '2023-08-02T17:00:00Z'
-      },
-      {
-        _id: '3',
-        employeeId: '2',
-        employeeName: 'Jane Smith',
-        date: '2023-08-01',
-        checkIn: '2023-08-01T08:45:00Z',
-        checkOut: '2023-08-01T18:30:00Z',
-        status: AttendanceStatus.PRESENT,
-        workingHours: 9.75,
-        overtime: 1.75,
-        overtimeRateType: OvertimeRateType.REGULAR,
-        createdAt: '2023-08-01T08:45:00Z',
-        updatedAt: '2023-08-01T18:30:00Z'
-      }
-    ];
+      throw error;
+    }
   }
 }
 

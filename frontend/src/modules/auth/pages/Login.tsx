@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTranslation } from '../../../hooks/useTranslation';
 
-export const Login: React.FC = () => {
+const Login: React.FC = () => {
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -83,3 +83,5 @@ export const Login: React.FC = () => {
     </div>
   );
 }
+
+export default Login;

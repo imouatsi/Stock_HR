@@ -21,7 +21,7 @@ export type Contract = {
   status: "active" | "pending" | "expired"
 }
 
-export const columns: ColumnDef<Contract>[] = [
+export const columns: ColumnDef<Contract, unknown>[] = [
   {
     accessorKey: "contractNumber",
     header: "Contract Number",

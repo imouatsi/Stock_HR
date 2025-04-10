@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { hrService } from '@/services/hrService';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './leave-requests/columns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
-interface LeaveRequest {
-  id: string;
-  employee: string;
-  type: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  reason?: string;
-}
+import type { LeaveRequest } from './leave-requests/columns';
 
 export default function LeaveRequests() {
-  const { t } = useTranslation();
+
   const { toast } = useToast();
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,11 +44,49 @@ export default function LeaveRequests() {
     }
   };
 
+  const [isNewRequestModalOpen, setIsNewRequestModalOpen] = useState(false);
+  const [newRequest, setNewRequest] = useState({
+    employeeId: '',
+    employeeName: '',
+    type: 'annual',
+    startDate: '',
+    endDate: '',
+    reason: ''
+  });
+
   const handleNewRequest = () => {
-    toast({
-      title: 'Not Implemented',
-      description: 'This feature is coming soon.',
-    });
+    setIsNewRequestModalOpen(true);
+  };
+
+  const handleSubmitRequest = async () => {
+    try {
+      setIsLoading(true);
+      await hrService.createLeaveRequest(newRequest);
+      toast({
+        title: 'Success',
+        description: 'Leave request submitted successfully',
+        variant: 'default',
+      });
+      setIsNewRequestModalOpen(false);
+      setNewRequest({
+        employeeId: '',
+        employeeName: '',
+        type: 'annual',
+        startDate: '',
+        endDate: '',
+        reason: ''
+      });
+      fetchLeaveRequests();
+    } catch (error) {
+      console.error('Error submitting leave request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to submit leave request',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,6 +104,86 @@ export default function LeaveRequests() {
       ) : (
         <DataTable columns={columns} data={leaveRequests} searchKey="employee" />
       )}
+
+      {/* New Leave Request Modal */}
+      <Dialog open={isNewRequestModalOpen} onOpenChange={setIsNewRequestModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Submit New Leave Request</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Employee ID:</div>
+              <Input
+                value={newRequest.employeeId}
+                onChange={(e) => setNewRequest({...newRequest, employeeId: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Employee Name:</div>
+              <Input
+                value={newRequest.employeeName}
+                onChange={(e) => setNewRequest({...newRequest, employeeName: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Leave Type:</div>
+              <div className="col-span-3">
+                <select
+                  value={newRequest.type}
+                  onChange={(e) => setNewRequest({...newRequest, type: e.target.value})}
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2"
+                >
+                  <option value="annual">Annual Leave</option>
+                  <option value="sick">Sick Leave</option>
+                  <option value="maternity">Maternity Leave</option>
+                  <option value="paternity">Paternity Leave</option>
+                  <option value="unpaid">Unpaid Leave</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Start Date:</div>
+              <Input
+                type="date"
+                value={newRequest.startDate}
+                onChange={(e) => setNewRequest({...newRequest, startDate: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">End Date:</div>
+              <Input
+                type="date"
+                value={newRequest.endDate}
+                onChange={(e) => setNewRequest({...newRequest, endDate: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Reason:</div>
+              <Textarea
+                value={newRequest.reason}
+                onChange={(e) => setNewRequest({...newRequest, reason: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsNewRequestModalOpen(false)}>Cancel</Button>
+            <Button type="button" onClick={handleSubmitRequest}>Submit Request</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

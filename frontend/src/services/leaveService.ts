@@ -73,8 +73,7 @@ class LeaveService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching leave requests:', error);
-      // Return mock data if API fails
-      return this.getMockLeaveRequests();
+      throw error;
     }
   }
 
@@ -88,8 +87,7 @@ class LeaveService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error(`Error fetching leave requests for employee ${employeeId}:`, error);
-      // Return mock data if API fails
-      return this.getMockLeaveRequests().filter(leave => leave.employeeId === employeeId);
+      throw error;
     }
   }
 
@@ -103,22 +101,8 @@ class LeaveService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error creating leave request:', error);
-      
-      // Create a mock response with the data we sent
-      const mockId = Math.random().toString(36).substring(2, 15);
-      return {
-        _id: mockId,
-        employeeId: leaveData.employeeId || '',
-        employeeName: leaveData.employeeName || 'Employee Name',
-        type: leaveData.type || LeaveType.ANNUAL,
-        startDate: leaveData.startDate || new Date().toISOString(),
-        endDate: leaveData.endDate || new Date().toISOString(),
-        duration: leaveData.duration || 1,
-        reason: leaveData.reason || '',
-        status: LeaveStatus.PENDING,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+
+      throw error;
     }
   }
 
@@ -200,55 +184,6 @@ class LeaveService {
       curDate.setDate(curDate.getDate() + 1);
     }
     return count;
-  }
-
-  // Mock data for testing
-  private getMockLeaveRequests(): LeaveRequest[] {
-    return [
-      {
-        _id: '1',
-        employeeId: '1',
-        employeeName: 'John Doe',
-        type: LeaveType.ANNUAL,
-        startDate: '2023-08-01T00:00:00Z',
-        endDate: '2023-08-15T00:00:00Z',
-        duration: 10, // Business days
-        reason: 'Summer vacation',
-        status: LeaveStatus.APPROVED,
-        approvedBy: 'admin',
-        approvedAt: '2023-07-15T10:30:00Z',
-        createdAt: '2023-07-10T09:15:00Z',
-        updatedAt: '2023-07-15T10:30:00Z'
-      },
-      {
-        _id: '2',
-        employeeId: '2',
-        employeeName: 'Jane Smith',
-        type: LeaveType.SICK,
-        startDate: '2023-07-20T00:00:00Z',
-        endDate: '2023-07-25T00:00:00Z',
-        duration: 4, // Business days
-        reason: 'Flu',
-        status: LeaveStatus.APPROVED,
-        cnasJustification: 'CNAS-2023-07-20-123',
-        approvedBy: 'admin',
-        approvedAt: '2023-07-20T11:45:00Z',
-        createdAt: '2023-07-20T08:30:00Z',
-        updatedAt: '2023-07-20T11:45:00Z'
-      },
-      {
-        _id: '3',
-        employeeId: '3',
-        employeeName: 'Michael Johnson',
-        type: LeaveType.MATERNITY,
-        startDate: '2023-09-01T00:00:00Z',
-        endDate: '2023-12-08T00:00:00Z', // 14 weeks
-        duration: 70, // Business days (14 weeks)
-        status: LeaveStatus.PENDING,
-        createdAt: '2023-07-25T14:20:00Z',
-        updatedAt: '2023-07-25T14:20:00Z'
-      }
-    ];
   }
 }
 

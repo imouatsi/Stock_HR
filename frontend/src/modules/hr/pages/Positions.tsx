@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { hrService } from '@/services/hrService';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './positions/columns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
-interface Position {
-  id: string;
-  title: string;
-  department: string;
-  minSalary?: number;
-  maxSalary?: number;
-  description?: string;
-  status?: string;
-}
+import type { Position } from './positions/columns';
 
 export default function Positions() {
-  const { t } = useTranslation();
+
   const { toast } = useToast();
   const [positions, setPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,11 +44,49 @@ export default function Positions() {
     }
   };
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newPosition, setNewPosition] = useState({
+    title: '',
+    department: '',
+    minSalary: 0,
+    maxSalary: 0,
+    description: '',
+    status: 'active'
+  });
+
   const handleAddPosition = () => {
-    toast({
-      title: 'Not Implemented',
-      description: 'This feature is coming soon.',
-    });
+    setIsAddModalOpen(true);
+  };
+
+  const handleSubmitPosition = async () => {
+    try {
+      setIsLoading(true);
+      await hrService.createPosition(newPosition);
+      toast({
+        title: 'Success',
+        description: 'Position added successfully',
+        variant: 'default',
+      });
+      setIsAddModalOpen(false);
+      setNewPosition({
+        title: '',
+        department: '',
+        minSalary: 0,
+        maxSalary: 0,
+        description: '',
+        status: 'active'
+      });
+      fetchPositions();
+    } catch (error) {
+      console.error('Error adding position:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add position',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,6 +104,83 @@ export default function Positions() {
       ) : (
         <DataTable columns={columns} data={positions || []} searchKey="title" />
       )}
+
+      {/* Add Position Modal */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Position</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Title:</div>
+              <Input
+                value={newPosition.title}
+                onChange={(e) => setNewPosition({...newPosition, title: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Department:</div>
+              <Input
+                value={newPosition.department}
+                onChange={(e) => setNewPosition({...newPosition, department: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Min Salary (DZD):</div>
+              <Input
+                type="number"
+                value={newPosition.minSalary}
+                onChange={(e) => setNewPosition({...newPosition, minSalary: parseInt(e.target.value) || 0})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Max Salary (DZD):</div>
+              <Input
+                type="number"
+                value={newPosition.maxSalary}
+                onChange={(e) => setNewPosition({...newPosition, maxSalary: parseInt(e.target.value) || 0})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Description:</div>
+              <Textarea
+                value={newPosition.description}
+                onChange={(e) => setNewPosition({...newPosition, description: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Status:</div>
+              <div className="col-span-3">
+                <select
+                  value={newPosition.status}
+                  onChange={(e) => setNewPosition({...newPosition, status: e.target.value})}
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+            <Button type="button" onClick={handleSubmitPosition}>Add Position</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

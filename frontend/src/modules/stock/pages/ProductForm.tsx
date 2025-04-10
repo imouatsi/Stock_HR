@@ -28,7 +28,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export const ProductForm: React.FC = () => {
+const ProductForm: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -158,7 +158,7 @@ export const ProductForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!product.name.en || !product.name.fr || !product.name.ar) {
       toast({
@@ -519,3 +519,5 @@ export const ProductForm: React.FC = () => {
     </div>
   );
 };
+
+export default ProductForm;

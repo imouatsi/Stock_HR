@@ -19,7 +19,7 @@ export type PerformanceReview = {
   status: 'pending' | 'completed';
 };
 
-export const columns: ColumnDef<PerformanceReview>[] = [
+export const columns: ColumnDef<PerformanceReview, unknown>[] = [
   {
     accessorKey: 'employee',
     header: 'Employee',
@@ -84,4 +84,4 @@ export const columns: ColumnDef<PerformanceReview>[] = [
       );
     },
   },
-]; 
+];

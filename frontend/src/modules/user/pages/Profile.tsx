@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 
-export const Profile: React.FC = () => {
+const Profile: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
 

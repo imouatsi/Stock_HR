@@ -96,8 +96,7 @@ class PayrollService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching payslips:', error);
-      // Return mock data if API fails
-      return this.getMockPayslips();
+      throw error;
     }
   }
 
@@ -111,8 +110,7 @@ class PayrollService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error(`Error fetching payslips for employee ${employeeId}:`, error);
-      // Return mock data if API fails
-      return this.getMockPayslips().filter(payslip => payslip.employeeId === employeeId);
+      throw error;
     }
   }
 
@@ -126,11 +124,7 @@ class PayrollService {
       throw new Error('Invalid response format');
     } catch (error) {
       console.error(`Error fetching payslip ${id}:`, error);
-      // Return mock data if API fails
-      const mockPayslip = this.getMockPayslips().find(payslip => payslip._id === id);
-      if (mockPayslip) {
-        return mockPayslip;
-      }
+
       throw error;
     }
   }
@@ -364,8 +358,10 @@ class PayrollService {
     }
   }
 
-  // Mock data for testing
+  // This method has been removed
   private getMockPayslips(): Payslip[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     return [
       {
         _id: '1',

@@ -1,0 +1,939 @@
+
+===== START FILE DUMP =====
+
+
+===== FILE: C:\Stock_HR\frontend\src\modules\auth\pages\Login.tsx =====
+import React, { useState } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useTranslation } from '../../../hooks/useTranslation';
+
+const Login: React.FC = () => {
+  const { t } = useTranslation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await login(username, password);
+      // Navigation is handled in the login function
+    } catch (err) {
+      setError(t('auth.error.invalidCredentials'));
+      console.error('Login error:', err);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-lg">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+            {t('auth.signIn')}
+          </h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4 rounded-md shadow-sm">
+            <div>
+              <label htmlFor="username" className="sr-only">
+                {t('auth.username')}
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                className="relative block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder={t('auth.username')}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                {t('auth.password')}
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="relative block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder={t('auth.password')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="text-center text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <button
+              type="submit"
+              className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              {t('auth.signInButton')}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
+
+===== FILE: C:\Stock_HR\frontend\src\pages\Login.tsx =====
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { Box, Button, TextField, Typography, Paper } from '@mui/material';
+import { login } from '../store/slices/authSlice';
+import { authService } from '../services/authService';
+
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await dispatch(login({ username, password })).unwrap();
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        bgcolor: 'background.default'
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: 400
+        }}
+      >
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          {t('auth.login')}
+        </Typography>
+        {error && (
+          <Typography color="error" align="center" gutterBottom>
+            {error}
+          </Typography>
+        )}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            margin="normal"
+            id="username"
+            label={t('auth.username')}
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            fullWidth
+            margin="normal"
+            name="password"
+            label={t('auth.password')}
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            {t('auth.login')}
+          </Button>
+        </form>
+      </Paper>
+    </Box>
+  );
+};
+
+export default Login;
+
+===== FILE: C:\Stock_HR\frontend\src\components\ProtectedRoute.tsx =====
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../features/store';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  roles?: string[];
+  permissions?: string[];
+}
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  roles = [],
+  permissions = []
+}) => {
+  // Get user from localStorage
+  const token = localStorage.getItem('token');
+  const userJson = localStorage.getItem('user');
+  const user = userJson ? JSON.parse(userJson) : null;
+  const location = useLocation();
+
+  // Check if user is authenticated
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check if user has required role
+  if (roles.length > 0 && user && !roles.includes(user.role)) {
+    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+===== FILE: C:\Stock_HR\frontend\src\modules\shared\components\ProtectedRoute.tsx =====
+import React, { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../hooks/useAuth';
+import { CircularProgress, Box } from '@mui/material';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  route?: {
+    roles?: string[];
+    permissions?: string[];
+  };
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, route }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
+  const [localLoading, setLocalLoading] = useState(false);
+
+  console.log('ProtectedRoute - Auth state:', { isAuthenticated, isLoading, user });
+
+  // Force check localStorage directly as a backup
+  const token = localStorage.getItem('token');
+  const userJson = localStorage.getItem('user');
+  const isTokenPresent = !!token;
+  const localUser = userJson ? JSON.parse(userJson) : null;
+
+  console.log('ProtectedRoute - Token in localStorage:', { isTokenPresent });
+  console.log('ProtectedRoute - User in localStorage:', localUser);
+
+  // Consider authenticated if either context says so OR we have a token and user in localStorage
+  const effectivelyAuthenticated = isAuthenticated || (isTokenPresent && !!localUser);
+
+  if (isLoading || localLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // If not authenticated and no token, redirect to login
+  if (!effectivelyAuthenticated) {
+    console.log('ProtectedRoute - Redirecting to login');
+    // Clear any stale data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check role permissions using either context user or localStorage user
+  const effectiveUser = user || localUser;
+  if (route?.roles && effectiveUser) {
+    const hasRequiredRole = route.roles.includes(effectiveUser.role);
+    if (!hasRequiredRole) {
+      console.log('ProtectedRoute - User does not have required role:', {
+        requiredRoles: route.roles,
+        userRole: effectiveUser.role
+      });
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  return <>{children}</>;
+};
+
+export default ProtectedRoute;
+
+===== FILE: C:\Stock_HR\frontend\src\contexts\AuthContext.tsx =====
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api.service';
+import { User } from '../types';
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => void;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  resetInactivityTimer: () => void;
+  setInactivityTimeout: (seconds: number) => void;
+  isAuthenticated: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Initialize user state from localStorage if available
+  const initialUser = (() => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+        localStorage.removeItem('user');
+      }
+    }
+    return null;
+  })();
+
+  const [user, setUser] = useState<User | null>(initialUser);
+  const [loading, setLoading] = useState(true);
+  const [inactivityTimeout, setInactivityTimeout] = useState<number>(
+    parseInt(localStorage.getItem('inactivityTimeout') || '600', 10)
+  ); // Default 10 minutes (600 seconds)
+  const navigate = useNavigate();
+
+  // Reference to the inactivity timer
+  const inactivityTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Setup inactivity timer
+  const setupInactivityTimer = () => {
+    // Clear any existing timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+
+    // Set new timer
+    inactivityTimerRef.current = setTimeout(() => {
+      // Log out the user when timer expires
+      if (user) {
+        console.log(`Logging out due to inactivity (${inactivityTimeout} seconds)`);
+        logout();
+      }
+    }, inactivityTimeout * 1000);
+  };
+
+  // Reset inactivity timer
+  const resetInactivityTimer = () => {
+    if (user) {
+      setupInactivityTimer();
+    }
+  };
+
+  // Set inactivity timeout
+  const setInactivityTimeoutValue = (seconds: number) => {
+    // Ensure the timeout is between 10 seconds and 10 minutes
+    const validatedTimeout = Math.max(10, Math.min(600, seconds));
+    setInactivityTimeout(validatedTimeout);
+
+    // Reset the timer with the new timeout
+    resetInactivityTimer();
+
+    // Save the setting to localStorage
+    localStorage.setItem('inactivityTimeout', validatedTimeout.toString());
+  };
+
+  // Initialize from localStorage and setup event listeners
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      const userJson = localStorage.getItem('user');
+      const savedTimeout = localStorage.getItem('inactivityTimeout');
+
+      // Restore saved timeout if available
+      if (savedTimeout) {
+        setInactivityTimeout(parseInt(savedTimeout, 10));
+      }
+
+      if (token) {
+        try {
+          // Attempt to validate the token with the backend
+          try {
+            // Make a request to validate the token
+            const response = await apiService.get('/auth/me');
+            console.log('Auth validation response:', response);
+
+            let userData;
+
+            // Try to use user data from localStorage first
+            if (userJson) {
+              userData = JSON.parse(userJson);
+            }
+            // If no user data in localStorage, use the response from /auth/me
+            else if (response && response.data && response.data.user) {
+              userData = response.data.user;
+            }
+            // Fallback to a default user object if all else fails
+            else {
+              userData = {
+                username: 'User',
+                role: 'superadmin'
+              };
+            }
+
+            // Validate that the user data has the required fields
+            if (!userData.role) {
+              // Set a default role if missing
+              userData.role = 'superadmin';
+            }
+
+            // Ensure username is present
+            if (!userData.username) {
+              userData.username = 'User';
+            }
+
+            // Update localStorage with the validated user data
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            setUser(userData);
+            console.log('User data set in AuthContext:', userData);
+
+            // Setup inactivity timer when user is loaded
+            setupInactivityTimer();
+
+            // Setup event listeners for user activity
+            const resetTimer = () => resetInactivityTimer();
+            window.addEventListener('mousemove', resetTimer);
+            window.addEventListener('mousedown', resetTimer);
+            window.addEventListener('keypress', resetTimer);
+            window.addEventListener('touchmove', resetTimer);
+            window.addEventListener('scroll', resetTimer);
+
+            return () => {
+              // Clean up event listeners
+              window.removeEventListener('mousemove', resetTimer);
+              window.removeEventListener('mousedown', resetTimer);
+              window.removeEventListener('keypress', resetTimer);
+              window.removeEventListener('touchmove', resetTimer);
+              window.removeEventListener('scroll', resetTimer);
+
+              // Clear the timer
+              if (inactivityTimerRef.current) {
+                clearTimeout(inactivityTimerRef.current);
+              }
+            };
+          } catch (apiError) {
+            console.error('Token validation failed:', apiError);
+            // Token is invalid, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            navigate('/login');
+          }
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          setUser(null);
+          navigate('/login');
+        }
+      } else {
+        // No token, ensure user is null
+        setUser(null);
+      }
+
+      setLoading(false);
+    };
+
+    validateToken();
+  }, [navigate]);
+
+  const login = async (username: string, password: string) => {
+    try {
+      setLoading(true);
+
+      // Connect to the backend API
+      const response = await apiService.post('/auth/login', { username, password });
+      console.log('Login response:', response);
+
+      // Check if the response has the expected format
+      if (response && response.status === 'success' && response.token) {
+        // Extract user data from the nested structure if it exists
+        const token = response.token;
+        const user = response.data?.user || {};
+
+        console.log('Extracted token and user:', { token, user });
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // Set user state
+        setUser(user);
+
+        // Immediately validate the token to ensure it works
+        try {
+          const validateResponse = await apiService.get('/auth/validate');
+          console.log('Token validation response:', validateResponse);
+
+          if (validateResponse && validateResponse.status === 'success') {
+            console.log('Token is valid, navigating to dashboard');
+            navigate('/dashboard');
+          } else {
+            console.error('Token validation failed:', validateResponse);
+            throw new Error('Token validation failed');
+          }
+        } catch (validationError) {
+          console.error('Error validating token:', validationError);
+          throw validationError;
+        }
+      } else {
+        console.error('Invalid response format:', response);
+        throw new Error('Invalid response format from API');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+
+    // Clear the inactivity timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+
+    navigate('/login');
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      // In a real app, you would call the API to change the password
+      // const response = await apiService.post('/auth/change-password', { currentPassword, newPassword });
+
+      // For development purposes, let's simulate a password change
+      if (currentPassword === 'Admin@123') {
+        // Password change successful
+        // In a real app, you might get a new token here
+        return Promise.resolve();
+      } else {
+        // Current password is incorrect
+        return Promise.reject(new Error('Current password is incorrect'));
+      }
+    } catch (error) {
+      console.error('Password change failed:', error);
+      return Promise.reject(error);
+    }
+  };
+
+  // Determine authentication status from both user state and localStorage token
+  const isAuthenticated = !!user || !!localStorage.getItem('token');
+
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+    changePassword,
+    resetInactivityTimer,
+    setInactivityTimeout: setInactivityTimeoutValue,
+    isAuthenticated,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+===== FILE: C:\Stock_HR\frontend\src\App.tsx =====
+import React, { useEffect, Suspense } from 'react';
+import { useTranslation } from './hooks/useTranslation';
+import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from './components/ui/toaster';
+import { AuthProvider } from './contexts/AuthContext';
+import MuiThemeProvider from './components/mui-theme-provider';
+import AppRoutes from './routes';
+// Roles are now handled in the AuthContext
+
+const App: React.FC = () => {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    // Set the dir attribute on the html element based on the language
+    document.documentElement.dir = i18n.dir();
+  }, [i18n]);
+
+  return (
+    <AuthProvider>
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <MuiThemeProvider>
+          <Suspense fallback={<div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div></div>}>
+            <AppRoutes />
+          </Suspense>
+          <Toaster />
+        </MuiThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;
+
+
+
+
+===== FILE: C:\Stock_HR\node_modules\@hello-pangea\dnd\src\view\drag-drop-context\app.tsx =====
+import React, { useEffect, useRef } from 'react';
+import { flushSync } from 'react-dom';
+import type { ReactNode, MutableRefObject } from 'react';
+import { bindActionCreators, Dispatch } from 'redux';
+import { Provider } from 'react-redux';
+import { useMemo, useCallback } from '../../use-memo-one';
+import { invariant } from '../../invariant';
+import createStore from '../../state/create-store';
+import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
+import canStartDrag from '../../state/can-start-drag';
+import scrollWindow from '../window/scroll-window';
+import createAutoScroller from '../../state/auto-scroller';
+import useStyleMarshal from '../use-style-marshal/use-style-marshal';
+import useFocusMarshal from '../use-focus-marshal';
+import useRegistry from '../../state/registry/use-registry';
+import type { Registry } from '../../state/registry/registry-types';
+import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
+import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
+import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
+import type {
+  DimensionMarshal,
+  Callbacks as DimensionMarshalCallbacks,
+} from '../../state/dimension-marshal/dimension-marshal-types';
+import type {
+  DraggableId,
+  State,
+  Responders,
+  Announce,
+  Sensor,
+  ElementId,
+} from '../../types';
+import type { Store, Action } from '../../state/store-types';
+import type { SetAppCallbacks, AppCallbacks } from './drag-drop-context-types';
+import StoreContext from '../context/store-context';
+import {
+  move,
+  publishWhileDragging,
+  updateDroppableScroll,
+  updateDroppableIsEnabled,
+  updateDroppableIsCombineEnabled,
+  collectionStarting,
+  flush,
+} from '../../state/action-creators';
+import isMovementAllowed from '../../state/is-movement-allowed';
+import useAnnouncer from '../use-announcer';
+import useHiddenTextElement from '../use-hidden-text-element';
+import AppContext from '../context/app-context';
+import type { AppContextValue } from '../context/app-context';
+import useStartupValidation from './use-startup-validation';
+import usePrevious from '../use-previous-ref';
+import { warning } from '../../dev-warning';
+import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
+import {
+  AutoScrollerOptions,
+  PartialAutoScrollerOptions,
+} from '../../state/auto-scroller/fluid-scroller/auto-scroller-options-types';
+import { defaultAutoScrollerOptions } from '../../state/auto-scroller/fluid-scroller/config';
+
+export interface Props extends Responders {
+  contextId: string;
+  setCallbacks: SetAppCallbacks;
+  nonce?: string;
+  // we do not technically need any children for this component
+  children: ReactNode | null;
+  // sensors
+  sensors?: Sensor[];
+  enableDefaultSensors?: boolean | null;
+  // screen reader
+  dragHandleUsageInstructions: string;
+  // options to exert more control over autoScroll
+  // eslint-disable-next-line react/no-unused-prop-types
+  autoScrollerOptions?: PartialAutoScrollerOptions;
+}
+
+const createResponders = (props: Props): Responders => ({
+  onBeforeCapture: (t) => {
+    const onBeforeCapureCallback = () => {
+      if (props.onBeforeCapture) {
+        props.onBeforeCapture(t);
+      }
+    };
+
+    // we must prevent automatic batching when using by calling flushSync
+    flushSync(onBeforeCapureCallback);
+  },
+  onBeforeDragStart: props.onBeforeDragStart,
+  onDragStart: props.onDragStart,
+  onDragEnd: props.onDragEnd,
+  onDragUpdate: props.onDragUpdate,
+});
+
+const createAutoScrollerOptions = (props: Props): AutoScrollerOptions => ({
+  ...defaultAutoScrollerOptions,
+  ...props.autoScrollerOptions,
+  durationDampening: {
+    ...defaultAutoScrollerOptions.durationDampening,
+    ...props.autoScrollerOptions,
+  },
+});
+
+type LazyStoreRef = MutableRefObject<Store | null>;
+
+function getStore(lazyRef: LazyStoreRef): Store {
+  invariant(lazyRef.current, 'Could not find store from lazy ref');
+  return lazyRef.current;
+}
+
+export default function App(props: Props) {
+  const {
+    contextId,
+    setCallbacks,
+    sensors,
+    nonce,
+    dragHandleUsageInstructions,
+  } = props;
+  const lazyStoreRef: LazyStoreRef = useRef<Store | null>(null);
+
+  useStartupValidation();
+
+  // lazy collection of responders using a ref - update on ever render
+  const lastPropsRef = usePrevious<Props>(props);
+
+  const getResponders: () => Responders = useCallback(() => {
+    return createResponders(lastPropsRef.current);
+  }, [lastPropsRef]);
+
+  const getAutoScrollerOptions = useCallback(() => {
+    return createAutoScrollerOptions(lastPropsRef.current);
+  }, [lastPropsRef]);
+
+  const announce: Announce = useAnnouncer(contextId);
+
+  const dragHandleUsageInstructionsId: ElementId = useHiddenTextElement({
+    contextId,
+    text: dragHandleUsageInstructions,
+  });
+  const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
+
+  const lazyDispatch: (a: Action) => void = useCallback(
+    (action: Action): void => {
+      getStore(lazyStoreRef).dispatch(action);
+    },
+    [],
+  );
+
+  const marshalCallbacks: DimensionMarshalCallbacks = useMemo(
+    () =>
+      bindActionCreators(
+        {
+          publishWhileDragging,
+          updateDroppableScroll,
+          updateDroppableIsEnabled,
+          updateDroppableIsCombineEnabled,
+          collectionStarting,
+        },
+        lazyDispatch as Dispatch,
+      ),
+    [lazyDispatch],
+  );
+
+  const registry: Registry = useRegistry();
+
+  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(() => {
+    return createDimensionMarshal(registry, marshalCallbacks);
+  }, [registry, marshalCallbacks]);
+
+  const autoScroller: AutoScroller = useMemo<AutoScroller>(
+    () =>
+      createAutoScroller({
+        scrollWindow,
+        scrollDroppable: dimensionMarshal.scrollDroppable,
+        getAutoScrollerOptions,
+        ...bindActionCreators(
+          {
+            move,
+          } as const,
+          lazyDispatch as Dispatch,
+        ),
+      }),
+    [dimensionMarshal.scrollDroppable, lazyDispatch, getAutoScrollerOptions],
+  );
+
+  const focusMarshal: FocusMarshal = useFocusMarshal(contextId);
+
+  const store: Store = useMemo<Store>(
+    () =>
+      createStore({
+        announce,
+        autoScroller,
+        dimensionMarshal,
+        focusMarshal,
+        getResponders,
+        styleMarshal,
+      }),
+    [
+      announce,
+      autoScroller,
+      dimensionMarshal,
+      focusMarshal,
+      getResponders,
+      styleMarshal,
+    ],
+  );
+
+  // Checking for unexpected store changes
+  if (process.env.NODE_ENV !== 'production') {
+    if (lazyStoreRef.current && lazyStoreRef.current !== store) {
+      warning('unexpected store change');
+    }
+  }
+
+  // assigning lazy store ref
+  lazyStoreRef.current = store;
+
+  const tryResetStore = useCallback(() => {
+    const current: Store = getStore(lazyStoreRef);
+    const state: State = current.getState();
+    if (state.phase !== 'IDLE') {
+      current.dispatch(flush());
+    }
+  }, []);
+
+  const isDragging = useCallback((): boolean => {
+    const state: State = getStore(lazyStoreRef).getState();
+
+    if (state.phase === 'DROP_ANIMATING') {
+      return true;
+    }
+
+    if (state.phase === 'IDLE') {
+      return false;
+    }
+
+    return state.isDragging;
+  }, []);
+
+  const appCallbacks: AppCallbacks = useMemo(
+    () => ({
+      isDragging,
+      tryAbort: tryResetStore,
+    }),
+    [isDragging, tryResetStore],
+  );
+
+  // doing this in render rather than a side effect so any errors on the
+  // initial mount are caught
+  setCallbacks(appCallbacks);
+
+  const getCanLift = useCallback(
+    (id: DraggableId) => canStartDrag(getStore(lazyStoreRef).getState(), id),
+    [],
+  );
+
+  const getIsMovementAllowed = useCallback(
+    () => isMovementAllowed(getStore(lazyStoreRef).getState()),
+    [],
+  );
+
+  const appContext: AppContextValue = useMemo(
+    () => ({
+      marshal: dimensionMarshal,
+      focus: focusMarshal,
+      contextId,
+      canLift: getCanLift,
+      isMovementAllowed: getIsMovementAllowed,
+      dragHandleUsageInstructionsId,
+      registry,
+    }),
+    [
+      contextId,
+      dimensionMarshal,
+      dragHandleUsageInstructionsId,
+      focusMarshal,
+      getCanLift,
+      getIsMovementAllowed,
+      registry,
+    ],
+  );
+
+  useSensorMarshal({
+    contextId,
+    store,
+    registry,
+    customSensors: sensors || null,
+    // default to 'true' unless 'false' is explicitly passed
+    enableDefaultSensors: props.enableDefaultSensors !== false,
+  });
+
+  // Clean store when unmounting
+  useEffect(() => {
+    return tryResetStore;
+  }, [tryResetStore]);
+
+  return (
+    <AppContext.Provider value={appContext}>
+      {/*
+        There are typings issues which prevent us from properly type the store context
+        see: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/dfec9e88385b279a94076c46a1cc4527ae657532/types/react-redux/index.d.ts#L482
+       */}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <Provider context={StoreContext as any} store={store}>
+        {props.children}
+      </Provider>
+    </AppContext.Provider>
+  );
+}
+
+===== END FILE DUMP =====

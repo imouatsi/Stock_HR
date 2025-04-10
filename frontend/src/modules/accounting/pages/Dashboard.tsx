@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 
-export const AccountingDashboard: React.FC = () => {
+const AccountingDashboard: React.FC = () => {
   const { t } = useTranslation();
 
   return (
@@ -57,4 +57,6 @@ export const AccountingDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default AccountingDashboard;
 

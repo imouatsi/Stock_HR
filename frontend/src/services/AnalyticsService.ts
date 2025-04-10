@@ -15,7 +15,7 @@ class LocalCache implements BaseCache {
   async get(key: string): Promise<any> {
     const item = localStorage.getItem(key);
     if (!item) return null;
-    
+
     const { value, expiry } = JSON.parse(item);
     if (expiry < Date.now()) {
       localStorage.removeItem(key);
@@ -72,7 +72,7 @@ const MOCK_DASHBOARD_DATA = {
 export class AnalyticsService {
   private static instance: AnalyticsService;
   private cache: BaseCache;
-  private useMockData: boolean = true; // Flag to use mock data when API isn't available
+  private useMockData: boolean = false; // Never use mock data
 
   private constructor() {
     this.cache = new LocalCache();
@@ -103,9 +103,8 @@ export class AnalyticsService {
       }
       throw new Error('Failed to fetch dashboard metrics');
     } catch (error) {
-      console.warn('Error fetching dashboard metrics, using mock data', error);
-      await this.cache.set('dashboard:metrics', MOCK_DASHBOARD_DATA, 300);
-      return MOCK_DASHBOARD_DATA;
+      console.error('Error fetching dashboard metrics:', error);
+      throw error;
     }
   }
 

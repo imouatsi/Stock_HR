@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export const Settings: React.FC = () => {
+const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();

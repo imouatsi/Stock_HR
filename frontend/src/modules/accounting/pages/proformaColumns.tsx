@@ -19,7 +19,7 @@ export interface ProformaInvoice {
   status: string;
 }
 
-export const columns: ColumnDef<ProformaInvoice>[] = [
+export const columns: ColumnDef<ProformaInvoice, unknown>[] = [
   {
     accessorKey: "invoiceNumber",
     header: "Invoice Number",

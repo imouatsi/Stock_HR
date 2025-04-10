@@ -82,22 +82,35 @@ class ApiService {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.error('Response error:', error.response.data);
+        console.log('Full error response:', error.response);
+
+        // Handle specific status codes
+        if (error.response.status === 401) {
+          // Clear token on authentication errors
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          return new Error('Unauthorized: Please log in again');
+        }
+
         return new Error(error.response.data?.message || 'An error occurred');
       }
       // Check if it's an Axios error with request but no response
       else if (error?.request) {
         // The request was made but no response was received
         console.error('Request error:', error.request);
+        console.log('Full error object:', error);
         return new Error('No response received from server');
       }
       // Check if it's a standard Error object
       else if (error instanceof Error) {
         console.error('Error:', error.message);
+        console.log('Full error object:', error);
         return error;
       }
       // Fallback for any other type of error
       else {
         console.error('Unknown error:', error);
+        console.log('Full error object:', error);
         return new Error('An unknown error occurred');
       }
     } catch (e) {
@@ -111,19 +124,6 @@ class ApiService {
       const response = await this.api.get<ApiResponse<T>>(endpoint, { params });
       return response.data;
     } catch (error) {
-      // If the endpoint is dashboard/stats, return a mock response instead of throwing
-      if (endpoint === '/dashboard/stats') {
-        console.warn('Using mock data for dashboard stats due to API error');
-        return {
-          success: true,
-          data: {
-            totalRevenue: 45231.89,
-            activeContracts: 24,
-            totalUsers: 573,
-            inventoryItems: 1432
-          } as unknown as T
-        };
-      }
       throw this.handleError(error);
     }
   }

@@ -17,7 +17,7 @@ router.get('/me', protect, (req, res) => {
   }
 
   const { _id, username, role, isAuthorized, isActive } = req.user;
-  
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -32,6 +32,21 @@ router.get('/me', protect, (req, res) => {
   });
 });
 
+// Get current user with token validation
+router.get('/validate', protect, (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid token'
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Token is valid'
+  });
+});
+
 // Admin only routes
 router.get('/admin', protect, restrictTo('admin'), (req, res) => {
   res.status(200).json({
@@ -40,4 +55,4 @@ router.get('/admin', protect, restrictTo('admin'), (req, res) => {
   });
 });
 
-export default router; 
+export default router;

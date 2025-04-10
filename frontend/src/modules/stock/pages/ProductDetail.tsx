@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export const ProductDetail: React.FC = () => {
+const ProductDetail: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export const ProductDetail: React.FC = () => {
 
   const handleDelete = async () => {
     if (!product) return;
-    
+
     if (window.confirm(t('stock.products.confirmDelete'))) {
       try {
         await productService.deleteProduct(product._id);
@@ -159,7 +159,7 @@ export const ProductDetail: React.FC = () => {
               <TabsTrigger value="stock">{t('stock.products.stock')}</TabsTrigger>
               <TabsTrigger value="history">{t('stock.products.history')}</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="details">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -169,14 +169,14 @@ export const ProductDetail: React.FC = () => {
                     </h3>
                     <p>{product.code}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.barcode')}
                     </h3>
                     <p>{product.barcode || t('common.notSpecified')}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.category')}
@@ -187,7 +187,7 @@ export const ProductDetail: React.FC = () => {
                         : product.category}
                     </p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.supplier')}
@@ -199,7 +199,7 @@ export const ProductDetail: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -207,7 +207,7 @@ export const ProductDetail: React.FC = () => {
                     </h3>
                     <p>{product.unit}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.purchasePrice')}
@@ -216,7 +216,7 @@ export const ProductDetail: React.FC = () => {
                       {product.purchasePrice.toLocaleString()} {t('common.currency')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.sellingPrice')}
@@ -225,14 +225,14 @@ export const ProductDetail: React.FC = () => {
                       {product.sellingPrice.toLocaleString()} {t('common.currency')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.tvaRate')}
                     </h3>
                     <p>{product.tvaRate}%</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {t('stock.products.status')}
@@ -245,7 +245,7 @@ export const ProductDetail: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                   {t('stock.products.description')}
@@ -260,7 +260,7 @@ export const ProductDetail: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
@@ -275,7 +275,7 @@ export const ProductDetail: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                     {t('common.updatedInfo')}
@@ -291,13 +291,13 @@ export const ProductDetail: React.FC = () => {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="stock">
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-md text-center">
                 <p>{t('stock.products.stockTabComingSoon')}</p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="history">
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-md text-center">
                 <p>{t('stock.products.historyTabComingSoon')}</p>
@@ -317,3 +317,5 @@ export const ProductDetail: React.FC = () => {
     </div>
   );
 };
+
+export default ProductDetail;

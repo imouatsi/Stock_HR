@@ -39,6 +39,24 @@
         "invoices",
         "inventoryitems"
       ]
+    },
+    {
+      "id": "backup_2025-04-10T16-00-00-144Z",
+      "timestamp": "2025-04-10T16:00:00.144Z",
+      "size": 15630,
+      "collections": [
+        "users",
+        "stockitems",
+        "suppliers",
+        "inventories",
+        "products",
+        "contracts",
+        "financialstatements",
+        "invoices",
+        "categories",
+        "warehouses",
+        "inventoryitems"
+      ]
     }
   ]
 }

@@ -37,7 +37,7 @@ import { stockService, type InventoryItem, type StockCategory } from '../../../s
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '@/components/ui/use-toast';
 
-export const Inventory: React.FC = () => {
+const Inventory: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -342,3 +342,5 @@ export const Inventory: React.FC = () => {
     </Box>
   );
 };
+
+export default Inventory;

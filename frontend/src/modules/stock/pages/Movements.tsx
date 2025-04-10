@@ -88,7 +88,7 @@ interface StockItem {
   quantity: number;
 }
 
-export const Movements: React.FC = () => {
+const Movements: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -501,3 +501,5 @@ export const Movements: React.FC = () => {
     </div>
   );
 };
+
+export default Movements;

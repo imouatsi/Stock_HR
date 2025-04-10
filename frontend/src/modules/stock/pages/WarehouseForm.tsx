@@ -27,7 +27,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export const WarehouseForm: React.FC = () => {
+const WarehouseForm: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -124,7 +124,7 @@ export const WarehouseForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!warehouse.name.en || !warehouse.name.fr || !warehouse.name.ar) {
       toast({
@@ -344,3 +344,5 @@ export const WarehouseForm: React.FC = () => {
     </div>
   );
 };
+
+export default WarehouseForm;

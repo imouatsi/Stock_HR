@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,4 +31,4 @@ export function handleApiError(error: unknown): Error {
   return error instanceof Error ? error : new Error('An unknown error occurred');
 }
 
-export default api; 
+export default api;

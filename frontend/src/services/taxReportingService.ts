@@ -1,11 +1,11 @@
 import api from './api.service';
-import { 
-  TaxPeriod, 
-  TaxRate, 
-  G50Declaration, 
-  TVADeclaration, 
-  IBSDeclaration, 
-  TaxReport 
+import {
+  TaxPeriod,
+  TaxRate,
+  G50Declaration,
+  TVADeclaration,
+  IBSDeclaration,
+  TaxReport
 } from '@/types/tax-reporting';
 
 class TaxReportingService {
@@ -22,26 +22,26 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
-      // Return mock data if API fails
-      return this.getDefaultTaxPeriods();
+
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching tax periods:', error);
-      // Return mock data
-      return this.getDefaultTaxPeriods();
+      throw error;
     }
   }
 
   private getDefaultTaxPeriods(): TaxPeriod[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
-    
+
     // Generate monthly periods for current year
     const monthlyPeriods: TaxPeriod[] = [];
     for (let month = 1; month <= 12; month++) {
       const startDate = new Date(currentYear, month - 1, 1);
       const endDate = new Date(currentYear, month, 0);
-      
+
       monthlyPeriods.push({
         _id: `TP-M-${currentYear}-${month.toString().padStart(2, '0')}`,
         code: `M${month.toString().padStart(2, '0')}/${currentYear}`,
@@ -56,7 +56,7 @@ class TaxReportingService {
         closedBy: month < currentMonth ? 'system' : undefined
       });
     }
-    
+
     // Generate quarterly periods for current year
     const quarterlyPeriods: TaxPeriod[] = [];
     for (let quarter = 1; quarter <= 4; quarter++) {
@@ -64,7 +64,7 @@ class TaxReportingService {
       const endMonth = quarter * 3;
       const startDate = new Date(currentYear, startMonth - 1, 1);
       const endDate = new Date(currentYear, endMonth, 0);
-      
+
       quarterlyPeriods.push({
         _id: `TP-Q-${currentYear}-${quarter}`,
         code: `Q${quarter}/${currentYear}`,
@@ -79,7 +79,7 @@ class TaxReportingService {
         closedBy: endMonth < currentMonth ? 'system' : undefined
       });
     }
-    
+
     // Generate annual period for current year
     const annualPeriods: TaxPeriod[] = [{
       _id: `TP-A-${currentYear}`,
@@ -91,7 +91,7 @@ class TaxReportingService {
       year: currentYear,
       isClosed: false
     }];
-    
+
     // Generate annual period for previous year
     const previousYear = currentYear - 1;
     annualPeriods.push({
@@ -106,7 +106,7 @@ class TaxReportingService {
       closedAt: new Date(currentYear, 3, 30).toISOString(),
       closedBy: 'system'
     });
-    
+
     return [...monthlyPeriods, ...quarterlyPeriods, ...annualPeriods];
   }
 
@@ -124,7 +124,7 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
+
       // If API fails, try to find in default periods
       const defaultPeriods = this.getDefaultTaxPeriods();
       const period = defaultPeriods.find(p => p._id === id);
@@ -145,17 +145,17 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
-      // Return mock data if API fails
-      return this.getDefaultTaxRates();
+
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching tax rates:', error);
-      // Return mock data
-      return this.getDefaultTaxRates();
+      throw error;
     }
   }
 
   private getDefaultTaxRates(): TaxRate[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     return [
       {
         _id: 'TR-TVA-19',
@@ -230,22 +230,22 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
-      // Return mock data if API fails
-      return this.getDefaultG50Declarations();
+
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching G50 declarations:', error);
-      // Return mock data
-      return this.getDefaultG50Declarations();
+      throw error;
     }
   }
 
   private getDefaultG50Declarations(): G50Declaration[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
     const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
     const previousMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
-    
+
     const companyInfo: CompanyInfo = {
       name: '404 ENTERPRISE',
       address: '123 Rue des Oliviers, Alger, Algérie',
@@ -256,7 +256,7 @@ class TaxReportingService {
       municipality: 'Alger Centre',
       wilaya: 'Alger'
     };
-    
+
     return [
       {
         _id: `G50-${previousMonthYear}-${previousMonth.toString().padStart(2, '0')}`,
@@ -331,7 +331,7 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
+
       // If API fails, try to find in default declarations
       const defaultDeclarations = this.getDefaultG50Declarations();
       const declaration = defaultDeclarations.find(d => d._id === id);
@@ -351,16 +351,16 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
+
       // Mock response if API fails
       const period = await this.getTaxPeriodById(periodId);
       if (!period) {
         throw new Error('Period not found');
       }
-      
+
       const currentYear = new Date().getFullYear();
       const currentMonth = new Date().getMonth() + 1;
-      
+
       const companyInfo: CompanyInfo = {
         name: '404 ENTERPRISE',
         address: '123 Rue des Oliviers, Alger, Algérie',
@@ -371,7 +371,7 @@ class TaxReportingService {
         municipality: 'Alger Centre',
         wilaya: 'Alger'
       };
-      
+
       return {
         _id: `G50-${period.year}-${period.month?.toString().padStart(2, '0') || period.quarter}`,
         declarationNumber: `G50/${period.year}/${period.month?.toString().padStart(2, '0') || 'Q' + period.quarter}`,
@@ -382,7 +382,7 @@ class TaxReportingService {
         month: period.month,
         quarter: period.quarter,
         submissionDate: new Date().toISOString().split('T')[0],
-        dueDate: period.type === 'monthly' 
+        dueDate: period.type === 'monthly'
           ? new Date(period.year, (period.month || 1), 20).toISOString().split('T')[0]
           : new Date(period.year, (period.quarter || 1) * 3, 20).toISOString().split('T')[0],
         status: 'draft',
@@ -446,13 +446,13 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
+
       // Mock response if API fails
       const declaration = await this.getG50DeclarationById(id);
       if (!declaration) {
         throw new Error('Declaration not found');
       }
-      
+
       return {
         ...declaration,
         status: 'submitted',
@@ -471,7 +471,7 @@ class TaxReportingService {
       const response = await api.get(`/accounting/g50-declarations/${id}/export/${format}`, {
         responseType: 'blob'
       });
-      
+
       // Create a blob URL for the file
       const contentType = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       const blob = new Blob([response.data], { type: contentType });
@@ -489,22 +489,22 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
-      // Return mock data if API fails
-      return this.getDefaultTVADeclarations();
+
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching TVA declarations:', error);
-      // Return mock data
-      return this.getDefaultTVADeclarations();
+      throw error;
     }
   }
 
   private getDefaultTVADeclarations(): TVADeclaration[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
     const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
     const previousMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
-    
+
     const companyInfo: CompanyInfo = {
       name: '404 ENTERPRISE',
       address: '123 Rue des Oliviers, Alger, Algérie',
@@ -515,7 +515,7 @@ class TaxReportingService {
       municipality: 'Alger Centre',
       wilaya: 'Alger'
     };
-    
+
     return [
       {
         _id: `TVA-${previousMonthYear}-${previousMonth.toString().padStart(2, '0')}`,
@@ -605,20 +605,20 @@ class TaxReportingService {
       if (response && response.data && response.data.data) {
         return response.data.data;
       }
-      
-      // Return mock data if API fails
-      return this.getDefaultIBSDeclarations();
+
+      throw new Error('Invalid response format');
     } catch (error) {
       console.error('Error fetching IBS declarations:', error);
-      // Return mock data
-      return this.getDefaultIBSDeclarations();
+      throw error;
     }
   }
 
   private getDefaultIBSDeclarations(): IBSDeclaration[] {
+    throw new Error('Mock data is not allowed');
+    // @ts-ignore
     const currentYear = new Date().getFullYear();
     const previousYear = currentYear - 1;
-    
+
     const companyInfo: CompanyInfo = {
       name: '404 ENTERPRISE',
       address: '123 Rue des Oliviers, Alger, Algérie',
@@ -629,7 +629,7 @@ class TaxReportingService {
       municipality: 'Alger Centre',
       wilaya: 'Alger'
     };
-    
+
     return [
       {
         _id: `IBS-${previousYear}`,

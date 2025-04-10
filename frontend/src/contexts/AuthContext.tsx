@@ -17,9 +17,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // Initialize user state from localStorage if available
+  const initialUser = (() => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+        localStorage.removeItem('user');
+      }
+    }
+    return null;
+  })();
+
+  const [user, setUser] = useState<User | null>(initialUser);
   const [loading, setLoading] = useState(true);
-  const [inactivityTimeout, setInactivityTimeout] = useState<number>(600); // Default 10 minutes (600 seconds)
+  const [inactivityTimeout, setInactivityTimeout] = useState<number>(
+    parseInt(localStorage.getItem('inactivityTimeout') || '600', 10)
+  ); // Default 10 minutes (600 seconds)
   const navigate = useNavigate();
 
   // Reference to the inactivity timer
@@ -64,110 +80,156 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize from localStorage and setup event listeners
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userJson = localStorage.getItem('user');
-    const savedTimeout = localStorage.getItem('inactivityTimeout');
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      const userJson = localStorage.getItem('user');
+      const savedTimeout = localStorage.getItem('inactivityTimeout');
 
-    // Restore saved timeout if available
-    if (savedTimeout) {
-      setInactivityTimeout(parseInt(savedTimeout, 10));
-    }
-
-    if (token && userJson) {
-      try {
-        const userData = JSON.parse(userJson);
-
-        // Validate that the user data has the required fields
-        if (!userData.role) {
-          // Set a default role if missing
-          userData.role = 'superadmin';
-        }
-
-        // Ensure username is present
-        if (!userData.username) {
-          userData.username = 'User';
-        }
-
-        // Update localStorage with the validated user data
-        localStorage.setItem('user', JSON.stringify(userData));
-
-        setUser(userData);
-
-        // Setup inactivity timer when user is loaded
-        setupInactivityTimer();
-
-        // Setup event listeners for user activity
-        const resetTimer = () => resetInactivityTimer();
-        window.addEventListener('mousemove', resetTimer);
-        window.addEventListener('mousedown', resetTimer);
-        window.addEventListener('keypress', resetTimer);
-        window.addEventListener('touchmove', resetTimer);
-        window.addEventListener('scroll', resetTimer);
-
-        return () => {
-          // Clean up event listeners
-          window.removeEventListener('mousemove', resetTimer);
-          window.removeEventListener('mousedown', resetTimer);
-          window.removeEventListener('keypress', resetTimer);
-          window.removeEventListener('touchmove', resetTimer);
-          window.removeEventListener('scroll', resetTimer);
-
-          // Clear the timer
-          if (inactivityTimerRef.current) {
-            clearTimeout(inactivityTimerRef.current);
-          }
-        };
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+      // Restore saved timeout if available
+      if (savedTimeout) {
+        setInactivityTimeout(parseInt(savedTimeout, 10));
       }
-    }
 
-    setLoading(false);
-  }, []);
+      if (token) {
+        try {
+          // Attempt to validate the token with the backend
+          try {
+            // Make a request to validate the token
+            const response = await apiService.get('/auth/me');
+            console.log('Auth validation response:', response);
+
+            let userData;
+
+            // Try to use user data from localStorage first
+            if (userJson) {
+              userData = JSON.parse(userJson);
+            }
+            // If no user data in localStorage, use the response from /auth/me
+            else if (response && response.data && response.data.user) {
+              userData = response.data.user;
+            }
+            // Fallback to a default user object if all else fails
+            else {
+              userData = {
+                username: 'User',
+                role: 'superadmin'
+              };
+            }
+
+            // Validate that the user data has the required fields
+            if (!userData.role) {
+              // Set a default role if missing
+              userData.role = 'superadmin';
+            }
+
+            // Ensure username is present
+            if (!userData.username) {
+              userData.username = 'User';
+            }
+
+            // Update localStorage with the validated user data
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            setUser(userData);
+            console.log('User data set in AuthContext:', userData);
+
+            // Setup inactivity timer when user is loaded
+            setupInactivityTimer();
+
+            // Setup event listeners for user activity
+            const resetTimer = () => resetInactivityTimer();
+            window.addEventListener('mousemove', resetTimer);
+            window.addEventListener('mousedown', resetTimer);
+            window.addEventListener('keypress', resetTimer);
+            window.addEventListener('touchmove', resetTimer);
+            window.addEventListener('scroll', resetTimer);
+
+            return () => {
+              // Clean up event listeners
+              window.removeEventListener('mousemove', resetTimer);
+              window.removeEventListener('mousedown', resetTimer);
+              window.removeEventListener('keypress', resetTimer);
+              window.removeEventListener('touchmove', resetTimer);
+              window.removeEventListener('scroll', resetTimer);
+
+              // Clear the timer
+              if (inactivityTimerRef.current) {
+                clearTimeout(inactivityTimerRef.current);
+              }
+            };
+          } catch (apiError) {
+            console.error('Token validation failed:', apiError);
+            // Token is invalid, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            navigate('/login');
+          }
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          setUser(null);
+          navigate('/login');
+        }
+      } else {
+        // No token, ensure user is null
+        setUser(null);
+      }
+
+      setLoading(false);
+    };
+
+    validateToken();
+  }, [navigate]);
 
   const login = async (username: string, password: string) => {
     try {
       setLoading(true);
 
-      try {
-        // Try to connect to the backend API
-        const response = await apiService.post('/auth/login', { username, password });
-        const { token, user } = response.data;
+      // Connect to the backend API
+      const response = await apiService.post('/auth/login', { username, password });
+      console.log('Login response:', response);
+
+      // Check if the response has the expected format
+      if (response && response.status === 'success' && response.token) {
+        // Extract user data from the nested structure if it exists
+        const token = response.token;
+        const user = response.data?.user || {};
+
+        console.log('Extracted token and user:', { token, user });
 
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
+
+        // Set user state
         setUser(user);
-        navigate('/dashboard');
-      } catch (apiError) {
-        console.error('API connection failed, using mock data:', apiError);
 
-        // Fallback to mock login for development if API is not available
-        if (username === 'superadmin' && password === 'Admin@123') {
-          const mockUser = {
-            id: '1',
-            username: 'superadmin',
-            firstName: 'Super',
-            lastName: 'Admin',
-            role: 'superadmin', // This should match one of the avatar image names
-            isActive: true,
-            permissions: ['all'],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MmQ3YzRkMzRkMzRkMzRkMzRkMzRkMyIsInVzZXJuYW1lIjoic3VwZXJhZG1pbiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjE1MjM5MDIyLCJleHAiOjE2MTUzMjU0MjJ9.7dKxerLxEYh_zH8uQmKjZOlXxjRBPR50TRfZp9TTOlQ';
+        // Immediately validate the token to ensure it works
+        try {
+          const validateResponse = await apiService.get('/auth/validate');
+          console.log('Token validation response:', validateResponse);
 
-          localStorage.setItem('token', mockToken);
-          localStorage.setItem('user', JSON.stringify(mockUser));
-          setUser(mockUser);
-          navigate('/dashboard');
-        } else {
-          throw new Error('Invalid credentials');
+          if (validateResponse && validateResponse.status === 'success') {
+            console.log('Token is valid, navigating to dashboard');
+            navigate('/dashboard');
+          } else {
+            console.error('Token validation failed:', validateResponse);
+            throw new Error('Token validation failed');
+          }
+        } catch (validationError) {
+          console.error('Error validating token:', validationError);
+          throw validationError;
         }
+      } else {
+        console.error('Invalid response format:', response);
+        throw new Error('Invalid response format from API');
       }
     } catch (error) {
       console.error('Login failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
       throw error;
     } finally {
       setLoading(false);
@@ -208,6 +270,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Determine authentication status from both user state and localStorage token
+  const isAuthenticated = !!user || !!localStorage.getItem('token');
+
   const value = {
     user,
     loading,
@@ -216,7 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     changePassword,
     resetInactivityTimer,
     setInactivityTimeout: setInactivityTimeoutValue,
-    isAuthenticated: !!user,
+    isAuthenticated,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

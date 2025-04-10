@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { hrService } from '@/services/hrService';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './performance-reviews/columns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PerformanceReview {
   id: string;
@@ -16,7 +18,7 @@ interface PerformanceReview {
 }
 
 export default function PerformanceReviews() {
-  const { t } = useTranslation();
+
   const { toast } = useToast();
   const [reviews, setReviews] = useState<PerformanceReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,11 +50,51 @@ export default function PerformanceReviews() {
     }
   };
 
+  const [isNewReviewModalOpen, setIsNewReviewModalOpen] = useState(false);
+  const [newReview, setNewReview] = useState({
+    employeeId: '',
+    employeeName: '',
+    reviewerId: '',
+    reviewerName: '',
+    period: '',
+    rating: 0,
+    comments: ''
+  });
+
   const handleNewReview = () => {
-    toast({
-      title: 'Not Implemented',
-      description: 'This feature is coming soon.',
-    });
+    setIsNewReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    try {
+      setIsLoading(true);
+      await hrService.createPerformanceReview(newReview);
+      toast({
+        title: 'Success',
+        description: 'Performance review submitted successfully',
+        variant: 'default',
+      });
+      setIsNewReviewModalOpen(false);
+      setNewReview({
+        employeeId: '',
+        employeeName: '',
+        reviewerId: '',
+        reviewerName: '',
+        period: '',
+        rating: 0,
+        comments: ''
+      });
+      fetchReviews();
+    } catch (error) {
+      console.error('Error submitting performance review:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to submit performance review',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,6 +112,90 @@ export default function PerformanceReviews() {
       ) : (
         <DataTable columns={columns} data={reviews} searchKey="employee" />
       )}
+
+      {/* New Performance Review Modal */}
+      <Dialog open={isNewReviewModalOpen} onOpenChange={setIsNewReviewModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Submit New Performance Review</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Employee ID:</div>
+              <Input
+                value={newReview.employeeId}
+                onChange={(e) => setNewReview({...newReview, employeeId: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Employee Name:</div>
+              <Input
+                value={newReview.employeeName}
+                onChange={(e) => setNewReview({...newReview, employeeName: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Reviewer ID:</div>
+              <Input
+                value={newReview.reviewerId}
+                onChange={(e) => setNewReview({...newReview, reviewerId: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Reviewer Name:</div>
+              <Input
+                value={newReview.reviewerName}
+                onChange={(e) => setNewReview({...newReview, reviewerName: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Period:</div>
+              <Input
+                value={newReview.period}
+                onChange={(e) => setNewReview({...newReview, period: e.target.value})}
+                className="col-span-3"
+                placeholder="e.g., Q1 2023"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Rating (1-5):</div>
+              <Input
+                type="number"
+                min="1"
+                max="5"
+                value={newReview.rating}
+                onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value) || 0})}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="text-right">Comments:</div>
+              <Textarea
+                value={newReview.comments}
+                onChange={(e) => setNewReview({...newReview, comments: e.target.value})}
+                className="col-span-3"
+                rows={5}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsNewReviewModalOpen(false)}>Cancel</Button>
+            <Button type="button" onClick={handleSubmitReview}>Submit Review</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

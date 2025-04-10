@@ -20,7 +20,7 @@ export type LeaveRequest = {
   reason: string;
 };
 
-export const columns: ColumnDef<LeaveRequest>[] = [
+export const columns: ColumnDef<LeaveRequest, unknown>[] = [
   {
     accessorKey: 'employee',
     header: 'Employee',
@@ -81,4 +81,4 @@ export const columns: ColumnDef<LeaveRequest>[] = [
       );
     },
   },
-]; 
+];

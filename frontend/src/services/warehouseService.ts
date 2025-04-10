@@ -24,13 +24,18 @@ class WarehouseService {
   }> {
     try {
       const response = await apiService.get('/v2/warehouses', { params: filters });
+
+      if (!response.data || !response.data.data) {
+        throw new Error('API response missing data structure');
+      }
+
       return {
-        warehouses: response.data.data.warehouses,
+        warehouses: response.data.data.warehouses || [],
         pagination: {
-          totalDocs: response.data.totalDocs,
-          totalPages: response.data.totalPages,
-          currentPage: response.data.currentPage,
-          limit: response.data.limit
+          totalDocs: response.data.totalDocs || 0,
+          totalPages: response.data.totalPages || 1,
+          currentPage: response.data.currentPage || 1,
+          limit: response.data.limit || 10
         }
       };
     } catch (error) {
@@ -42,6 +47,11 @@ class WarehouseService {
   async getWarehouseById(id: string): Promise<Warehouse> {
     try {
       const response = await apiService.get(`/v2/warehouses/${id}`);
+
+      if (!response.data || !response.data.data || !response.data.data.warehouse) {
+        throw new Error(`API response missing data structure for warehouse ID ${id}`);
+      }
+
       return response.data.data.warehouse;
     } catch (error) {
       console.error(`Error fetching warehouse with ID ${id}:`, error);
@@ -52,6 +62,11 @@ class WarehouseService {
   async createWarehouse(warehouseData: WarehouseInput): Promise<Warehouse> {
     try {
       const response = await apiService.post('/v2/warehouses', warehouseData);
+
+      if (!response.data || !response.data.data || !response.data.data.warehouse) {
+        throw new Error('API response missing data structure for warehouse creation');
+      }
+
       return response.data.data.warehouse;
     } catch (error) {
       console.error('Error creating warehouse:', error);
@@ -62,6 +77,11 @@ class WarehouseService {
   async updateWarehouse(id: string, warehouseData: Partial<WarehouseInput>): Promise<Warehouse> {
     try {
       const response = await apiService.patch(`/v2/warehouses/${id}`, warehouseData);
+
+      if (!response.data || !response.data.data || !response.data.data.warehouse) {
+        throw new Error(`API response missing data structure for warehouse update ID ${id}`);
+      }
+
       return response.data.data.warehouse;
     } catch (error) {
       console.error(`Error updating warehouse with ID ${id}:`, error);
@@ -81,6 +101,9 @@ class WarehouseService {
   async getWarehousesByManager(managerId: string): Promise<Warehouse[]> {
     try {
       const response = await apiService.get(`/v2/warehouses/manager/${managerId}`);
+      if (!response.data || !response.data.data || !response.data.data.warehouses) {
+        throw new Error(`API response missing data structure for manager ${managerId}`);
+      }
       return response.data.data.warehouses;
     } catch (error) {
       console.error(`Error fetching warehouses for manager ${managerId}:`, error);

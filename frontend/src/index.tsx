@@ -9,6 +9,11 @@ import './index.css';
 import './styles/rtl.css';
 // i18n is now handled in App.tsx with our custom provider
 
+// Clear localStorage to force login
+console.log('Clearing localStorage to force login');
+localStorage.removeItem('token');
+localStorage.removeItem('user');
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

@@ -15,7 +15,7 @@ interface Supplier extends StockSupplier {
   updatedAt: string;
 }
 
-export const Suppliers: React.FC = () => {
+const Suppliers: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -263,3 +263,5 @@ export const Suppliers: React.FC = () => {
     </div>
   );
 };
+
+export default Suppliers;

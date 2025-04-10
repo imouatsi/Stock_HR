@@ -35,7 +35,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
-export const Warehouses: React.FC = () => {
+const Warehouses: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -324,3 +324,5 @@ export const Warehouses: React.FC = () => {
     </div>
   );
 };
+
+export default Warehouses;
