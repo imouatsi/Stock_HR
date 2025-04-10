@@ -6,26 +6,20 @@ import { Input } from '../../../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/useToast';
-import apiService from "../../../services/api.service";
+import { stockService, type StockCategory } from '../../../services/stockService';
 
-interface Category {
-  _id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Using StockCategory from stockService
 
 export const Categories: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showToast } = useToast();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<StockCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<StockCategory | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: ''
@@ -38,8 +32,8 @@ export const Categories: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get('/categories');
-      setCategories(response.data);
+      const categories = await stockService.getAllCategories();
+      setCategories(categories);
       setError(null);
     } catch (err) {
       setError(t('common.error.loading'));
@@ -57,13 +51,13 @@ export const Categories: React.FC = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await apiService.put(`/categories/${editingCategory._id}`, formData);
+        await stockService.updateCategory(editingCategory._id, formData);
         showToast({
           title: t('common.success'),
           description: t('stock.categories.updateSuccess')
         });
       } else {
-        await apiService.post('/categories', formData);
+        await stockService.createCategory(formData);
         showToast({
           title: t('common.success'),
           description: t('stock.categories.createSuccess')
@@ -84,9 +78,9 @@ export const Categories: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('stock.categories.confirmDelete'))) return;
-    
+
     try {
-      await apiService.delete(`/categories/${id}`);
+      await stockService.deleteCategory(id);
       showToast({
         title: t('common.success'),
         description: t('stock.categories.deleteSuccess')
@@ -101,10 +95,10 @@ export const Categories: React.FC = () => {
     }
   };
 
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredCategories = categories && categories.length > 0 ? categories.filter(category =>
+    category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (category?.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) : [];
 
   return (
     <div className="space-y-4">
@@ -141,7 +135,7 @@ export const Categories: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCategories.map((category) => (
+              {filteredCategories?.map((category) => (
                 <TableRow key={category._id}>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>{category.description}</TableCell>
@@ -217,4 +211,4 @@ export const Categories: React.FC = () => {
       </Dialog>
     </div>
   );
-}; 
+};

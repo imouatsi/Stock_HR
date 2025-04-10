@@ -198,10 +198,86 @@
       "credit": "Crédit"
     },
     "financialStatements": {
+      "title": "États Financiers",
+      "description": "Consulter et générer des états financiers",
       "type": "Type",
       "period": "Période",
       "date": "Date",
-      "status": "État"
+      "status": "État",
+      "generateStatement": "Générer un État",
+      "generateDescription": "Générer un nouvel état financier",
+      "statementsList": "Liste des États",
+      "statement": "État",
+      "balanceSheet": "Bilan",
+      "incomeStatement": "Compte de Résultat",
+      "cashFlowStatement": "Tableau des Flux de Trésorerie",
+      "selectType": "Sélectionner le type d'état",
+      "selectPeriod": "Sélectionner la période comptable",
+      "comparisonPeriod": "Période de Comparaison",
+      "selectComparisonPeriod": "Sélectionner la période de comparaison (optionnel)",
+      "noComparison": "Pas de comparaison",
+      "comparisonDescription": "Comparer avec une période précédente",
+      "finalize": "Finaliser",
+      "exportPDF": "Exporter en PDF",
+      "exportExcel": "Exporter en Excel",
+      "printedOn": "Imprimé le",
+      "asOf": "Au",
+      "assets": "Actifs",
+      "liabilities": "Passifs",
+      "liabilitiesAndEquity": "Passifs et Capitaux Propres",
+      "totalAssets": "Total des Actifs",
+      "totalLiabilities": "Total des Passifs",
+      "totalLiabilitiesAndEquity": "Total des Passifs et Capitaux Propres",
+      "operatingRevenue": "Produits d'Exploitation",
+      "totalOperatingRevenue": "Total des Produits d'Exploitation",
+      "operatingExpenses": "Charges d'Exploitation",
+      "totalOperatingExpenses": "Total des Charges d'Exploitation",
+      "operatingResult": "Résultat d'Exploitation",
+      "financialRevenue": "Produits Financiers",
+      "totalFinancialRevenue": "Total des Produits Financiers",
+      "financialExpenses": "Charges Financières",
+      "totalFinancialExpenses": "Total des Charges Financières",
+      "financialResult": "Résultat Financier",
+      "ordinaryResult": "Résultat Ordinaire",
+      "extraordinaryItems": "Éléments Extraordinaires",
+      "totalExtraordinaryItems": "Total des Éléments Extraordinaires",
+      "extraordinaryResult": "Résultat Extraordinaire",
+      "taxes": "Impôts",
+      "totalTaxes": "Total des Impôts",
+      "netResult": "Résultat Net",
+      "operatingActivities": "Activités d'Exploitation",
+      "netCashFromOperatingActivities": "Flux Net de Trésorerie d'Exploitation",
+      "investingActivities": "Activités d'Investissement",
+      "netCashFromInvestingActivities": "Flux Net de Trésorerie d'Investissement",
+      "financingActivities": "Activités de Financement",
+      "netCashFromFinancingActivities": "Flux Net de Trésorerie de Financement",
+      "netChangeInCash": "Variation Nette de Trésorerie",
+      "openingCashBalance": "Trésorerie d'Ouverture",
+      "closingCashBalance": "Trésorerie de Clôture",
+      "code": "Code",
+      "item": "Élément",
+      "amount": "Montant",
+      "previousAmount": "Montant Précédent",
+      "statementDetails": "Détails de l'État",
+      "createdBy": "Créé par",
+      "createdAt": "Créé le",
+      "updatedAt": "Mis à jour le",
+      "status": {
+        "draft": "Brouillon",
+        "final": "Final"
+      },
+      "success": {
+        "generated": "État financier généré avec succès",
+        "finalized": "État financier finalisé avec succès",
+        "exported": "État financier exporté avec succès"
+      },
+      "error": {
+        "loading": "Erreur lors du chargement des états financiers",
+        "generating": "Erreur lors de la génération de l'état financier",
+        "finalizing": "Erreur lors de la finalisation de l'état financier",
+        "exporting": "Erreur lors de l'exportation de l'état financier",
+        "missingFields": "Veuillez remplir tous les champs obligatoires"
+      }
     },
     "chartOfAccounts": {
       "title": "Plan comptable",
@@ -210,35 +286,18 @@
   },
   "settings": {
     "title": "Paramètres",
-    "general": {
-      "title": "Paramètres généraux",
-      "language": "Langue",
-      "timezone": "Fuseau horaire",
-      "dateFormat": "Format de date"
-    },
-    "appearance": {
-      "title": "Apparence",
-      "theme": {
-        "title": "Thème",
-        "light": "Clair",
-        "dark": "Sombre",
-        "system": "Système"
-      },
-      "layout": "Mise en page",
-      "colors": "Couleurs"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "email": "Notifications par email",
-      "push": "Notifications push",
-      "inApp": "Notifications dans l'application"
-    },
-    "security": {
-      "title": "Sécurité",
-      "password": "Mot de passe",
-      "twoFactor": "Authentification à deux facteurs",
-      "sessions": "Sessions actives"
-    }
+    "appearance": "Apparence",
+    "appearanceDesc": "Personnaliser l'apparence de l'application",
+    "darkMode": "Mode sombre",
+    "darkModeDesc": "Basculer entre le mode clair et sombre",
+    "language": "Langue",
+    "selectLanguage": "Sélectionner la langue",
+    "languageDesc": "Changer la langue de l'application",
+    "notifications": "Notifications",
+    "notificationsDesc": "Gérer vos préférences de notification",
+    "pushNotifications": "Notifications push",
+    "pushNotificationsDesc": "Recevoir des notifications push",
+    "saveSettings": "Enregistrer les paramètres"
   },
   "profile": {
     "title": "Profil",
@@ -247,5 +306,95 @@
     "preferences": "Préférences",
     "activity": "Activité récente",
     "security": "Paramètres de sécurité"
+  },
+  "stock": {
+    "title": "Gestion de Stock",
+    "description": "Gérez votre inventaire, vos produits et vos mouvements de stock",
+    "products": {
+      "title": "Produits",
+      "description": "Gérez votre catalogue de produits",
+      "add": "Ajouter un Produit",
+      "edit": "Modifier le Produit",
+      "details": "Détails du Produit",
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "category": "Catégorie",
+      "supplier": "Fournisseur",
+      "unit": "Unité",
+      "purchasePrice": "Prix d'Achat",
+      "sellingPrice": "Prix de Vente",
+      "tvaRate": "Taux de TVA",
+      "barcode": "Code-barres",
+      "status": "Statut",
+      "search": "Rechercher des produits...",
+      "codeGenerated": "Généré automatiquement si laissé vide",
+      "barcodePlaceholder": "Entrez le code-barres (optionnel)",
+      "unitPlaceholder": "ex: kg, unité, litre",
+      "selectCategory": "Sélectionnez une catégorie",
+      "selectSupplier": "Sélectionnez un fournisseur",
+      "selectTvaRate": "Sélectionnez le taux de TVA",
+      "addDescription": "Ajoutez un nouveau produit à votre catalogue",
+      "editDescription": "Modifiez les informations du produit",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce produit ?",
+      "notFound": "Produit non trouvé",
+      "stock": "Stock",
+      "history": "Historique",
+      "stockTabComingSoon": "Les informations de stock seront disponibles prochainement",
+      "historyTabComingSoon": "L'historique des mouvements sera disponible prochainement",
+      "success": {
+        "created": "Produit créé avec succès",
+        "updated": "Produit mis à jour avec succès",
+        "deleted": "Produit supprimé avec succès"
+      },
+      "error": {
+        "fetch": "Échec de récupération des produits",
+        "create": "Échec de création du produit",
+        "update": "Échec de mise à jour du produit",
+        "delete": "Échec de suppression du produit",
+        "nameRequired": "Le nom du produit est requis dans toutes les langues",
+        "categoryRequired": "La catégorie est requise",
+        "supplierRequired": "Le fournisseur est requis",
+        "unitRequired": "L'unité est requise"
+      }
+    },
+    "warehouses": {
+      "title": "Entrepôts",
+      "description": "Gérez vos entrepôts et emplacements",
+      "add": "Ajouter un Entrepôt",
+      "edit": "Modifier l'Entrepôt",
+      "details": "Détails de l'Entrepôt",
+      "code": "Code",
+      "name": "Nom",
+      "address": "Adresse",
+      "manager": "Responsable",
+      "status": "Statut",
+      "search": "Rechercher des entrepôts...",
+      "codeGenerated": "Généré automatiquement si laissé vide",
+      "addressPlaceholder": "Entrez l'adresse de l'entrepôt",
+      "selectManager": "Sélectionnez un responsable",
+      "addDescription": "Ajoutez un nouvel entrepôt à votre inventaire",
+      "editDescription": "Modifiez les informations de l'entrepôt",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet entrepôt ?",
+      "notFound": "Entrepôt non trouvé",
+      "inventory": "Inventaire",
+      "movements": "Mouvements",
+      "inventoryTabComingSoon": "Les informations d'inventaire seront disponibles prochainement",
+      "movementsTabComingSoon": "L'historique des mouvements sera disponible prochainement",
+      "success": {
+        "created": "Entrepôt créé avec succès",
+        "updated": "Entrepôt mis à jour avec succès",
+        "deleted": "Entrepôt supprimé avec succès"
+      },
+      "error": {
+        "fetch": "Échec de récupération des entrepôts",
+        "create": "Échec de création de l'entrepôt",
+        "update": "Échec de mise à jour de l'entrepôt",
+        "delete": "Échec de suppression de l'entrepôt",
+        "nameRequired": "Le nom de l'entrepôt est requis dans toutes les langues",
+        "addressRequired": "L'adresse est requise",
+        "managerRequired": "Le responsable est requis"
+      }
+    }
   }
-} 
+}

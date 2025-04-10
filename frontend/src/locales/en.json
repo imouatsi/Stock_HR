@@ -32,33 +32,54 @@
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",
+    "submitting": "Saving...",
+    "calculating": "Calculating...",
+    "reset": "Reset",
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
     "search": "Search",
     "filter": "Filter",
     "actions": "Actions",
+    "success": "Success",
     "add": "Add",
     "loading": "Loading...",
+    "navigation": "Navigation",
+    "notifications": "Notifications",
+    "timeAgo": {
+      "hour": "{{count}}h ago",
+      "minute": "{{count}}m ago",
+      "day": "{{count}}d ago"
+    },
     "error": {
       "title": "Error",
       "loading": "Failed to load data",
       "save": "Failed to save data",
       "delete": "Failed to delete data"
     },
-    "success": "Success"
+    "success": "Success",
+    "notImplemented": "Not Implemented",
+    "featureComingSoon": "This feature is coming soon"
   },
   "auth": {
     "login": "Login",
     "logout": "Logout",
     "email": "Email",
     "password": "Password",
+    "username": "Username",
     "submit": "Submit",
-    "error": "Invalid email or password"
+    "signIn": "Sign in to your account",
+    "signInButton": "Sign in",
+    "error": {
+      "invalidCredentials": "Invalid username or password"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome to Stock & HR Management System"
+  },
+  "profile": {
+    "title": "Profile"
   },
   "users": {
     "title": "Users",
@@ -69,6 +90,11 @@
   },
   "stock": {
     "title": "Stock Management",
+    "dashboard": {
+      "title": "Stock Dashboard",
+      "totalItems": "Total Items",
+      "itemsChange": "Items in inventory"
+    },
     "inventory": {
       "title": "Inventory",
       "add": "Add Item",
@@ -133,6 +159,668 @@
       "cancelSuccess": "Movement cancelled successfully",
       "confirmDelete": "Are you sure you want to delete this movement?",
       "confirmCancel": "Are you sure you want to cancel this movement?"
+    },
+    "purchaseOrders": {
+      "title": "Purchase Orders",
+      "add": "Add Purchase Order"
+    }
+  },
+  "hr": {
+    "title": "HR Management",
+    "dashboard": {
+      "title": "HR Dashboard",
+      "totalEmployees": "Total Employees",
+      "employeesChange": "Active employees",
+      "activeDepartments": "Active Departments",
+      "pendingLeaveRequests": "Pending Leave Requests",
+      "upcomingReviews": "Upcoming Reviews"
+    },
+    "employees": {
+      "title": "Employees",
+      "addEmployee": "Add Employee",
+      "addEmployeeDescription": "Fill in the details to add a new employee.",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "department": "Department",
+      "position": "Position",
+      "salary": "Salary (DZD)",
+      "selectDepartment": "Select department",
+      "selectPosition": "Select position",
+      "selectStatus": "Select status",
+      "selectDate": "Select date",
+      "selectFamilySituation": "Select family situation",
+      "selectContractType": "Select contract type",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "tabs": {
+        "basicInfo": "Basic Information",
+        "algerianInfo": "Algerian Information"
+      },
+      "cnasNumber": "CNAS Number",
+      "nationalRegistryNumber": "National Registry Number",
+      "dateOfBirth": "Date of Birth",
+      "familySituation": "Family Situation",
+      "familySituation": {
+        "single": "Single",
+        "married": "Married",
+        "divorced": "Divorced",
+        "widowed": "Widowed"
+      },
+      "contractType": "Contract Type",
+      "contractType": {
+        "cdi": "CDI (Permanent)",
+        "cdd": "CDD (Fixed Term)",
+        "stage": "Internship",
+        "interim": "Temporary"
+      },
+      "contractStartDate": "Contract Start Date",
+      "contractEndDate": "Contract End Date",
+      "probationPeriodEndDate": "Probation Period End Date",
+      "cnasAffiliationStatus": "CNAS Affiliation",
+      "error": {
+        "loading": "Failed to load employees.",
+        "creating": "Failed to create employee.",
+        "updating": "Failed to update employee.",
+        "deleting": "Failed to delete employee.",
+        "requiredFields": "Please fill in all required fields.",
+        "contractEndDateRequired": "Contract end date is required for CDD contracts."
+      },
+      "success": {
+        "created": "Employee created successfully.",
+        "updated": "Employee updated successfully.",
+        "deleted": "Employee deleted successfully."
+      }
+    },
+    "departments": {
+      "title": "Departments"
+    },
+    "positions": {
+      "title": "Positions"
+    },
+    "leave": {
+      "title": "Leave Management",
+      "addLeaveRequest": "Add Leave Request",
+      "addLeaveRequestDescription": "Fill in the details to request time off.",
+      "employee": "Employee",
+      "selectEmployee": "Select employee",
+      "type": "Leave Type",
+      "selectLeaveType": "Select leave type",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectDate": "Select date",
+      "duration": "Duration",
+      "businessDays": "business days",
+      "days": "days",
+      "weeks": "weeks",
+      "reason": "Reason",
+      "status": "Status",
+      "approve": "Approve",
+      "reject": "Reject",
+      "cnasJustification": "CNAS Justification",
+      "cnasJustificationPlaceholder": "Enter CNAS reference number",
+      "cnasJustificationHelp": "Required for sick leave as per Algerian regulations",
+      "remainingDays": "Remaining days",
+      "publicHolidays": "Public Holidays",
+      "publicHolidaysDescription": "Official holidays in Algeria",
+      "statistics": "Leave Statistics",
+      "statisticsDescription": "Summary of leave requests",
+      "pendingRequests": "Pending Requests",
+      "approvedRequests": "Approved Requests",
+      "rejectedRequests": "Rejected Requests",
+      "policy": "Leave Policy",
+      "policyDescription": "Based on Algerian labor law",
+      "annualLeaveEntitlement": "Annual Leave",
+      "sickLeaveRequirement": "Sick Leave",
+      "maternityLeave": "Maternity Leave",
+      "type": {
+        "annual": "Annual Leave",
+        "sick": "Sick Leave",
+        "maternity": "Maternity Leave",
+        "unpaid": "Unpaid Leave",
+        "publicHoliday": "Public Holiday"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "error": {
+        "loading": "Failed to load leave requests.",
+        "creating": "Failed to create leave request.",
+        "approving": "Failed to approve leave request.",
+        "rejecting": "Failed to reject leave request.",
+        "requiredFields": "Please fill in all required fields.",
+        "invalidDateRange": "End date must be after start date.",
+        "cnasJustificationRequired": "CNAS justification is required for sick leave.",
+        "insufficientLeave": "Insufficient leave days remaining. You have {{remaining}} days left."
+      },
+      "success": {
+        "created": "Leave request created successfully.",
+        "approved": "Leave request approved successfully.",
+        "rejected": "Leave request rejected successfully."
+      }
+    },
+    "leaveRequests": {
+      "title": "Leave Requests"
+    },
+    "performanceReviews": {
+      "title": "Performance Reviews"
+    },
+    "payroll": {
+      "title": "Payroll Management",
+      "calculator": "Algerian Payroll Calculator",
+      "calculatorDescription": "Calculate salary according to Algerian regulations",
+      "calculate": "Calculate",
+      "results": "Results",
+      "payslips": "Payslips",
+      "generatePayslip": "Generate Payslip",
+      "generatePayslipDescription": "Create a new payslip for an employee",
+      "payslipTitle": "Payslip",
+      "payslipDescription": "Employee payslip with detailed breakdown",
+      "payslipFooter": "This is an official payslip. Please keep for your records.",
+      "reference": "Reference",
+      "employeeDetails": "Employee Details",
+      "paymentDetails": "Payment Details",
+      "summary": "Summary",
+      "reports": "Reports",
+      "employee": "Employee",
+      "selectEmployee": "Select employee",
+      "period": "Period",
+      "month": "Month",
+      "selectMonth": "Select month",
+      "year": "Year",
+      "selectYear": "Select year",
+      "earnings": "Earnings",
+      "grossSalary": "Gross Salary",
+      "netSalary": "Net Salary",
+      "baseSalary": "Base Salary",
+      "workDays": "Working Days",
+      "bonuses": "Bonuses",
+      "bonusesAndAllowances": "Bonuses & Allowances",
+      "transportAllowance": "Transport Allowance",
+      "housingAllowance": "Housing Allowance",
+      "totalAllowances": "Total Allowances",
+      "deductions": "Deductions",
+      "applyCNAS": "Apply CNAS Contribution",
+      "applyIRG": "Apply IRG (Income Tax)",
+      "cnasEmployeeContribution": "CNAS Employee Contribution",
+      "retirementFund": "Retirement Fund",
+      "professionalTax": "Professional Tax",
+      "unionContribution": "Union Contribution",
+      "totalDeductionsBeforeTax": "Total Deductions Before Tax",
+      "taxableIncome": "Taxable Income",
+      "irgTax": "IRG (Income Tax)",
+      "totalDeductions": "Total Deductions",
+      "totalEmployerCost": "Total Employer Cost",
+      "paymentDate": "Payment Date",
+      "view": "View",
+      "print": "Print",
+      "printSent": "Payslip sent to printer",
+      "download": "Download",
+      "downloadStarted": "Download started",
+      "payslipDetail": "Payslip Details",
+      "description": "Description",
+      "amount": "Amount",
+      "employmentDetails": "Employment Details",
+      "position": "Position",
+      "department": "Department",
+      "employerContributions": "Employer Contributions",
+      "cnasEmployerContribution": "CNAS Employer Contribution",
+      "yearToDate": "Year to Date",
+      "grossYTD": "Gross YTD",
+      "taxYTD": "Tax YTD",
+      "algerianPayrollInfo": "Algerian Payroll Information",
+      "minimumWage": "Minimum Wage",
+      "cnasEmployeeRate": "CNAS Employee Rate",
+      "cnasEmployerRate": "CNAS Employer Rate",
+      "payrollComponents": "Payroll Components",
+      "seniorityBonus": "Seniority Bonus",
+      "transportAllowance": "Transport Allowance",
+      "required": "Required",
+      "afterTwoYears": "After 2 years",
+      "included": "Included",
+      "cnasDeclaration": "CNAS Declaration",
+      "cnasDeclarationDescription": "Generate monthly CNAS declaration",
+      "cnasDeclarationInfo": "The CNAS declaration must be submitted monthly to the Algerian social security authority.",
+      "generateCNASDeclaration": "Generate CNAS Declaration",
+      "das": "DAS (Annual Salary Declaration)",
+      "dasDescription": "Generate annual salary declaration",
+      "dasInfo": "The DAS must be submitted annually to the Algerian tax authority.",
+      "generateDAS": "Generate DAS",
+      "cnasNumber": "CNAS Number",
+      "autoCalculate": "Auto-Calculate",
+      "date": "Date",
+      "history": {
+        "title": "Payroll History",
+        "description": "View past payroll calculations",
+        "empty": "No payroll history found",
+        "caption": "Recent payroll calculations"
+      },
+      "error": {
+        "loading": "Failed to load employees.",
+        "loadingHistory": "Failed to load payroll history.",
+        "calculating": "Failed to calculate payroll.",
+        "generating": "Failed to generate payslip.",
+        "cnasGenerating": "Failed to generate CNAS declaration.",
+        "dasGenerating": "Failed to generate DAS.",
+        "selectEmployee": "Please select an employee.",
+        "minimumSalary": "Salary must be at least {{minimum}} DZD.",
+        "invalidWorkDays": "Work days must be between 0 and 31.",
+        "negativeValue": "Value cannot be negative.",
+        "validationFailed": "Please fix the errors in the form.",
+        "saving": "Failed to save payroll calculation."
+      },
+      "success": {
+        "calculated": "Payroll calculated successfully.",
+        "generated": "Payslip generated successfully.",
+        "cnasGenerated": "CNAS declaration generated successfully.",
+        "dasGenerated": "DAS generated successfully.",
+        "saved": "Payroll Saved",
+        "savedDescription": "Payroll calculation saved to history.",
+        "printed": "Payslip Printed",
+        "printedDescription": "Payslip has been sent to the printer.",
+        "downloaded": "Payslip Downloaded",
+        "downloadedDescription": "Payslip has been downloaded as PDF."
+      }
+    }
+  },
+  "accounting": {
+    "title": "Accounting",
+    "dashboard": {
+      "title": "Accounting Dashboard",
+      "totalRevenue": "Total Revenue",
+      "revenueChange": "Revenue this month",
+      "totalExpenses": "Total Expenses",
+      "pendingInvoices": "Pending Invoices",
+      "openContracts": "Open Contracts",
+      "contractsChange": "Active contracts"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "addInvoice": "Add Invoice",
+      "addInvoiceDescription": "Fill in the details to add a new invoice.",
+      "number": "Number",
+      "date": "Date",
+      "dueDate": "Due Date",
+      "client": "Client",
+      "amount": "Amount",
+      "selectStatus": "Select status",
+      "status": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "overdue": "Overdue"
+      },
+      "error": {
+        "loading": "Failed to load invoices.",
+        "creating": "Failed to create invoice.",
+        "updating": "Failed to update invoice.",
+        "deleting": "Failed to delete invoice.",
+        "requiredFields": "Please fill in all required fields."
+      },
+      "success": {
+        "created": "Invoice created successfully.",
+        "updated": "Invoice updated successfully.",
+        "deleted": "Invoice deleted successfully."
+      }
+    },
+    "proforma": {
+      "title": "Proforma Invoices",
+      "addProforma": "Add Proforma",
+      "number": "Number",
+      "date": "Date",
+      "client": "Client",
+      "amount": "Amount",
+      "status": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      }
+    },
+    "contracts": {
+      "title": "Contracts"
+    },
+    "journalEntries": {
+      "title": "Journal Entries",
+      "description": "Record and manage accounting transactions",
+      "addEntry": "Add Entry",
+      "editEntry": "Edit Entry",
+      "date": "Date",
+      "reference": "Reference",
+      "description": "Description",
+      "account": "Account",
+      "debit": "Debit",
+      "credit": "Credit",
+      "period": "Period",
+      "selectPeriod": "Select period",
+      "status": "Status",
+      "balanced": "Balanced",
+      "notBalanced": "Not Balanced",
+      "lines": "Journal Entry Lines",
+      "addLine": "Add Line",
+      "lineDescription": "Line description",
+      "selectAccount": "Select account",
+      "totalDebit": "Total Debit",
+      "totalCredit": "Total Credit",
+      "difference": "Difference",
+      "error": {
+        "loading": "Error loading journal entry",
+        "referenceRequired": "Reference is required",
+        "dateRequired": "Date is required",
+        "descriptionRequired": "Description is required",
+        "periodRequired": "Accounting period is required",
+        "accountRequired": "Account is required",
+        "lineDescriptionRequired": "Line description is required",
+        "amountRequired": "Amount is required",
+        "bothDebitCredit": "Cannot have both debit and credit",
+        "notBalanced": "Journal entry must be balanced (total debit = total credit)"
+      },
+      "success": {
+        "created": "Journal entry created successfully",
+        "updated": "Journal entry updated successfully"
+      }
+    },
+    "chartOfAccounts": {
+      "title": "Chart of Accounts",
+      "scfDescription": "SCF (Système Comptable Financier) compliant",
+      "addAccount": "Add Account",
+      "editAccount": "Edit Account",
+      "code": "Code",
+      "codeHelp": "Must start with SCF class number",
+      "label": "Label",
+      "name": "Name",
+      "type": "Type",
+      "selectType": "Select account type",
+      "types": {
+        "asset": "Asset",
+        "liability": "Liability",
+        "equity": "Equity",
+        "income": "Income",
+        "expense": "Expense"
+      },
+      "scfClass": "SCF Class",
+      "class": "Class",
+      "selectClass": "Select SCF class",
+      "classes": {
+        "1": "Capital accounts",
+        "2": "Fixed assets",
+        "3": "Inventory accounts",
+        "4": "Third-party accounts",
+        "5": "Financial accounts",
+        "6": "Expense accounts",
+        "7": "Revenue accounts"
+      },
+      "parent": "Parent",
+      "isParent": "Parent Account",
+      "parentAccount": "Parent Account",
+      "selectParent": "Select parent account",
+      "category": "Category",
+      "balance": "Balance",
+      "description": "Description",
+      "isActive": "Active",
+      "error": {
+        "codeRequired": "Account code is required",
+        "codeNumeric": "Account code must contain only digits",
+        "codeStartWithClass": "Account code must start with class {{class}}",
+        "labelRequired": "Account label is required",
+        "parentRequired": "Parent account is required for non-parent accounts"
+      },
+      "success": {
+        "created": "Account created successfully",
+        "updated": "Account updated successfully"
+      }
+    },
+    "taxReporting": {
+      "title": "Tax Reporting",
+      "description": "Manage tax declarations and reports",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "annual": "Annual",
+      "upcomingDeadlines": "Upcoming Deadlines",
+      "dueIn": "Due in",
+      "days": "days",
+      "prepare": "Prepare",
+      "g50": {
+        "title": "G50 Declaration",
+        "description": "Monthly tax declaration for TVA, TAP, and IRG",
+        "generateDeclaration": "Generate G50 Declaration",
+        "generateDescription": "Create a new G50 declaration based on accounting data",
+        "number": "Declaration Number",
+        "period": "Period",
+        "selectPeriod": "Select period",
+        "periodDescription": "Select the period for which you want to generate the G50 declaration",
+        "periodType": "Period Type",
+        "periodType": {
+          "monthly": "Monthly",
+          "quarterly": "Quarterly"
+        },
+        "submissionDate": "Submission Date",
+        "dueDate": "Due Date",
+        "amount": "Amount",
+        "status": "Status",
+        "status": {
+          "draft": "Draft",
+          "submitted": "Submitted",
+          "accepted": "Accepted",
+          "rejected": "Rejected"
+        },
+        "submit": "Submit Declaration",
+        "exportPDF": "Export to PDF",
+        "exportExcel": "Export to Excel",
+        "declaration": "Declaration",
+        "details": "Details",
+        "declarationDetails": "Declaration Details",
+        "companyInfo": "Company Information",
+        "companyName": "Company Name",
+        "taxId": "Tax ID (NIF)",
+        "taxRegistrationNumber": "Tax Registration Number (NIS)",
+        "activityCode": "Activity Code",
+        "address": "Address",
+        "municipality": "Municipality",
+        "wilaya": "Wilaya",
+        "taxSections": "Tax Sections",
+        "code": "Code",
+        "name": "Name",
+        "taxType": "Tax Type",
+        "taxableAmount": "Taxable Amount",
+        "taxRate": "Tax Rate",
+        "taxAmount": "Tax Amount",
+        "totalAmount": "Total Amount",
+        "paymentInfo": "Payment Information",
+        "paymentMethod": "Payment Method",
+        "paymentReference": "Payment Reference",
+        "paymentDate": "Payment Date",
+        "year": "Year",
+        "month": "Month",
+        "quarter": "Quarter",
+        "createdBy": "Created By",
+        "createdAt": "Created At",
+        "submittedAt": "Submitted At",
+        "submittedBy": "Submitted By",
+        "manage": "Manage G50 Declarations"
+      },
+      "tva": {
+        "title": "TVA Declaration",
+        "description": "Value Added Tax declaration",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage TVA Declarations"
+      },
+      "irg": {
+        "title": "IRG Salaries",
+        "description": "Income tax on salaries",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage IRG Declarations"
+      },
+      "g50Quarterly": {
+        "title": "G50 Quarterly",
+        "description": "Quarterly tax declaration",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage Quarterly G50"
+      },
+      "ibsAdvance": {
+        "title": "IBS Advance Payments",
+        "description": "Corporate tax advance payments",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage IBS Advances"
+      },
+      "ibs": {
+        "title": "IBS Annual Declaration",
+        "description": "Annual corporate tax declaration",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage IBS Declaration"
+      },
+      "annualSummary": {
+        "title": "Annual Summary",
+        "description": "Annual client and supplier summary",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage Annual Summary"
+      },
+      "das": {
+        "title": "DAS",
+        "description": "Annual salary declaration",
+        "dueDate": "Due Date",
+        "includes": "Includes",
+        "requiredFor": "Required For",
+        "manage": "Manage DAS"
+      },
+      "error": {
+        "loading": "Failed to load tax declarations",
+        "generating": "Failed to generate tax declaration",
+        "submitting": "Failed to submit tax declaration",
+        "exporting": "Failed to export tax declaration",
+        "missingFields": "Please select a period"
+      },
+      "success": {
+        "generated": "Tax declaration generated successfully",
+        "submitted": "Tax declaration submitted successfully",
+        "exported": "Tax declaration exported successfully"
+      }
+    },
+    "financialStatements": {
+      "title": "Financial Statements",
+      "description": "Generate and view financial reports according to SCF standards",
+      "generateStatement": "Generate Statement",
+      "generateDescription": "Create a new financial statement based on accounting data",
+      "type": "Type",
+      "selectType": "Select statement type",
+      "balanceSheet": "Balance Sheet",
+      "incomeStatement": "Income Statement",
+      "cashFlowStatement": "Cash Flow Statement",
+      "period": "Period",
+      "selectPeriod": "Select accounting period",
+      "comparisonPeriod": "Comparison Period",
+      "selectComparisonPeriod": "Select comparison period (optional)",
+      "noComparison": "No comparison",
+      "comparisonDescription": "Compare with a previous period to show changes",
+      "date": "Date",
+      "status": "Status",
+      "status": {
+        "draft": "Draft",
+        "final": "Final"
+      },
+      "finalize": "Finalize",
+      "exportPDF": "Export to PDF",
+      "exportExcel": "Export to Excel",
+      "statement": "Statement",
+      "details": "Details",
+      "statementDetails": "Statement Details",
+      "createdBy": "Created By",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "code": "Code",
+      "item": "Item",
+      "amount": "Amount",
+      "previousAmount": "Previous Amount",
+      "asOf": "As of",
+      "assets": "Assets",
+      "totalAssets": "Total Assets",
+      "liabilitiesAndEquity": "Liabilities and Equity",
+      "totalLiabilitiesAndEquity": "Total Liabilities and Equity",
+      "error": {
+        "loading": "Failed to load financial statements",
+        "generating": "Failed to generate financial statement",
+        "finalizing": "Failed to finalize financial statement",
+        "exporting": "Failed to export financial statement",
+        "missingFields": "Please select a statement type and period"
+      },
+      "success": {
+        "generated": "Financial statement generated successfully",
+        "finalized": "Financial statement finalized successfully",
+        "exported": "Financial statement exported successfully"
+      }
+    },
+    "accountingPeriods": {
+      "title": "Accounting Periods",
+      "description": "Manage accounting periods for financial reporting",
+      "addPeriod": "Add Period",
+      "editPeriod": "Edit Period",
+      "name": "Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "open": "Open",
+      "closed": "Closed",
+      "closedBy": "Closed By",
+      "closedAt": "Closed At",
+      "isClosed": "Closed",
+      "close": "Close Period",
+      "error": {
+        "nameRequired": "Period name is required",
+        "startDateRequired": "Start date is required",
+        "endDateRequired": "End date is required",
+        "startDateBeforeEndDate": "Start date must be before end date",
+        "closing": "Error closing period"
+      },
+      "success": {
+        "created": "Period created successfully",
+        "updated": "Period updated successfully",
+        "closed": "Period closed successfully"
+      }
+    },
+    "generalLedger": {
+      "title": "General Ledger",
+      "description": "View and analyze account transactions",
+      "filters": "Filters",
+      "account": "Account",
+      "allAccounts": "All Accounts",
+      "period": "Period",
+      "selectPeriod": "Select Period",
+      "customPeriod": "Custom Period",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "applyFilters": "Apply Filters",
+      "date": "Date",
+      "reference": "Reference",
+      "description": "Description",
+      "debit": "Debit",
+      "credit": "Credit",
+      "balance": "Balance",
+      "openingBalance": "Opening Balance",
+      "closingBalance": "Closing Balance",
+      "totalDebit": "Total Debit",
+      "totalCredit": "Total Credit",
+      "netChange": "Net Change",
+      "noEntries": "No entries found",
+      "error": {
+        "loading": "Error loading general ledger"
+      }
     }
   },
   "analytics": {
@@ -140,11 +828,55 @@
     "overview": "Overview",
     "reports": "Reports"
   },
+  "notifications": {
+    "newUpdate": {
+      "title": "New update available",
+      "description": "A new software update is available for download."
+    },
+    "newMessage": {
+      "title": "New message",
+      "description": "You have a new message from Admin."
+    },
+    "subscription": {
+      "title": "Your subscription expires soon",
+      "description": "Your subscription will expire in 3 days."
+    }
+  },
   "settings": {
     "title": "Settings",
     "profile": "Profile",
     "preferences": "Preferences",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "appearance": "Appearance",
+    "customizeLookAndFeel": "Customize the look and feel of the application",
+    "darkMode": "Dark Mode",
+    "toggleDarkMode": "Toggle between light and dark mode",
+    "changeLanguage": "Change the application language",
+    "security": "Security",
+    "manageSecuritySettings": "Manage your security settings",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordRequirements": "Password must be at least 8 characters long",
+    "passwordChanged": "Your password has been changed successfully",
+    "passwordError": "Failed to change password",
+    "currentPasswordRequired": "Current password is required",
+    "newPasswordRequired": "New password is required",
+    "passwordsDoNotMatch": "New passwords do not match",
+    "passwordTooShort": "New password must be at least 8 characters long",
+    "currentPasswordIncorrect": "Current password is incorrect",
+    "autoLogout": "Auto Logout",
+    "inactivityTimeout": "Inactivity Timeout",
+    "inactivityTimeoutDescription": "You will be automatically logged out after this period of inactivity.",
+    "inactivityTimeoutRange": "Range: 10 seconds to 10 minutes (600 seconds).",
+    "inactivityTimeoutUpdated": "Inactivity Timeout Updated",
+    "notifications": "Notifications",
+    "manageNotificationPreferences": "Manage your notification preferences",
+    "pushNotifications": "Push Notifications",
+    "receivePushNotifications": "Receive push notifications",
+    "saveSettings": "Save Settings",
+    "settingsSaved": "Your settings have been saved successfully."
   }
 }

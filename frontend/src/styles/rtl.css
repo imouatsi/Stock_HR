@@ -1,0 +1,93 @@
+/* RTL Layout Styles */
+html[dir="rtl"] {
+  text-align: right;
+}
+
+/* Main layout */
+html[dir="rtl"] .h-screen.flex {
+  flex-direction: row-reverse;
+}
+
+/* Flex containers */
+html[dir="rtl"] .flex:not(.flex-col) {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .md\:flex:not(.flex-col) {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .items-center {
+  justify-content: flex-end;
+}
+
+html[dir="rtl"] .justify-between {
+  flex-direction: row-reverse;
+}
+
+/* Margins and paddings */
+html[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+html[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+html[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+html[dir="rtl"] .pr-2 {
+  padding-right: 0;
+  padding-left: 0.5rem;
+}
+
+html[dir="rtl"] .pl-2 {
+  padding-left: 0;
+  padding-right: 0.5rem;
+}
+
+/* Text alignment */
+html[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+html[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+/* Sidebar specific */
+html[dir="rtl"] .border-r {
+  border-right: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+html[dir="rtl"] .border-l {
+  border-left: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Icons and buttons */
+html[dir="rtl"] .items-center svg {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* Dropdown menus */
+html[dir="rtl"] .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+/* Tables */
+html[dir="rtl"] th:first-child {
+  text-align: right;
+}
+
+html[dir="rtl"] th:last-child {
+  text-align: left;
+}

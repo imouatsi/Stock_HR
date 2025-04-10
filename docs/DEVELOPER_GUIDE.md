@@ -267,22 +267,22 @@ interface ComponentProps {
 const Component: React.FC<ComponentProps> = ({ title, onAction }) => {
   // Hooks
   const { t } = useTranslation();
-  
+
   // State
   const [isLoading, setIsLoading] = React.useState(false);
-  
+
   // Effects
   React.useEffect(() => {
     // Effect logic
   }, []);
-  
+
   // Handlers
   const handleClick = () => {
     setIsLoading(true);
     onAction();
     setIsLoading(false);
   };
-  
+
   // Render
   return (
     <Box>
@@ -605,18 +605,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   ...rest
 }) => {
   const { token, user } = useSelector((state: RootState) => state.auth);
-  
-  const userHasRequiredRole = roles.length === 0 || 
+
+  const userHasRequiredRole = roles.length === 0 ||
     (user && roles.includes(user.role));
-  
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  
+
   if (!userHasRequiredRole) {
     return <Navigate to="/unauthorized" replace />;
   }
-  
+
   return <Route {...rest} />;
 };
 
@@ -665,18 +665,18 @@ import { useTranslation } from 'react-i18next';
 
 const MyComponent: React.FC = () => {
   const { t, i18n } = useTranslation();
-  
+
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     // Handle RTL for Arabic
     document.dir = lng === 'ar' ? 'rtl' : 'ltr';
   };
-  
+
   return (
     <div>
       <h1>{t('welcome.title')}</h1>
       <p>{t('welcome.description')}</p>
-      
+
       <button onClick={() => changeLanguage('en')}>English</button>
       <button onClick={() => changeLanguage('fr')}>Français</button>
       <button onClick={() => changeLanguage('ar')}>العربية</button>
@@ -700,7 +700,7 @@ const MyComponent: React.FC = () => {
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-    "email": "Email Address",
+
     "password": "Password"
   }
 }
@@ -722,14 +722,14 @@ describe('Button component', () => {
     render(<Button>Test</Button>);
     expect(screen.getByText('Test')).toBeInTheDocument();
   });
-  
+
   test('calls onClick when clicked', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Test</Button>);
     fireEvent.click(screen.getByText('Test'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
-  
+
   test('is disabled when disabled prop is true', () => {
     render(<Button disabled>Test</Button>);
     expect(screen.getByText('Test')).toBeDisabled();
@@ -750,34 +750,34 @@ describe('User API', () => {
   beforeAll(async () => {
     await connectDB();
   });
-  
+
   afterEach(async () => {
     await dropCollections();
   });
-  
+
   afterAll(async () => {
     await dropDB();
   });
-  
+
   it('should create a new user', async () => {
     const userData = {
-      email: 'test@example.com',
+      username: 'U00001',
       password: 'password123',
       firstName: 'Test',
       lastName: 'User',
       role: 'user',
     };
-    
+
     const res = await request(app)
       .post('/api/users')
       .send(userData);
-    
+
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('_id');
-    expect(res.body.email).toBe(userData.email);
+    expect(res.body.username).toBe(userData.username);
     expect(res.body).not.toHaveProperty('password');
   });
-  
+
   // More tests...
 });
 ```
@@ -820,7 +820,7 @@ services:
       - mongo-data:/data/db
     networks:
       - app-network
-  
+
   backend:
     build: ./backend
     ports:
@@ -832,7 +832,7 @@ services:
       - NODE_ENV=production
     networks:
       - app-network
-  
+
   frontend:
     build: ./frontend
     ports:
@@ -864,7 +864,7 @@ volumes:
    const sortedItems = useMemo(() => {
      return [...items].sort((a, b) => a.name.localeCompare(b.name));
    }, [items]);
-   
+
    // Memoize callbacks
    const handleClick = useCallback(() => {
      // Event handling logic
@@ -874,7 +874,7 @@ volumes:
 3. **Virtualization**: Use react-window for rendering large lists
    ```tsx
    import { FixedSizeList } from 'react-window';
-   
+
    const MyList = ({ items }) => (
      <FixedSizeList
        height={500}
@@ -902,7 +902,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for detailed contribution guidelines.
 
 ---
 
-This documentation is a living document and will be updated as the project evolves. For questions or suggestions, please open an issue on the project repository. 
+This documentation is a living document and will be updated as the project evolves. For questions or suggestions, please open an issue on the project repository.
 
 ## System Architecture
 
@@ -1129,4 +1129,4 @@ describe('Authentication API', () => {
 - Database indexing
 - Query optimization
 - Caching strategy
-- Resource management 
+- Resource management

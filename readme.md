@@ -1,26 +1,46 @@
-# Stock HR System
+# 404 ENTERPRISE
 
-A comprehensive HR management system built with Electron, TypeScript, and MongoDB.
+A comprehensive Stock and HR management system built with Electron, TypeScript, and MongoDB. 404 ENTERPRISE is designed to help businesses manage their inventory, human resources, accounting, and more in a single integrated platform.
 
 ## Features
 
-### Authentication
+### Authentication & User Management
 - Username-based authentication
 - Role-based access control
 - Secure password hashing
 - JWT token management
-
-### User Management
-- User registration
+- User registration and profile management
 - Admin authorization
-- Profile management
 - Role assignment
+
+### Stock Management
+- Inventory tracking
+- Stock movements
+- Purchase orders
+- Suppliers management
+- Low stock alerts
+
+### HR Management
+- Employee records
+- Department management
+- Position tracking
+- Leave requests
+- Performance reviews
+
+### Accounting
+- Invoices and billing
+- Proforma invoices
+- Contracts management
+- Journal entries
+- Chart of accounts
+- Financial statements
 
 ### Security
 - Password encryption
 - Session management
 - Input validation
 - Error handling
+- Audit logging
 
 ## Installation
 
@@ -32,8 +52,8 @@ A comprehensive HR management system built with Electron, TypeScript, and MongoD
 ### Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/stock-hr.git
-cd stock-hr
+git clone https://github.com/imouatsi/Stock_HR.git
+cd Stock_HR
 ```
 
 2. Install dependencies
@@ -45,7 +65,7 @@ npm install
 ```env
 NODE_ENV=development
 PORT=3000
-MONGODB_URI=mongodb://localhost:27017/stock_hr
+MONGODB_URI=mongodb://localhost:27017/404enterprise
 JWT_SECRET=your_jwt_secret_key
 JWT_EXPIRES_IN=90d
 JWT_COOKIE_EXPIRES_IN=90
@@ -148,4 +168,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-For support, email support@example.com or create an issue in the repository.
+For support, create an issue in the repository or contact the development team.
+
+## About
+
+404 ENTERPRISE is designed specifically for businesses in Algeria, with full support for the Algerian Dinar (DZD) as the default currency throughout the application.

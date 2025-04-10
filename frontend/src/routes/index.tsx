@@ -9,6 +9,14 @@ import { Suppliers } from '../modules/stock/pages/Suppliers';
 import { Movements } from '../modules/stock/pages/Movements';
 import { PurchaseOrders } from '../modules/stock/pages/PurchaseOrders';
 import { Inventory } from '../modules/stock/pages/Inventory';
+
+// New Stock Module
+import { Products } from '../modules/stock/pages/Products';
+import { ProductForm } from '../modules/stock/pages/ProductForm';
+import { ProductDetail } from '../modules/stock/pages/ProductDetail';
+import { Warehouses } from '../modules/stock/pages/Warehouses';
+import { WarehouseForm } from '../modules/stock/pages/WarehouseForm';
+import { WarehouseDetail } from '../modules/stock/pages/WarehouseDetail';
 import Login from '../modules/auth/pages/Login';
 import NotFound from '../modules/shared/pages/NotFound';
 import Profile from '../modules/profile/pages/Profile';
@@ -23,13 +31,15 @@ import { LeaveRequests } from '../modules/hr/pages/LeaveRequests';
 import { PerformanceReviews } from '../modules/hr/pages/PerformanceReviews';
 
 // Accounting Module
-import AccountingDashboard from '../modules/accounting/pages/Dashboard';
+import { AccountingDashboard } from '../modules/accounting/pages/Dashboard';
 import { Invoices } from '../modules/accounting/pages/Invoices';
 import { Proforma } from '../modules/accounting/pages/Proforma';
 import { Contracts } from '../modules/accounting/pages/Contracts';
 import { JournalEntries } from '../modules/accounting/pages/JournalEntries';
-import ChartOfAccounts from '../modules/accounting/pages/ChartOfAccounts';
+import { ChartOfAccounts } from '../modules/accounting/pages/ChartOfAccounts';
 import { FinancialStatements } from '../modules/accounting/pages/FinancialStatements';
+import AccountingPeriods from '../modules/accounting/pages/AccountingPeriods';
+import GeneralLedger from '../modules/accounting/pages/GeneralLedger';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -37,13 +47,13 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-      
+
       <Route path="/" element={<ProtectedRoute><NewLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
-        
+
         {/* Profile Route */}
         <Route path="profile" element={<Profile />} />
-        
+
         {/* Stock Management Routes */}
         <Route path="stock">
           <Route path="categories" element={<Categories />} />
@@ -51,6 +61,18 @@ const AppRoutes: React.FC = () => {
           <Route path="movements" element={<Movements />} />
           <Route path="purchase-orders" element={<PurchaseOrders />} />
           <Route path="inventory" element={<Inventory />} />
+
+          {/* New Stock Module Routes */}
+          <Route path="products" element={<Products />} />
+          <Route path="products/new" element={<ProductForm />} />
+          <Route path="products/:id" element={<ProductDetail />} />
+          <Route path="products/:id/edit" element={<ProductForm />} />
+
+          {/* Warehouse Routes */}
+          <Route path="warehouses" element={<Warehouses />} />
+          <Route path="warehouses/new" element={<WarehouseForm />} />
+          <Route path="warehouses/:id" element={<WarehouseDetail />} />
+          <Route path="warehouses/:id/edit" element={<WarehouseForm />} />
         </Route>
 
         {/* HR Module Routes */}
@@ -71,6 +93,8 @@ const AppRoutes: React.FC = () => {
           <Route path="contracts" element={<Contracts />} />
           <Route path="journal-entries" element={<JournalEntries />} />
           <Route path="chart-of-accounts" element={<ChartOfAccounts />} />
+          <Route path="accounting-periods" element={<AccountingPeriods />} />
+          <Route path="general-ledger" element={<GeneralLedger />} />
           <Route path="financial-statements" element={<FinancialStatements />} />
         </Route>
 
@@ -83,4 +107,4 @@ const AppRoutes: React.FC = () => {
   );
 };
 
-export default AppRoutes; 
+export default AppRoutes;

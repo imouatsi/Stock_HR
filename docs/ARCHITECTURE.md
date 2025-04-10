@@ -1,7 +1,7 @@
-# System Architecture
+# 404 ENTERPRISE System Architecture
 
 ## Overview
-Stock HR uses a microservices architecture with event-driven communication.
+404 ENTERPRISE uses a microservices architecture with event-driven communication between its core modules: Stock Management, HR Management, and Accounting.
 
 ## Service Components
 
@@ -19,7 +19,7 @@ graph TB
     Processing --> ML[ML Models]
     ML --> Predictions[Predictions]
     ML --> Insights[Insights]
-    
+
     Processing --> Stream[Stream Processing]
     Stream --> RT[Real-time Analytics]
     RT --> Dashboard[Dashboard]
@@ -33,7 +33,7 @@ sequenceDiagram
     participant Cache
     participant DB
     participant Queue
-    
+
     Client->>API: Request
     API->>Cache: Check Cache
     Cache-->>API: Cache Miss
@@ -43,9 +43,11 @@ sequenceDiagram
     API-->>Client: Response
 ```
 
-# Architecture Documentation
+# 404 ENTERPRISE Architecture Documentation
 
 ## System Overview
+
+404 ENTERPRISE is a comprehensive business management system designed for Algerian businesses, with integrated modules for Stock Management, HR Management, and Accounting. The system uses Algerian Dinar (DZD) as the default currency throughout all financial operations.
 
 ### Authentication System
 - Username-based authentication
@@ -58,6 +60,30 @@ sequenceDiagram
 - User authorization
 - Role management
 - Permission control
+
+## Core Modules
+
+### Stock Management Module
+- Inventory tracking
+- Stock movements
+- Purchase orders
+- Supplier management
+- Low stock alerts
+
+### HR Management Module
+- Employee records
+- Department management
+- Position tracking
+- Leave requests
+- Performance reviews
+
+### Accounting Module
+- Invoices and billing
+- Proforma invoices
+- Contracts management
+- Journal entries
+- Chart of accounts
+- Financial statements
 
 ## Components
 

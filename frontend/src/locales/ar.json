@@ -30,10 +30,37 @@
     "browserNotifications": "إشعارات المتصفح",
     "soundNotifications": "التنبيهات الصوتية",
     "desktopNotifications": "إشعارات سطح المكتب",
-    "autoLogout": "تسجيل الخروج التلقائي (بالدقائق)",
+    "autoLogout": "تسجيل الخروج التلقائي",
     "theme": "المظهر",
     "profile": "الملف الشخصي",
-    "preferences": "التفضيلات"
+    "preferences": "التفضيلات",
+    "appearance": "المظهر",
+    "customizeLookAndFeel": "تخصيص مظهر وإحساس التطبيق",
+    "toggleDarkMode": "التبديل بين الوضع الفاتح والداكن",
+    "changeLanguage": "تغيير لغة التطبيق",
+    "security": "الأمان",
+    "manageSecuritySettings": "إدارة إعدادات الأمان الخاصة بك",
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordRequirements": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+    "passwordChanged": "تم تغيير كلمة المرور الخاصة بك بنجاح",
+    "passwordError": "فشل في تغيير كلمة المرور",
+    "currentPasswordRequired": "كلمة المرور الحالية مطلوبة",
+    "newPasswordRequired": "كلمة المرور الجديدة مطلوبة",
+    "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
+    "passwordTooShort": "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل",
+    "currentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
+    "inactivityTimeout": "مهلة الخمول",
+    "inactivityTimeoutDescription": "سيتم تسجيل خروجك تلقائيًا بعد هذه الفترة من الخمول.",
+    "inactivityTimeoutRange": "النطاق: 10 ثواني إلى 10 دقائق (600 ثانية).",
+    "inactivityTimeoutUpdated": "تم تحديث مهلة الخمول",
+    "manageNotificationPreferences": "إدارة تفضيلات الإشعارات الخاصة بك",
+    "pushNotifications": "إشعارات الدفع",
+    "receivePushNotifications": "تلقي إشعارات الدفع",
+    "saveSettings": "حفظ الإعدادات",
+    "settingsSaved": "تم حفظ الإعدادات الخاصة بك بنجاح."
   },
   "common": {
     "noData": "لا توجد بيانات",
@@ -59,6 +86,12 @@
     "filter": "تصفية",
     "actions": "الإجراءات",
     "loading": "جاري التحميل...",
+    "notifications": "الإشعارات",
+    "timeAgo": {
+      "hour": "منذ {{count}} ساعة",
+      "minute": "منذ {{count}} دقيقة",
+      "day": "منذ {{count}} يوم"
+    },
     "error": {
       "title": "خطأ",
       "loading": "فشل في تحميل البيانات",
@@ -68,15 +101,21 @@
     "success": "نجاح",
     "confirm": "تأكيد",
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "reset": "إعادة تعيين"
   },
   "auth": {
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
+    "username": "اسم المستخدم",
     "submit": "إرسال",
-    "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    "signIn": "تسجيل الدخول إلى حسابك",
+    "signInButton": "تسجيل الدخول",
+    "error": {
+      "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة"
+    }
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -99,6 +138,10 @@
     "editItem": "تعديل الصنف",
     "deleteItem": "حذف الصنف",
     "deleteConfirm": "هل أنت متأكد من حذف هذا الصنف؟",
+    "purchaseOrders": {
+      "title": "طلبات الشراء",
+      "add": "إضافة طلب شراء"
+    },
     "fields": {
       "name": "اسم الصنف",
       "description": "الوصف",
@@ -196,9 +239,301 @@
       "confirmCancel": "هل أنت متأكد من إلغاء هذه الحركة؟"
     }
   },
+  "hr": {
+    "title": "إدارة الموارد البشرية",
+    "dashboard": {
+      "title": "لوحة تحكم الموارد البشرية",
+      "totalEmployees": "إجمالي الموظفين",
+      "employeesChange": "الموظفين النشطين",
+      "activeDepartments": "الأقسام النشطة",
+      "pendingLeaveRequests": "طلبات الإجازة المعلقة",
+      "upcomingReviews": "المراجعات القادمة"
+    },
+    "employees": {
+      "title": "الموظفين",
+      "addEmployee": "إضافة موظف",
+      "firstName": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "email": "البريد الإلكتروني",
+      "department": "القسم",
+      "position": "المنصب",
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط"
+      }
+    },
+    "departments": {
+      "title": "الأقسام"
+    },
+    "positions": {
+      "title": "المناصب"
+    },
+    "leaveRequests": {
+      "title": "طلبات الإجازة"
+    },
+    "performanceReviews": {
+      "title": "تقييمات الأداء"
+    }
+  },
+  "accounting": {
+    "title": "المحاسبة",
+    "dashboard": {
+      "title": "لوحة تحكم المحاسبة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "revenueChange": "الإيرادات هذا الشهر",
+      "totalExpenses": "إجمالي المصروفات",
+      "pendingInvoices": "الفواتير المعلقة",
+      "openContracts": "العقود المفتوحة",
+      "contractsChange": "العقود النشطة"
+    },
+    "invoices": {
+      "title": "الفواتير",
+      "addInvoice": "إضافة فاتورة",
+      "number": "الرقم",
+      "date": "التاريخ",
+      "dueDate": "تاريخ الاستحقاق",
+      "client": "العميل",
+      "amount": "المبلغ",
+      "status": {
+        "paid": "مدفوعة",
+        "pending": "معلقة",
+        "overdue": "متأخرة"
+      }
+    },
+    "proforma": {
+      "title": "الفواتير الأولية",
+      "addProforma": "إضافة فاتورة أولية",
+      "number": "الرقم",
+      "date": "التاريخ",
+      "client": "العميل",
+      "amount": "المبلغ",
+      "status": {
+        "draft": "مسودة",
+        "sent": "مرسلة",
+        "accepted": "مقبولة",
+        "rejected": "مرفوضة"
+      }
+    },
+    "contracts": {
+      "title": "العقود"
+    },
+    "journalEntries": {
+      "title": "قيود اليومية",
+      "description": "تسجيل وإدارة المعاملات المحاسبية",
+      "addEntry": "إضافة قيد",
+      "editEntry": "تعديل القيد",
+      "date": "التاريخ",
+      "reference": "المرجع",
+      "description": "الوصف",
+      "account": "الحساب",
+      "debit": "مدين",
+      "credit": "دائن",
+      "period": "الفترة",
+      "selectPeriod": "اختر الفترة",
+      "status": "الحالة",
+      "balanced": "متوازن",
+      "notBalanced": "غير متوازن",
+      "lines": "بنود القيد",
+      "addLine": "إضافة بند",
+      "lineDescription": "وصف البند",
+      "selectAccount": "اختر الحساب",
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "difference": "الفرق",
+      "error": {
+        "loading": "خطأ في تحميل القيد",
+        "referenceRequired": "المرجع مطلوب",
+        "dateRequired": "التاريخ مطلوب",
+        "descriptionRequired": "الوصف مطلوب",
+        "periodRequired": "الفترة المحاسبية مطلوبة",
+        "accountRequired": "الحساب مطلوب",
+        "lineDescriptionRequired": "وصف البند مطلوب",
+        "amountRequired": "المبلغ مطلوب",
+        "bothDebitCredit": "لا يمكن أن يكون لديك مدين ودائن معاً",
+        "notBalanced": "يجب أن يكون القيد متوازناً (إجمالي المدين = إجمالي الدائن)"
+      },
+      "success": {
+        "created": "تم إنشاء القيد بنجاح",
+        "updated": "تم تحديث القيد بنجاح"
+      }
+    },
+    "chartOfAccounts": {
+      "title": "دليل الحسابات",
+      "scfDescription": "متوافق مع النظام المحاسبي المالي (SCF)",
+      "addAccount": "إضافة حساب",
+      "editAccount": "تعديل الحساب",
+      "code": "الرمز",
+      "codeHelp": "يجب أن يبدأ برقم فئة النظام المحاسبي المالي",
+      "label": "التسمية",
+      "name": "الاسم",
+      "type": "النوع",
+      "selectType": "اختر نوع الحساب",
+      "types": {
+        "asset": "أصول",
+        "liability": "خصوم",
+        "equity": "حقوق الملكية",
+        "income": "إيرادات",
+        "expense": "مصروفات"
+      },
+      "scfClass": "فئة النظام المحاسبي المالي",
+      "class": "الفئة",
+      "selectClass": "اختر فئة النظام المحاسبي المالي",
+      "classes": {
+        "1": "حسابات رأس المال",
+        "2": "حسابات الأصول الثابتة",
+        "3": "حسابات المخزون",
+        "4": "حسابات الغير",
+        "5": "الحسابات المالية",
+        "6": "حسابات المصروفات",
+        "7": "حسابات الإيرادات"
+      },
+      "parent": "الأصل",
+      "isParent": "حساب أصلي",
+      "parentAccount": "الحساب الأصلي",
+      "selectParent": "اختر الحساب الأصلي",
+      "category": "الفئة",
+      "balance": "الرصيد",
+      "description": "الوصف",
+      "isActive": "نشط",
+      "error": {
+        "codeRequired": "رمز الحساب مطلوب",
+        "codeNumeric": "يجب أن يحتوي رمز الحساب على أرقام فقط",
+        "codeStartWithClass": "يجب أن يبدأ رمز الحساب بالفئة {{class}}",
+        "labelRequired": "تسمية الحساب مطلوبة",
+        "parentRequired": "الحساب الأصلي مطلوب للحسابات غير الأصلية"
+      },
+      "success": {
+        "created": "تم إنشاء الحساب بنجاح",
+        "updated": "تم تحديث الحساب بنجاح"
+      }
+    },
+    "financialStatements": {
+      "title": "القوائم المالية",
+      "description": "إنشاء وعرض التقارير المالية وفقاً لمعايير النظام المحاسبي المالي",
+      "generateStatement": "إنشاء قائمة",
+      "generateDescription": "إنشاء قائمة مالية جديدة بناءً على البيانات المحاسبية",
+      "type": "النوع",
+      "selectType": "اختر نوع القائمة",
+      "balanceSheet": "الميزانية العمومية",
+      "incomeStatement": "قائمة الدخل",
+      "cashFlowStatement": "قائمة التدفقات النقدية",
+      "period": "الفترة",
+      "selectPeriod": "اختر الفترة المحاسبية",
+      "comparisonPeriod": "فترة المقارنة",
+      "selectComparisonPeriod": "اختر فترة المقارنة (اختياري)",
+      "noComparison": "بدون مقارنة",
+      "comparisonDescription": "مقارنة مع فترة سابقة لإظهار التغييرات",
+      "date": "التاريخ",
+      "status": "الحالة",
+      "status": {
+        "draft": "مسودة",
+        "final": "نهائي"
+      },
+      "finalize": "إنهاء",
+      "exportPDF": "تصدير إلى PDF",
+      "exportExcel": "تصدير إلى Excel",
+      "statement": "القائمة",
+      "details": "التفاصيل",
+      "statementDetails": "تفاصيل القائمة",
+      "createdBy": "أنشئت بواسطة",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "code": "الرمز",
+      "item": "البند",
+      "amount": "المبلغ",
+      "previousAmount": "المبلغ السابق",
+      "asOf": "كما في",
+      "assets": "الأصول",
+      "totalAssets": "إجمالي الأصول",
+      "liabilitiesAndEquity": "الالتزامات وحقوق الملكية",
+      "totalLiabilitiesAndEquity": "إجمالي الالتزامات وحقوق الملكية",
+      "error": {
+        "loading": "فشل في تحميل القوائم المالية",
+        "generating": "فشل في إنشاء القائمة المالية",
+        "finalizing": "فشل في إنهاء القائمة المالية",
+        "exporting": "فشل في تصدير القائمة المالية",
+        "missingFields": "الرجاء اختيار نوع القائمة والفترة"
+      },
+      "success": {
+        "generated": "تم إنشاء القائمة المالية بنجاح",
+        "finalized": "تم إنهاء القائمة المالية بنجاح",
+        "exported": "تم تصدير القائمة المالية بنجاح"
+      }
+    },
+    "accountingPeriods": {
+      "title": "الفترات المحاسبية",
+      "description": "إدارة الفترات المحاسبية للتقارير المالية",
+      "addPeriod": "إضافة فترة",
+      "editPeriod": "تعديل الفترة",
+      "name": "الاسم",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "status": "الحالة",
+      "open": "مفتوحة",
+      "closed": "مغلقة",
+      "closedBy": "أغلقت بواسطة",
+      "closedAt": "أغلقت في",
+      "isClosed": "مغلقة",
+      "close": "إغلاق الفترة",
+      "error": {
+        "nameRequired": "اسم الفترة مطلوب",
+        "startDateRequired": "تاريخ البدء مطلوب",
+        "endDateRequired": "تاريخ الانتهاء مطلوب",
+        "startDateBeforeEndDate": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء",
+        "closing": "خطأ في إغلاق الفترة"
+      },
+      "success": {
+        "created": "تم إنشاء الفترة بنجاح",
+        "updated": "تم تحديث الفترة بنجاح",
+        "closed": "تم إغلاق الفترة بنجاح"
+      }
+    },
+    "generalLedger": {
+      "title": "دفتر الأستاذ العام",
+      "description": "عرض وتحليل معاملات الحسابات",
+      "filters": "المرشحات",
+      "account": "الحساب",
+      "allAccounts": "جميع الحسابات",
+      "period": "الفترة",
+      "selectPeriod": "اختر الفترة",
+      "customPeriod": "فترة مخصصة",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "applyFilters": "تطبيق المرشحات",
+      "date": "التاريخ",
+      "reference": "المرجع",
+      "description": "الوصف",
+      "debit": "مدين",
+      "credit": "دائن",
+      "balance": "الرصيد",
+      "openingBalance": "الرصيد الافتتاحي",
+      "closingBalance": "الرصيد الختامي",
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "netChange": "التغيير الصافي",
+      "noEntries": "لا توجد قيود",
+      "error": {
+        "loading": "خطأ في تحميل دفتر الأستاذ العام"
+      }
+    }
+  },
   "analytics": {
     "title": "التحليلات",
     "overview": "نظرة عامة",
     "reports": "التقارير"
+  },
+  "notifications": {
+    "newUpdate": {
+      "title": "تحديث جديد متاح",
+      "description": "يتوفر تحديث برمجي جديد للتنزيل."
+    },
+    "newMessage": {
+      "title": "رسالة جديدة",
+      "description": "لديك رسالة جديدة من المسؤول."
+    },
+    "subscription": {
+      "title": "اشتراكك ينتهي قريباً",
+      "description": "سينتهي اشتراكك في غضون 3 أيام."
+    }
   }
 }

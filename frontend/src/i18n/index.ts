@@ -4,10 +4,12 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import en from './locales/en.json';
 import fr from './locales/fr.json';
+import ar from './locales/ar.json';
 
 export const languages = [
   { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' }
+  { code: 'fr', name: 'Français' },
+  { code: 'ar', name: 'العربية' }
 ];
 
 i18n
@@ -16,10 +18,11 @@ i18n
   .init({
     resources: {
       en: { translation: en },
-      fr: { translation: fr }
+      fr: { translation: fr },
+      ar: { translation: ar }
     },
     fallbackLng: 'en',
-    supportedLngs: ['en', 'fr'],
+    supportedLngs: ['en', 'fr', 'ar'],
     interpolation: {
       escapeValue: false
     },
@@ -43,4 +46,4 @@ i18n.on('languageChanged', (lng) => {
   setDocumentDirection(lng);
 });
 
-export default i18n; 
+export default i18n;

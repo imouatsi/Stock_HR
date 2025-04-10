@@ -1,6 +1,6 @@
-# Deployment Guide
+# 404 ENTERPRISE Deployment Guide
 
-This document provides step-by-step instructions for deploying the Stock & HR Management System to different environments.
+This document provides step-by-step instructions for deploying the 404 ENTERPRISE system to different environments.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ This document provides step-by-step instructions for deploying the Stock & HR Ma
 
 ## Prerequisites
 
-Before deploying the Stock & HR Management System, ensure you have the following:
+Before deploying 404 ENTERPRISE, ensure you have the following:
 
 - Node.js v14.x or later
 - MongoDB v4.4 or later
@@ -47,7 +47,7 @@ REACT_APP_SENTRY_DSN=your_sentry_dsn (optional)
 ```
 PORT=5000
 NODE_ENV=production
-MONGODB_URI=mongodb://mongodb:27017/stockhr
+MONGODB_URI=mongodb://mongodb:27017/404enterprise
 JWT_SECRET=your_secure_jwt_secret
 CORS_ORIGIN=https://yourdomain.com
 LOG_LEVEL=info
@@ -97,23 +97,23 @@ For testing deployment locally before moving to production:
    ```bash
    # Update packages
    sudo apt update && sudo apt upgrade -y
-   
+
    # Install Node.js
    curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
    sudo apt-get install -y nodejs
-   
+
    # Install MongoDB
    sudo apt-get install -y mongodb
    sudo systemctl enable mongodb
    sudo systemctl start mongodb
-   
+
    # Install PM2 process manager
    sudo npm install -g pm2
    ```
 
 2. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/stock-hr.git
+   git clone https://github.com/imouatsi/Stock_HR.git
    cd stock-hr
    ```
 
@@ -132,7 +132,7 @@ For testing deployment locally before moving to production:
 
 5. Start the backend with PM2:
    ```bash
-   pm2 start dist/server.js --name "stock-hr-api"
+   pm2 start dist/server.js --name "404enterprise-api"
    pm2 save
    pm2 startup
    ```
@@ -153,17 +153,17 @@ For testing deployment locally before moving to production:
 
 3. Create an Nginx configuration:
    ```
-   # /etc/nginx/sites-available/stock-hr
+   # /etc/nginx/sites-available/404enterprise
    server {
        listen 80;
        server_name yourdomain.com www.yourdomain.com;
-       
+
        location / {
            root /path/to/stock-hr/frontend/build;
            index index.html;
            try_files $uri $uri/ /index.html;
        }
-       
+
        location /api {
            proxy_pass http://localhost:5000;
            proxy_http_version 1.1;
@@ -177,7 +177,7 @@ For testing deployment locally before moving to production:
 
 4. Enable the site and restart Nginx:
    ```bash
-   sudo ln -s /etc/nginx/sites-available/stock-hr /etc/nginx/sites-enabled/
+   sudo ln -s /etc/nginx/sites-available/404enterprise /etc/nginx/sites-enabled/
    sudo nginx -t
    sudo systemctl restart nginx
    ```
@@ -195,7 +195,7 @@ For testing deployment locally before moving to production:
    # Install Docker
    curl -fsSL https://get.docker.com -o get-docker.sh
    sudo sh get-docker.sh
-   
+
    # Install Docker Compose
    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
    sudo chmod +x /usr/local/bin/docker-compose
@@ -212,7 +212,7 @@ For testing deployment locally before moving to production:
        networks:
          - app-network
        restart: always
-   
+
      backend:
        build: ./backend
        ports:
@@ -220,7 +220,7 @@ For testing deployment locally before moving to production:
        depends_on:
          - mongodb
        environment:
-         - MONGODB_URI=mongodb://mongodb:27017/stockhr
+         - MONGODB_URI=mongodb://mongodb:27017/404enterprise
          - NODE_ENV=production
          - JWT_SECRET=${JWT_SECRET}
          - PORT=5000
@@ -228,7 +228,7 @@ For testing deployment locally before moving to production:
        networks:
          - app-network
        restart: always
-   
+
      frontend:
        build: ./frontend
        ports:
@@ -242,10 +242,10 @@ For testing deployment locally before moving to production:
        networks:
          - app-network
        restart: always
-   
+
    networks:
      app-network:
-   
+
    volumes:
      mongo-data:
    ```
@@ -259,7 +259,7 @@ For testing deployment locally before moving to production:
    RUN npm install
    COPY . .
    RUN npm run build
-   
+
    FROM nginx:alpine
    COPY --from=build /app/build /usr/share/nginx/html
    EXPOSE 80
@@ -285,13 +285,13 @@ For testing deployment locally before moving to production:
    server {
        listen 80;
        server_name localhost;
-       
+
        location / {
            root /usr/share/nginx/html;
            index index.html;
            try_files $uri $uri/ /index.html;
        }
-       
+
        location /api {
            proxy_pass http://backend:5000;
            proxy_http_version 1.1;
@@ -308,7 +308,7 @@ For testing deployment locally before moving to production:
    # Create a .env file for Docker environment variables
    echo "JWT_SECRET=your_secure_jwt_secret" > .env
    echo "CORS_ORIGIN=https://yourdomain.com" >> .env
-   
+
    # Build and start the containers
    docker-compose up -d
    ```
@@ -340,12 +340,12 @@ For testing deployment locally before moving to production:
    cd backend
    heroku create stock-hr-api
    heroku addons:create mongolab:sandbox
-   
+
    # Set environment variables
    heroku config:set NODE_ENV=production
    heroku config:set JWT_SECRET=your_secure_jwt_secret
    heroku config:set CORS_ORIGIN=https://stock-hr-frontend.herokuapp.com
-   
+
    # Deploy
    git push heroku main
    ```
@@ -354,13 +354,13 @@ For testing deployment locally before moving to production:
    ```bash
    cd frontend
    heroku create stock-hr-frontend
-   
+
    # Set environment variables
    heroku config:set REACT_APP_API_URL=https://stock-hr-api.herokuapp.com/api
-   
+
    # Create static.json for static site hosting
    echo '{ "root": "build/", "routes": { "/**": "index.html" } }' > static.json
-   
+
    # Deploy
    git push heroku main
    ```
@@ -372,7 +372,7 @@ For testing deployment locally before moving to production:
 Create a `.github/workflows/deploy.yml` file:
 
 ```yaml
-name: Deploy Stock & HR Management System
+name: Deploy 404 ENTERPRISE
 
 on:
   push:
@@ -429,20 +429,20 @@ jobs:
 
 ```bash
 # Create a backup
-mongodump --uri="mongodb://localhost:27017/stockhr" --out=/backup/stockhr-$(date +%Y%m%d)
+mongodump --uri="mongodb://localhost:27017/404enterprise" --out=/backup/404enterprise-$(date +%Y%m%d)
 
 # Compress the backup
-tar -zcvf /backup/stockhr-$(date +%Y%m%d).tar.gz /backup/stockhr-$(date +%Y%m%d)
+tar -zcvf /backup/404enterprise-$(date +%Y%m%d).tar.gz /backup/404enterprise-$(date +%Y%m%d)
 ```
 
 ### Restoring MongoDB
 
 ```bash
 # Extract backup
-tar -zxvf /backup/stockhr-20230101.tar.gz -C /tmp
+tar -zxvf /backup/404enterprise-20230101.tar.gz -C /tmp
 
 # Restore from backup
-mongorestore --uri="mongodb://localhost:27017/stockhr" --drop /tmp/stockhr-20230101/stockhr
+mongorestore --uri="mongodb://localhost:27017/404enterprise" --drop /tmp/404enterprise-20230101/404enterprise
 ```
 
 ### Automated Backups
@@ -467,17 +467,17 @@ Create a file named `backup-script.sh`:
 #!/bin/bash
 BACKUP_DIR=/backup
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE=${BACKUP_DIR}/stockhr_${TIMESTAMP}
+BACKUP_FILE=${BACKUP_DIR}/404enterprise_${TIMESTAMP}
 
 # Create MongoDB backup
-mongodump --uri="mongodb://localhost:27017/stockhr" --out=${BACKUP_FILE}
+mongodump --uri="mongodb://localhost:27017/404enterprise" --out=${BACKUP_FILE}
 
 # Compress backup
 tar -zcvf ${BACKUP_FILE}.tar.gz ${BACKUP_FILE}
 rm -rf ${BACKUP_FILE}
 
 # Keep only the last 7 backups
-find ${BACKUP_DIR} -name "stockhr_*.tar.gz" -type f -mtime +7 -delete
+find ${BACKUP_DIR} -name "404enterprise_*.tar.gz" -type f -mtime +7 -delete
 
 # Optional: Upload to S3 or other cloud storage
 # aws s3 cp ${BACKUP_FILE}.tar.gz s3://your-bucket/backups/
@@ -530,11 +530,11 @@ chmod +x backup-script.sh
        server backend2.example.com;
        server backend3.example.com;
    }
-   
+
    server {
        listen 80;
        server_name api.example.com;
-       
+
        location / {
            proxy_pass http://backend;
            proxy_http_version 1.1;
@@ -598,4 +598,8 @@ See the [Troubleshooting Guide](TROUBLESHOOTING.md) for common deployment issues
 
 ---
 
-This deployment guide covers the basics of deploying the Stock & HR Management System. For complex deployments or specialized environments, additional configuration may be required. If you encounter issues, consult the documentation or seek assistance from the development team.
+This deployment guide covers the basics of deploying 404 ENTERPRISE. For complex deployments or specialized environments, additional configuration may be required. If you encounter issues, consult the documentation or seek assistance from the development team.
+
+## Currency Configuration
+
+404 ENTERPRISE is configured to use the Algerian Dinar (DZD) as the default currency throughout the application. This is hardcoded in the application and does not require any additional configuration during deployment.

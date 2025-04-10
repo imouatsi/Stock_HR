@@ -9,7 +9,7 @@ export enum UserRole {
 
 export interface User {
   id: string;
-  email: string;
+  username: string;
   firstName: string;
   lastName: string;
   role: UserRole;
@@ -22,7 +22,7 @@ export interface UserSettings {
   theme: 'light' | 'dark';
   language: string;
   notifications: {
-    email: boolean;
+
     push: boolean;
   };
 }
@@ -31,7 +31,7 @@ export interface UserProfile {
   id: string;
   username: string;
   role: UserRole;
-  email?: string;
+
   firstName?: string;
   lastName?: string;
   department?: string;
@@ -79,12 +79,12 @@ export type UserFormData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 export type UserProfileFormData = Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt'>;
 
 export interface LoginCredentials {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface RegisterData {
-  email: string;
+  username: string;
   password: string;
   firstName: string;
   lastName: string;
@@ -99,4 +99,4 @@ export interface AuthResponse {
 export interface ErrorResponse {
   message: string;
   code?: string;
-} 
+}

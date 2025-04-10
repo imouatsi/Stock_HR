@@ -6,15 +6,11 @@ import { Input } from '../../../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/useToast';
-import apiService from "../../../services/api.service";
+import { stockService, type Supplier as StockSupplier } from '../../../services/stockService';
 
-interface Supplier {
-  _id: string;
-  name: string;
-  contactPerson?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
+// Using StockSupplier from stockService
+interface Supplier extends StockSupplier {
+  _id: string; // Ensure _id is available
   createdAt: string;
   updatedAt: string;
 }
@@ -44,8 +40,8 @@ export const Suppliers: React.FC = () => {
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get('/suppliers');
-      setSuppliers(response.data);
+      const suppliers = await stockService.getAllSuppliers();
+      setSuppliers(suppliers);
       setError(null);
     } catch (err) {
       setError(t('common.error.loading'));
@@ -63,13 +59,13 @@ export const Suppliers: React.FC = () => {
     e.preventDefault();
     try {
       if (editingSupplier) {
-        await apiService.put(`/suppliers/${editingSupplier._id}`, formData);
+        await stockService.updateSupplier(editingSupplier._id, formData);
         showToast({
           title: t('common.success'),
           description: t('stock.suppliers.updateSuccess')
         });
       } else {
-        await apiService.post('/suppliers', formData);
+        await stockService.createSupplier(formData);
         showToast({
           title: t('common.success'),
           description: t('stock.suppliers.createSuccess')
@@ -96,9 +92,9 @@ export const Suppliers: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('stock.suppliers.confirmDelete'))) return;
-    
+
     try {
-      await apiService.delete(`/suppliers/${id}`);
+      await stockService.deleteSupplier(id);
       showToast({
         title: t('common.success'),
         description: t('stock.suppliers.deleteSuccess')
@@ -113,12 +109,12 @@ export const Suppliers: React.FC = () => {
     }
   };
 
-  const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (supplier.contactPerson && supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (supplier.email && supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (supplier.phone && supplier.phone.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredSuppliers = Array.isArray(suppliers) ? suppliers.filter(supplier =>
+    supplier?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (supplier?.contactPerson && supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (supplier?.address && supplier.address.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (supplier?.phone && supplier.phone.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) : [];
 
   return (
     <div className="space-y-4">
@@ -151,18 +147,18 @@ export const Suppliers: React.FC = () => {
               <TableRow>
                 <TableHead>{t('stock.suppliers.name')}</TableHead>
                 <TableHead>{t('stock.suppliers.contactPerson')}</TableHead>
-                <TableHead>{t('stock.suppliers.email')}</TableHead>
+                <TableHead>{t('stock.suppliers.address')}</TableHead>
                 <TableHead>{t('stock.suppliers.phone')}</TableHead>
                 <TableHead>{t('common.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSuppliers.map((supplier) => (
+              {filteredSuppliers?.map((supplier) => (
                 <TableRow key={supplier._id}>
-                  <TableCell>{supplier.name}</TableCell>
-                  <TableCell>{supplier.contactPerson}</TableCell>
-                  <TableCell>{supplier.email}</TableCell>
-                  <TableCell>{supplier.phone}</TableCell>
+                  <TableCell>{supplier?.name}</TableCell>
+                  <TableCell>{supplier?.contactPerson}</TableCell>
+                  <TableCell>{supplier?.address}</TableCell>
+                  <TableCell>{supplier?.phone}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -230,9 +226,9 @@ export const Suppliers: React.FC = () => {
                 {t('stock.suppliers.email')}
               </label>
               <Input
-                type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                type="email"
               />
             </div>
             <div>
@@ -266,4 +262,4 @@ export const Suppliers: React.FC = () => {
       </Dialog>
     </div>
   );
-}; 
+};

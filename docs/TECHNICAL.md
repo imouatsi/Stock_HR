@@ -1,6 +1,6 @@
-# Technical Documentation
+# 404 ENTERPRISE Technical Documentation
 
-## Architecture Overview
+## 404 ENTERPRISE Architecture Overview
 
 ### System Components
 - Frontend: React 18 + TypeScript
@@ -326,3 +326,28 @@ const logAuthEvent = (event: string, metadata?: Record<string, any>): void => {
 - Query optimization
 - Caching strategy
 - Resource management
+
+## Currency Handling
+
+### Algerian Dinar (DZD) Implementation
+```typescript
+interface CurrencyConfig {
+  code: 'DZD';
+  symbol: 'DA';
+  locale: 'fr-DZ';
+  precision: 2;
+}
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('fr-DZ', {
+    style: 'currency',
+    currency: 'DZD',
+  }).format(amount);
+};
+
+const parseCurrency = (value: string): number => {
+  // Remove currency symbol and non-numeric characters except decimal point
+  const numericValue = value.replace(/[^0-9.]/g, '');
+  return parseFloat(numericValue);
+};
+```

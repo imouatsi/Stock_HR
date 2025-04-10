@@ -1,6 +1,6 @@
-# Troubleshooting Guide
+# 404 ENTERPRISE Troubleshooting Guide
 
-This document provides solutions for common issues you might encounter while working with the Stock & HR Management System.
+This document provides solutions for common issues you might encounter while working with 404 ENTERPRISE.
 
 ## Table of Contents
 
@@ -71,7 +71,7 @@ This document provides solutions for common issues you might encounter while wor
 4. Reset the user's password in the database:
    ```javascript
    // In MongoDB shell
-   use stockhr
+   use 404enterprise
    db.users.updateOne(
      { email: "user@example.com" },
      { $set: { password: "$2a$10$X/YZwZ..." } }
@@ -246,6 +246,39 @@ This document provides solutions for common issues you might encounter while wor
 3. Monitor backend memory usage
 4. Implement proper garbage collection practices
 5. Consider implementing a monitoring tool like Sentry
+
+## Currency-Related Issues
+
+### Currency Displays as USD Instead of DZD
+
+**Issue**: Some parts of the application display USD instead of DZD.
+
+**Solution**:
+1. Check the formatting in the component:
+   ```typescript
+   // Incorrect
+   new Intl.NumberFormat('en-US', {
+     style: 'currency',
+     currency: 'USD',
+   }).format(amount)
+
+   // Correct
+   new Intl.NumberFormat('fr-DZ', {
+     style: 'currency',
+     currency: 'DZD',
+   }).format(amount)
+   ```
+2. Update any hardcoded currency symbols from $ to DZD
+3. Verify the locale settings in your application
+
+### Currency Conversion Issues
+
+**Issue**: Values are not correctly converted or displayed.
+
+**Solution**:
+1. Ensure all monetary values are stored in DZD
+2. Check for any currency conversion functions that might be using incorrect rates
+3. Verify decimal precision is appropriate for DZD (2 decimal places)
 
 ## Common Error Messages
 
@@ -451,4 +484,4 @@ Use the bug report template when creating a new issue on GitHub.
 
 ---
 
-If you need further assistance, please contact support at [support@example.com](mailto:support@example.com) or join our [Discord community](https://discord.gg/example). 
+If you need further assistance, please create an issue on the [GitHub repository](https://github.com/imouatsi/Stock_HR) with detailed information about your problem.

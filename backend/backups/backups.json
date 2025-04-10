@@ -26,6 +26,19 @@
         "users",
         "inventoryitems"
       ]
+    },
+    {
+      "id": "backup_2025-04-09T16-00-00-091Z",
+      "timestamp": "2025-04-09T16:00:00.091Z",
+      "size": 15524,
+      "collections": [
+        "users",
+        "stockitems",
+        "inventories",
+        "contracts",
+        "invoices",
+        "inventoryitems"
+      ]
     }
   ]
 }

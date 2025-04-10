@@ -1,34 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { BarChart, DollarSign, Users, Package } from 'lucide-react';
 import { useTranslation } from '../../../hooks/useTranslation';
-
-interface DashboardData {
-  totalRevenue: number;
-  activeContracts: number;
-  totalUsers: number;
-  inventoryItems: number;
-}
-
-const MOCK_DATA: DashboardData = {
-  totalRevenue: 45231.89,
-  activeContracts: 24,
-  totalUsers: 573,
-  inventoryItems: 1432
-};
+import { dashboardService, DashboardData } from '../../../services/dashboardService';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Dashboard = () => {
   const { t } = useTranslation();
-  const data = MOCK_DATA;
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const renderCardContent = (value: number | string, subtitle: string) => {
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const dashboardData = await dashboardService.getDashboardData();
+        setData(dashboardData);
+        // Clear any previous errors
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        setError(t('dashboard.error.loading'));
+        // Use mock data as fallback
+        setData({
+          totalRevenue: 45231.89,
+          activeContracts: 24,
+          totalUsers: 573,
+          inventoryItems: 1432
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [t]);
+
+  const renderCardContent = (value: number | string | undefined, subtitle: string, isRevenue: boolean = false) => {
+    if (loading) {
+      return (
+        <>
+          <Skeleton className="h-8 w-[100px] mb-2" />
+          <Skeleton className="h-4 w-[80px]" />
+        </>
+      );
+    }
+
+    if (error || !value) {
+      return <div className="text-sm text-red-500">{error || t('common.error.loading')}</div>;
+    }
+
     return (
       <>
         <div className="text-2xl font-bold">
-          {typeof value === 'number' && value.toLocaleString('en-US', {
-            style: value === data.totalRevenue ? 'currency' : 'decimal',
-            currency: 'USD',
-            minimumFractionDigits: value === data.totalRevenue ? 2 : 0
+          {typeof value === 'number' && value.toLocaleString('fr-DZ', {
+            style: isRevenue ? 'currency' : 'decimal',
+            currency: 'DZD',
+            minimumFractionDigits: isRevenue ? 2 : 0
           })}
         </div>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
@@ -39,7 +68,7 @@ export const Dashboard = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">{t('common.dashboard')}</h1>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -47,7 +76,7 @@ export const Dashboard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {renderCardContent(data.totalRevenue, t('accounting.dashboard.revenueChange'))}
+            {renderCardContent(data?.totalRevenue, t('accounting.dashboard.revenueChange'), true)}
           </CardContent>
         </Card>
 
@@ -57,7 +86,7 @@ export const Dashboard = () => {
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {renderCardContent(data.activeContracts, t('accounting.dashboard.contractsChange'))}
+            {renderCardContent(data?.activeContracts, t('accounting.dashboard.contractsChange'))}
           </CardContent>
         </Card>
 
@@ -67,7 +96,7 @@ export const Dashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {renderCardContent(data.totalUsers, t('hr.dashboard.employeesChange'))}
+            {renderCardContent(data?.totalUsers, t('hr.dashboard.employeesChange'))}
           </CardContent>
         </Card>
 
@@ -77,10 +106,10 @@ export const Dashboard = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {renderCardContent(data.inventoryItems, t('stock.dashboard.itemsChange'))}
+            {renderCardContent(data?.inventoryItems, t('stock.dashboard.itemsChange'))}
           </CardContent>
         </Card>
       </div>
     </div>
   );
-}; 
+};

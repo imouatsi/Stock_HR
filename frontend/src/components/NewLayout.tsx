@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getRoleAvatar } from '../utils/avatarUtils';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../features/store';
@@ -56,10 +57,13 @@ import {
   Users,
   FileSpreadsheet,
   ChevronDown,
+  Calendar,
+  BookOpen,
+  Home,
 } from 'lucide-react';
 import { useTheme } from './theme-provider';
 import { cn } from '@/lib/utils';
-import { languages } from '@/i18n';
+
 
 const drawerWidth = 240;
 const collapsedDrawerWidth = 65;
@@ -81,48 +85,61 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-const menuItems: MenuItem[] = [
+const getMenuItems = (t: any): MenuItem[] => [
+  {
+    id: 'dashboard',
+    label: t('common.dashboard'),
+    path: '/dashboard',
+    icon: <LayoutDashboard className="h-4 w-4" />,
+    roles: [ROLES.ADMIN, ROLES.SUPERADMIN, ROLES.HR_MANAGER, ROLES.ACCOUNTANT, ROLES.STOCK_MANAGER],
+  },
   {
     id: 'stock',
-    label: 'stock.title',
-    path: '/stock',
+    label: t('stock.title'),
+    path: '/dashboard/stock',
     icon: <Package className="h-4 w-4" />,
     roles: [ROLES.STOCK_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { id: 'stock-inventory', label: 'stock.inventory', path: '/stock/inventory', icon: <Package className="h-4 w-4" /> },
-      { id: 'stock-categories', label: 'stock.categories', path: '/stock/categories', icon: <FileText className="h-4 w-4" /> },
-      { id: 'stock-suppliers', label: 'stock.suppliers', path: '/stock/suppliers', icon: <Users className="h-4 w-4" /> },
-      { id: 'stock-movements', label: 'stock.movements', path: '/stock/movements', icon: <FileSpreadsheet className="h-4 w-4" /> },
-      { id: 'stock-purchase-orders', label: 'stock.purchaseOrders', path: '/stock/purchase-orders', icon: <Receipt className="h-4 w-4" /> },
+      { id: 'stock-products', label: t('stock.products.title'), path: '/stock/products', icon: <Package className="h-4 w-4" /> },
+      { id: 'stock-warehouses', label: t('stock.warehouses.title'), path: '/stock/warehouses', icon: <Home className="h-4 w-4" /> },
+      { id: 'stock-inventory', label: t('stock.inventory.title'), path: '/dashboard/stock/inventory', icon: <Package className="h-4 w-4" /> },
+      { id: 'stock-categories', label: t('stock.categories.title'), path: '/dashboard/stock/categories', icon: <FileText className="h-4 w-4" /> },
+      { id: 'stock-suppliers', label: t('stock.suppliers.title'), path: '/dashboard/stock/suppliers', icon: <Users className="h-4 w-4" /> },
+      { id: 'stock-movements', label: t('stock.movements.title'), path: '/dashboard/stock/movements', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'stock-purchase-orders', label: t('stock.purchaseOrders.title'), path: '/dashboard/stock/purchase-orders', icon: <Receipt className="h-4 w-4" /> },
     ],
   },
   {
     id: 'hr',
-    label: 'hr.title',
-    path: '/hr',
+    label: t('hr.title'),
+    path: '/dashboard/hr',
     icon: <Users className="h-4 w-4" />,
     roles: [ROLES.HR_MANAGER, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { id: 'hr-employees', label: 'hr.employees', path: '/hr/employees', icon: <Users className="h-4 w-4" /> },
-      { id: 'hr-departments', label: 'hr.departments', path: '/hr/departments', icon: <FileText className="h-4 w-4" /> },
-      { id: 'hr-positions', label: 'hr.positions', path: '/hr/positions', icon: <FileText className="h-4 w-4" /> },
-      { id: 'hr-leave-requests', label: 'hr.leaveRequests', path: '/hr/leave-requests', icon: <FileText className="h-4 w-4" /> },
-      { id: 'hr-performance', label: 'hr.performanceReviews', path: '/hr/performance', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-employees', label: t('hr.employees.title'), path: '/dashboard/hr/employees', icon: <Users className="h-4 w-4" /> },
+      { id: 'hr-departments', label: t('hr.departments.title'), path: '/dashboard/hr/departments', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-positions', label: t('hr.positions.title'), path: '/dashboard/hr/positions', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-leave-requests', label: t('hr.leaveRequests.title'), path: '/dashboard/hr/leave-requests', icon: <FileText className="h-4 w-4" /> },
+      { id: 'hr-payroll', label: t('hr.payroll.title'), path: '/dashboard/hr/payroll', icon: <Receipt className="h-4 w-4" /> },
+      { id: 'hr-performance', label: t('hr.performanceReviews.title'), path: '/dashboard/hr/performance', icon: <FileText className="h-4 w-4" /> },
     ],
   },
   {
     id: 'accounting',
-    label: 'accounting.title',
+    label: t('accounting.title'),
     path: '/accounting',
     icon: <Receipt className="h-4 w-4" />,
     roles: [ROLES.ACCOUNTANT, ROLES.ADMIN, ROLES.SUPERADMIN],
     children: [
-      { id: 'accounting-invoices', label: 'accounting.invoices', path: '/accounting/invoices', icon: <Receipt className="h-4 w-4" /> },
-      { id: 'accounting-contracts', label: 'accounting.contracts', path: '/accounting/contracts', icon: <FileText className="h-4 w-4" /> },
-      { id: 'accounting-proformas', label: 'accounting.proformas', path: '/accounting/proformas', icon: <FileText className="h-4 w-4" /> },
-      { id: 'accounting-journal', label: 'accounting.journalEntries', path: '/accounting/journal', icon: <FileSpreadsheet className="h-4 w-4" /> },
-      { id: 'accounting-chart', label: 'accounting.chartOfAccounts', path: '/accounting/chart', icon: <FileSpreadsheet className="h-4 w-4" /> },
-      { id: 'accounting-statements', label: 'accounting.financialStatements', path: '/accounting/statements', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-invoices', label: t('accounting.invoices.title'), path: '/accounting/invoices', icon: <Receipt className="h-4 w-4" /> },
+      { id: 'accounting-contracts', label: t('accounting.contracts.title'), path: '/accounting/contracts', icon: <FileText className="h-4 w-4" /> },
+      { id: 'accounting-proformas', label: t('accounting.proforma.title'), path: '/accounting/proformas', icon: <FileText className="h-4 w-4" /> },
+      { id: 'accounting-journal', label: t('accounting.journalEntries.title'), path: '/accounting/journal-entries', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-chart', label: t('accounting.chartOfAccounts.title'), path: '/accounting/chart-of-accounts', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-periods', label: t('accounting.accountingPeriods.title'), path: '/accounting/accounting-periods', icon: <Calendar className="h-4 w-4" /> },
+      { id: 'accounting-ledger', label: t('accounting.generalLedger.title'), path: '/accounting/general-ledger', icon: <BookOpen className="h-4 w-4" /> },
+      { id: 'accounting-statements', label: t('accounting.financialStatements.title'), path: '/accounting/financial-statements', icon: <FileSpreadsheet className="h-4 w-4" /> },
+      { id: 'accounting-tax-reporting', label: t('accounting.taxReporting.title'), path: '/accounting/tax-reporting', icon: <FileText className="h-4 w-4" /> },
     ],
   },
 ];
@@ -140,11 +157,35 @@ function Layout() {
   const { theme, setTheme } = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { settings } = useSelector((state: RootState) => state.settings);
+
+  // Mock user data for development
+  const mockUser = {
+    id: '1',
+    name: 'Admin User',
+    username: 'admin',
+    email: 'admin@example.com',
+    role: 'admin',
+    permissions: ['all'],
+    avatar: '',
+    isActive: true
+  };
+
+  // Use mock data instead of Redux store for now
+  // const { user } = useSelector((state: RootState) => state.auth);
+  // const { settings } = useSelector((state: RootState) => state.settings);
+  const user = mockUser;
+  const settings = {
+    language: 'en',
+    theme: 'light',
+    notifications: true
+  };
+
   const { t, i18n } = useTranslation();
 
   const isRTL = i18n.dir() === 'rtl';
+
+  // Get translated menu items
+  const translatedMenuItems = getMenuItems(t);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -208,11 +249,11 @@ function Layout() {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate('/dashboard/profile');
   };
 
   const handleSettingsClick = () => {
-    navigate('/settings');
+    navigate('/dashboard/settings');
   };
 
   const hasAccess = (item: MenuItem) => {
@@ -231,34 +272,43 @@ function Layout() {
           variant="ghost"
           className={cn(
             'w-full flex items-center justify-between',
-            hasChildren ? 'font-semibold' : 'pl-4'
+            hasChildren ? 'font-semibold' : (isRTL ? 'pr-4' : 'pl-4')
           )}
           onClick={() => item.path && handleNavigation(item.path)}
         >
-          <div className="flex items-center gap-2">
+          <div className={cn(
+            "flex items-center gap-2",
+            isRTL && "flex-row-reverse"
+          )}>
             {item.icon}
-            <span>{t(item.label)}</span>
+            <span>{item.label}</span>
           </div>
           {hasChildren && (
-            <ChevronRight 
+            <ChevronRight
               className={cn(
                 'h-4 w-4 transition-transform',
                 isRTL && 'rotate-180'
-              )} 
+              )}
             />
           )}
         </Button>
         {hasChildren && (
-          <div className="pl-4 space-y-1">
+          <div className={cn(
+            "space-y-1",
+            isRTL ? "pr-4" : "pl-4"
+          )}>
             {item.children.map((child) => (
               <Button
                 key={child.id}
                 variant="ghost"
-                className="w-full flex items-center gap-2 justify-start"
+                className={cn(
+                  "w-full flex items-center gap-2",
+                  isRTL ? "flex-row-reverse justify-end" : "justify-start"
+                )}
                 onClick={() => child.path && handleNavigation(child.path)}
               >
                 {child.icon}
-                <span>{t(child.label)}</span>
+                <span>{child.label}</span>
               </Button>
             ))}
           </div>
@@ -275,8 +325,16 @@ function Layout() {
 
   const handleResizeMove = (e: MouseEvent) => {
     if (!isResizing.current || !sidebarRef.current) return;
-    
-    const newWidth = e.clientX;
+
+    let newWidth;
+    if (isRTL) {
+      // For RTL, calculate from the right edge of the screen
+      newWidth = window.innerWidth - e.clientX;
+    } else {
+      // For LTR, use the standard calculation
+      newWidth = e.clientX;
+    }
+
     if (newWidth >= 200 && newWidth <= 400) {
       setSidebarWidth(newWidth);
     }
@@ -298,12 +356,12 @@ function Layout() {
   }, []);
 
   return (
-    <div className={`flex h-screen ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
+    <div className={`flex h-screen ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side={i18n.language === 'ar' ? 'right' : 'left'} className="w-[240px] p-0">
           <SheetHeader>
-            <SheetTitle className="px-4">{t('common.dashboard')}</SheetTitle>
+            <SheetTitle className="px-4">404 ENTERPRISE</SheetTitle>
             <SheetDescription className="sr-only">
               {t('common.navigation')}
             </SheetDescription>
@@ -317,7 +375,7 @@ function Layout() {
             <Separator />
             <ScrollArea className="flex-1">
               <div className="flex flex-col gap-1 p-4">
-                {menuItems.map(renderMenuItem)}
+                {translatedMenuItems.map(renderMenuItem)}
               </div>
             </ScrollArea>
           </div>
@@ -327,28 +385,33 @@ function Layout() {
       {/* Desktop Sidebar */}
       <div
         ref={sidebarRef}
-        className={`hidden md:flex flex-col border-r transition-all duration-300 relative`}
-        style={{ width: isCollapsed ? '65px' : `${sidebarWidth}px` }}
+        className={`hidden md:flex flex-col ${isRTL ? 'border-l' : 'border-r'} transition-all duration-300 relative`}
+        style={{
+          width: isCollapsed ? '65px' : `${sidebarWidth}px`
+        }}
       >
         <div className="flex h-14 items-center justify-between px-4">
-          {!isCollapsed && <h1 className="text-lg font-semibold">{t('common.dashboard')}</h1>}
+          {!isCollapsed && <h1 className="text-lg font-semibold">404 ENTERPRISE</h1>}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleDrawerToggle}
           >
-            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            {isCollapsed
+              ? (isRTL ? <ChevronLeft size={20} /> : <ChevronRight size={20} />)
+              : (isRTL ? <ChevronRight size={20} /> : <ChevronLeft size={20} />)
+            }
           </Button>
         </div>
         <Separator />
         <ScrollArea className="flex-1">
           <div className="flex flex-col gap-1 p-4">
-            {menuItems.map(renderMenuItem)}
+            {translatedMenuItems.map(renderMenuItem)}
           </div>
         </ScrollArea>
         {!isCollapsed && (
           <div
-            className="absolute right-0 top-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700`}
             onMouseDown={handleResizeStart}
           />
         )}
@@ -385,8 +448,8 @@ function Layout() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   className={cn(
                     "transition-colors",
@@ -397,26 +460,41 @@ function Layout() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                {languages.map((lang) => (
-                  <DropdownMenuItem
-                    key={lang.code}
-                    onClick={() => handleLanguageSelect(lang.code)}
-                    className={cn(
-                      "flex items-center gap-2",
-                      i18n.language === lang.code && "bg-accent"
-                    )}
-                  >
-                    {lang.name}
-                  </DropdownMenuItem>
-                ))}
+                <DropdownMenuItem
+                  onClick={() => handleLanguageSelect('en')}
+                  className={cn(
+                    "flex items-center gap-2",
+                    i18n.language === 'en' && "bg-accent"
+                  )}
+                >
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleLanguageSelect('fr')}
+                  className={cn(
+                    "flex items-center gap-2",
+                    i18n.language === 'fr' && "bg-accent"
+                  )}
+                >
+                  Français
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleLanguageSelect('ar')}
+                  className={cn(
+                    "flex items-center gap-2",
+                    i18n.language === 'ar' && "bg-accent"
+                  )}
+                >
+                  العربية
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className={cn(
                     "relative transition-colors",
                     isRTL && "ml-4"
@@ -429,24 +507,52 @@ function Layout() {
               <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-80">
                 <DropdownMenuLabel>{t('common.notifications')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {/* Add notification items here */}
+                <div className="p-2">
+                  <div className="mb-2 rounded-md bg-accent p-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{t('notifications.newUpdate.title')}</p>
+                        <p className="text-xs text-muted-foreground">{t('notifications.newUpdate.description')}</p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{t('common.timeAgo.hour', { count: 1 })}</span>
+                    </div>
+                  </div>
+                  <div className="mb-2 rounded-md bg-accent p-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{t('notifications.newMessage.title')}</p>
+                        <p className="text-xs text-muted-foreground">{t('notifications.newMessage.description')}</p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{t('common.timeAgo.hour', { count: 3 })}</span>
+                    </div>
+                  </div>
+                  <div className="rounded-md bg-accent p-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{t('notifications.subscription.title')}</p>
+                        <p className="text-xs text-muted-foreground">{t('notifications.subscription.description')}</p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{t('common.timeAgo.hour', { count: 5 })}</span>
+                    </div>
+                  </div>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className={cn(
                     "gap-2 transition-colors",
                     isRTL && "ml-4"
                   )}
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
+                    <AvatarImage src={`/assets/${getRoleAvatar(user?.role)}`} alt={user?.username || 'User'} />
+                    <AvatarFallback>{(user?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  {!isMobile && <span>{user?.name}</span>}
+                  {!isMobile && <span>{user?.username || 'User'}</span>}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={isRTL ? "start" : "end"}>
@@ -477,4 +583,4 @@ function Layout() {
   );
 }
 
-export default Layout; 
+export default Layout;

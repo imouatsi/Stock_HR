@@ -1,4 +1,4 @@
-import { api } from '../../../services/api';
+import api from '../../../services/api.service';
 import { eventService, EventType } from './EventService';
 
 // Common status types across modules
@@ -183,4 +183,4 @@ class StatusManagementService {
   }
 }
 
-export const statusManagementService = StatusManagementService.getInstance(); 
+export const statusManagementService = StatusManagementService.getInstance();

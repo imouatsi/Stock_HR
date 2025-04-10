@@ -124,7 +124,7 @@ export const Inventory: React.FC = () => {
       setError(null);
 
       if (!formData.name || !formData.category || !formData.unit) {
-        throw new Error('Please fill in all required fields');
+        throw new Error(t('stock.inventory.error.requiredFields'));
       }
 
       if (editingItem) {
@@ -136,14 +136,14 @@ export const Inventory: React.FC = () => {
       await fetchData();
       handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save item');
+      setError(err instanceof Error ? err.message : t('stock.inventory.error.save'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
+    if (!window.confirm(t('stock.inventory.deleteConfirm'))) {
       return;
     }
 
@@ -160,13 +160,10 @@ export const Inventory: React.FC = () => {
   };
 
   const handleAddItem = () => {
-    toast({
-      title: t('common.notImplemented'),
-      description: t('common.featureComingSoon'),
-    });
+    handleOpen();
   };
 
-  if (loading && items.length === 0) {
+  if (loading && (!items || items.length === 0)) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -212,12 +209,12 @@ export const Inventory: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
+            {items?.map((item) => (
               <TableRow key={item._id}>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.category.name}</TableCell>
-                <TableCell>{item.unit}</TableCell>
-                <TableCell>{item.currentStock}</TableCell>
+                <TableCell>{item?.name}</TableCell>
+                <TableCell>{item?.category?.name}</TableCell>
+                <TableCell>{item?.unit}</TableCell>
+                <TableCell>{item?.currentStock}</TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     {canUpdate && (
@@ -344,4 +341,4 @@ export const Inventory: React.FC = () => {
       </Dialog>
     </Box>
   );
-}; 
+};

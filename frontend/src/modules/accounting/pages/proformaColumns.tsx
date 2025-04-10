@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 
-interface ProformaInvoice {
+export interface ProformaInvoice {
   id: string;
   invoiceNumber: string;
   date: string;
@@ -37,9 +37,9 @@ export const columns: ColumnDef<ProformaInvoice>[] = [
     header: "Amount",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("fr-DZ", {
         style: "currency",
-        currency: "USD",
+        currency: "DZD",
       }).format(amount);
       return formatted;
     },
@@ -85,4 +85,4 @@ export const columns: ColumnDef<ProformaInvoice>[] = [
       );
     },
   },
-]; 
+];

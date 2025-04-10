@@ -1,4 +1,4 @@
-# API Documentation
+# 404 ENTERPRISE API Documentation
 
 ## Authentication
 All endpoints except `/auth/login` and `/auth/register` require Bearer token.
@@ -331,6 +331,12 @@ Response:
 - CORS enabled
 - XSS protection
 - NoSQL injection prevention
+- Rate limiting
+- Audit logging
+
+## Currency
+
+All monetary values in the API are represented in Algerian Dinar (DZD). Clients should format currency displays accordingly.
 
 ### Error Codes
 | Code    | Description           |

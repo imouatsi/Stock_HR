@@ -92,44 +92,92 @@
   },
   "stock": {
     "title": "إدارة المخزون",
-    "inventory": "المخزون",
-    "categories": "الفئات",
-    "suppliers": "الموردون",
-    "movements": "حركات المخزون",
-    "purchaseOrders": "طلبات الشراء",
-    "dashboard": {
-      "title": "لوحة تحكم المخزون",
-      "totalItems": "إجمالي العناصر",
-      "lowStock": "عناصر منخفضة المخزون",
-      "outOfStock": "نفذ من المخزون",
-      "itemsChange": "تغيير العناصر",
-      "acrossCategories": "عبر جميع الفئات",
-      "belowThreshold": "عناصر أقل من الحد الأدنى",
-      "pendingOrders": "الطلبات المعلقة",
-      "awaitingDelivery": "في انتظار التسليم",
-      "totalValue": "القيمة الإجمالية",
-      "currentValue": "قيمة المخزون الحالية",
-      "recentMovements": "حركات المخزون الأخيرة"
-    },
-    "items": {
-      "title": "العناصر",
-      "add": "إضافة عنصر",
-      "edit": "تعديل عنصر",
-      "delete": "حذف عنصر",
-      "details": "تفاصيل العنصر",
+    "description": "إدارة المخزون والمنتجات وحركات المخزون",
+    "products": {
+      "title": "المنتجات",
+      "description": "إدارة كتالوج المنتجات",
+      "add": "إضافة منتج",
+      "edit": "تعديل منتج",
+      "details": "تفاصيل المنتج",
+      "code": "الرمز",
       "name": "الاسم",
       "description": "الوصف",
       "category": "الفئة",
       "supplier": "المورد",
-      "quantity": "الكمية",
-      "price": "السعر",
-      "status": "الحالة"
+      "unit": "الوحدة",
+      "purchasePrice": "سعر الشراء",
+      "sellingPrice": "سعر البيع",
+      "tvaRate": "نسبة الضريبة",
+      "barcode": "الباركود",
+      "status": "الحالة",
+      "search": "بحث عن المنتجات...",
+      "codeGenerated": "يتم التوليد تلقائياً إذا تُرك فارغاً",
+      "barcodePlaceholder": "أدخل الباركود (اختياري)",
+      "unitPlaceholder": "مثال: كجم، وحدة، لتر",
+      "selectCategory": "اختر فئة",
+      "selectSupplier": "اختر مورد",
+      "selectTvaRate": "اختر نسبة الضريبة",
+      "addDescription": "إضافة منتج جديد إلى الكتالوج",
+      "editDescription": "تعديل معلومات المنتج",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المنتج؟",
+      "notFound": "لم يتم العثور على المنتج",
+      "stock": "المخزون",
+      "history": "السجل",
+      "stockTabComingSoon": "معلومات المخزون ستكون متاحة قريباً",
+      "historyTabComingSoon": "سجل الحركات سيكون متاحاً قريباً",
+      "success": {
+        "created": "تم إنشاء المنتج بنجاح",
+        "updated": "تم تحديث المنتج بنجاح",
+        "deleted": "تم حذف المنتج بنجاح"
+      },
+      "error": {
+        "fetch": "فشل في جلب المنتجات",
+        "create": "فشل في إنشاء المنتج",
+        "update": "فشل في تحديث المنتج",
+        "delete": "فشل في حذف المنتج",
+        "nameRequired": "اسم المنتج مطلوب بجميع اللغات",
+        "categoryRequired": "الفئة مطلوبة",
+        "supplierRequired": "المورد مطلوب",
+        "unitRequired": "الوحدة مطلوبة"
+      }
     },
-    "movements": {
-      "date": "التاريخ",
-      "type": "النوع",
-      "quantity": "الكمية",
-      "status": "الحالة"
+    "warehouses": {
+      "title": "المستودعات",
+      "description": "إدارة المستودعات والمواقع",
+      "add": "إضافة مستودع",
+      "edit": "تعديل مستودع",
+      "details": "تفاصيل المستودع",
+      "code": "الرمز",
+      "name": "الاسم",
+      "address": "العنوان",
+      "manager": "المدير",
+      "status": "الحالة",
+      "search": "بحث عن المستودعات...",
+      "codeGenerated": "يتم التوليد تلقائياً إذا تُرك فارغاً",
+      "addressPlaceholder": "أدخل عنوان المستودع",
+      "selectManager": "اختر مدير",
+      "addDescription": "إضافة مستودع جديد إلى المخزون",
+      "editDescription": "تعديل معلومات المستودع",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المستودع؟",
+      "notFound": "لم يتم العثور على المستودع",
+      "inventory": "المخزون",
+      "movements": "الحركات",
+      "inventoryTabComingSoon": "معلومات المخزون ستكون متاحة قريباً",
+      "movementsTabComingSoon": "سجل الحركات سيكون متاحاً قريباً",
+      "success": {
+        "created": "تم إنشاء المستودع بنجاح",
+        "updated": "تم تحديث المستودع بنجاح",
+        "deleted": "تم حذف المستودع بنجاح"
+      },
+      "error": {
+        "fetch": "فشل في جلب المستودعات",
+        "create": "فشل في إنشاء المستودع",
+        "update": "فشل في تحديث المستودع",
+        "delete": "فشل في حذف المستودع",
+        "nameRequired": "اسم المستودع مطلوب بجميع اللغات",
+        "addressRequired": "العنوان مطلوب",
+        "managerRequired": "المدير مطلوب"
+      }
     }
   },
   "hr": {
@@ -198,10 +246,86 @@
       "credit": "دائن"
     },
     "financialStatements": {
+      "title": "البيانات المالية",
+      "description": "عرض وتوليد البيانات المالية",
       "type": "النوع",
       "period": "الفترة",
       "date": "التاريخ",
-      "status": "الحالة"
+      "status": "الحالة",
+      "generateStatement": "توليد بيان",
+      "generateDescription": "توليد بيان مالي جديد",
+      "statementsList": "قائمة البيانات",
+      "statement": "بيان",
+      "balanceSheet": "الميزانية العمومية",
+      "incomeStatement": "قائمة الدخل",
+      "cashFlowStatement": "قائمة التدفقات النقدية",
+      "selectType": "اختر نوع البيان",
+      "selectPeriod": "اختر الفترة المحاسبية",
+      "comparisonPeriod": "فترة المقارنة",
+      "selectComparisonPeriod": "اختر فترة المقارنة (اختياري)",
+      "noComparison": "بدون مقارنة",
+      "comparisonDescription": "مقارنة مع فترة سابقة",
+      "finalize": "إنهاء",
+      "exportPDF": "تصدير إلى PDF",
+      "exportExcel": "تصدير إلى Excel",
+      "printedOn": "تمت الطباعة في",
+      "asOf": "كما في",
+      "assets": "الأصول",
+      "liabilities": "الخصوم",
+      "liabilitiesAndEquity": "الخصوم وحقوق الملكية",
+      "totalAssets": "إجمالي الأصول",
+      "totalLiabilities": "إجمالي الخصوم",
+      "totalLiabilitiesAndEquity": "إجمالي الخصوم وحقوق الملكية",
+      "operatingRevenue": "إيرادات التشغيل",
+      "totalOperatingRevenue": "إجمالي إيرادات التشغيل",
+      "operatingExpenses": "مصاريف التشغيل",
+      "totalOperatingExpenses": "إجمالي مصاريف التشغيل",
+      "operatingResult": "نتيجة التشغيل",
+      "financialRevenue": "الإيرادات المالية",
+      "totalFinancialRevenue": "إجمالي الإيرادات المالية",
+      "financialExpenses": "المصاريف المالية",
+      "totalFinancialExpenses": "إجمالي المصاريف المالية",
+      "financialResult": "النتيجة المالية",
+      "ordinaryResult": "النتيجة العادية",
+      "extraordinaryItems": "البنود الاستثنائية",
+      "totalExtraordinaryItems": "إجمالي البنود الاستثنائية",
+      "extraordinaryResult": "النتيجة الاستثنائية",
+      "taxes": "الضرائب",
+      "totalTaxes": "إجمالي الضرائب",
+      "netResult": "صافي النتيجة",
+      "operatingActivities": "الأنشطة التشغيلية",
+      "netCashFromOperatingActivities": "صافي النقد من الأنشطة التشغيلية",
+      "investingActivities": "الأنشطة الاستثمارية",
+      "netCashFromInvestingActivities": "صافي النقد من الأنشطة الاستثمارية",
+      "financingActivities": "الأنشطة التمويلية",
+      "netCashFromFinancingActivities": "صافي النقد من الأنشطة التمويلية",
+      "netChangeInCash": "صافي التغير في النقد",
+      "openingCashBalance": "رصيد النقد الافتتاحي",
+      "closingCashBalance": "رصيد النقد الختامي",
+      "code": "الرمز",
+      "item": "البند",
+      "amount": "المبلغ",
+      "previousAmount": "المبلغ السابق",
+      "statementDetails": "تفاصيل البيان",
+      "createdBy": "تم الإنشاء بواسطة",
+      "createdAt": "تم الإنشاء في",
+      "updatedAt": "تم التحديث في",
+      "status": {
+        "draft": "مسودة",
+        "final": "نهائي"
+      },
+      "success": {
+        "generated": "تم توليد البيان المالي بنجاح",
+        "finalized": "تم إنهاء البيان المالي بنجاح",
+        "exported": "تم تصدير البيان المالي بنجاح"
+      },
+      "error": {
+        "loading": "خطأ في تحميل البيانات المالية",
+        "generating": "خطأ في توليد البيان المالي",
+        "finalizing": "خطأ في إنهاء البيان المالي",
+        "exporting": "خطأ في تصدير البيان المالي",
+        "missingFields": "يرجى ملء جميع الحقول المطلوبة"
+      }
     },
     "chartOfAccounts": {
       "title": "دليل الحسابات",
@@ -210,35 +334,18 @@
   },
   "settings": {
     "title": "الإعدادات",
-    "general": {
-      "title": "الإعدادات العامة",
-      "language": "اللغة",
-      "timezone": "المنطقة الزمنية",
-      "dateFormat": "تنسيق التاريخ"
-    },
-    "appearance": {
-      "title": "المظهر",
-      "theme": {
-        "title": "المظهر",
-        "light": "فاتح",
-        "dark": "داكن",
-        "system": "النظام"
-      },
-      "layout": "التخطيط",
-      "colors": "الألوان"
-    },
-    "notifications": {
-      "title": "الإشعارات",
-      "email": "إشعارات البريد الإلكتروني",
-      "push": "إشعارات الدفع",
-      "inApp": "الإشعارات داخل التطبيق"
-    },
-    "security": {
-      "title": "الأمان",
-      "password": "كلمة المرور",
-      "twoFactor": "المصادقة الثنائية",
-      "sessions": "الجلسات النشطة"
-    }
+    "appearance": "المظهر",
+    "appearanceDesc": "تخصيص مظهر وشكل التطبيق",
+    "darkMode": "الوضع الداكن",
+    "darkModeDesc": "التبديل بين الوضع الفاتح والداكن",
+    "language": "اللغة",
+    "selectLanguage": "اختر اللغة",
+    "languageDesc": "تغيير لغة التطبيق",
+    "notifications": "الإشعارات",
+    "notificationsDesc": "إدارة تفضيلات الإشعارات",
+    "pushNotifications": "إشعارات الدفع",
+    "pushNotificationsDesc": "استلام إشعارات الدفع",
+    "saveSettings": "حفظ الإعدادات"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -248,4 +355,4 @@
     "activity": "النشاط الأخير",
     "security": "إعدادات الأمان"
   }
-} 
+}

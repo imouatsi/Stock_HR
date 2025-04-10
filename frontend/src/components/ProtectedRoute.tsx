@@ -9,21 +9,26 @@ interface ProtectedRouteProps {
   permissions?: string[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  roles = [], 
-  permissions = [] 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  roles = [],
+  permissions = []
 }) => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  // Get user from localStorage
+  const token = localStorage.getItem('token');
+  const userJson = localStorage.getItem('user');
+  const user = userJson ? JSON.parse(userJson) : null;
   const location = useLocation();
 
-  if (!user) {
+  // Check if user is authenticated
+  if (!token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (roles.length > 0 && !roles.includes(user.role)) {
+  // Check if user has required role
+  if (roles.length > 0 && user && !roles.includes(user.role)) {
     return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
-}; 
+};

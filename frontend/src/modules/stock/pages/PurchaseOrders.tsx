@@ -40,7 +40,7 @@ import { stockService, type PurchaseOrder, type Supplier, type InventoryItem } f
 import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 
-const PurchaseOrders: React.FC = () => {
+export const PurchaseOrders: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
@@ -183,14 +183,14 @@ const PurchaseOrders: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1">
-          {t('stock.purchaseOrders.title')}
+          Purchase Orders
         </Typography>
         {user?.permissions.includes('stock:create') && (
           <GradientButton
             startIcon={<AddIcon />}
             onClick={() => handleOpen()}
           >
-            {t('stock.purchaseOrders.add')}
+            Add Purchase Order
           </GradientButton>
         )}
       </Box>
@@ -205,39 +205,43 @@ const PurchaseOrders: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{t('stock.purchaseOrders.reference')}</TableCell>
-              <TableCell>{t('stock.purchaseOrders.supplier')}</TableCell>
-              <TableCell>{t('stock.purchaseOrders.total')}</TableCell>
-              <TableCell>{t('stock.purchaseOrders.status')}</TableCell>
-              <TableCell>{t('stock.purchaseOrders.expectedDelivery')}</TableCell>
-              <TableCell>{t('common.actions')}</TableCell>
+              <TableCell>Reference</TableCell>
+              <TableCell>Supplier</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Expected Delivery</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => (
+            {orders?.map((order) => (
               <TableRow key={order._id}>
-                <TableCell>{order.reference}</TableCell>
+                <TableCell>{order?.reference}</TableCell>
                 <TableCell>
-                  {suppliers.find(supplier => supplier._id === order.supplier)?.name}
+                  {suppliers?.find(supplier => supplier?._id === order?.supplier)?.name}
                 </TableCell>
                 <TableCell>
-                  {new Intl.NumberFormat('en-US', {
+                  {new Intl.NumberFormat('fr-DZ', {
                     style: 'currency',
-                    currency: 'USD',
-                  }).format(calculateTotal(order.items))}
+                    currency: 'DZD',
+                  }).format(calculateTotal(order?.items || []))}
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={t(`stock.purchaseOrders.status.${order.status}`)}
-                    color={getStatusColor(order.status)}
+                    label={order?.status === 'pending' ? 'Pending' :
+                           order?.status === 'approved' ? 'Approved' :
+                           order?.status === 'ordered' ? 'Ordered' :
+                           order?.status === 'received' ? 'Received' :
+                           order?.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                    color={getStatusColor(order?.status)}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {format(new Date(order.expectedDeliveryDate), 'dd/MM/yyyy')}
+                  {order?.expectedDelivery ? format(new Date(order.expectedDelivery), 'dd/MM/yyyy') : ''}
                 </TableCell>
                 <TableCell>
-                  <Tooltip title={t('common.view')}>
+                  <Tooltip title="View">
                     <IconButton
                       size="small"
                       onClick={() => handleOpen(order)}
@@ -254,42 +258,48 @@ const PurchaseOrders: React.FC = () => {
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>
-          {selectedOrder ? t('stock.purchaseOrders.details') : t('stock.purchaseOrders.add')}
+          {selectedOrder ? 'Purchase Order Details' : 'Add Purchase Order'}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             {selectedOrder ? (
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">{t('stock.purchaseOrders.reference')}</Typography>
+                  <Typography variant="subtitle2">Reference</Typography>
                   <Typography>{selectedOrder.reference}</Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">{t('stock.purchaseOrders.supplier')}</Typography>
+                  <Typography variant="subtitle2">Supplier</Typography>
                   <Typography>
                     {suppliers.find(supplier => supplier._id === selectedOrder.supplier)?.name}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">{t('stock.purchaseOrders.status')}</Typography>
-                  <Typography>{t(`stock.purchaseOrders.status.${selectedOrder.status}`)}</Typography>
+                  <Typography variant="subtitle2">Status</Typography>
+                  <Typography>
+                    {selectedOrder.status === 'pending' ? 'Pending' :
+                     selectedOrder.status === 'approved' ? 'Approved' :
+                     selectedOrder.status === 'ordered' ? 'Ordered' :
+                     selectedOrder.status === 'received' ? 'Received' :
+                     selectedOrder.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">{t('stock.purchaseOrders.expectedDelivery')}</Typography>
+                  <Typography variant="subtitle2">Expected Delivery</Typography>
                   <Typography>
                     {format(new Date(selectedOrder.expectedDeliveryDate), 'dd/MM/yyyy')}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="subtitle2">{t('stock.purchaseOrders.items')}</Typography>
+                  <Typography variant="subtitle2">Items</Typography>
                   <TableContainer component={Paper} variant="outlined">
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>{t('stock.purchaseOrders.item')}</TableCell>
-                          <TableCell align="right">{t('stock.purchaseOrders.quantity')}</TableCell>
-                          <TableCell align="right">{t('stock.purchaseOrders.unitPrice')}</TableCell>
-                          <TableCell align="right">{t('stock.purchaseOrders.total')}</TableCell>
+                          <TableCell>Item</TableCell>
+                          <TableCell align="right">Quantity</TableCell>
+                          <TableCell align="right">Unit Price</TableCell>
+                          <TableCell align="right">Total</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -300,15 +310,15 @@ const PurchaseOrders: React.FC = () => {
                             </TableCell>
                             <TableCell align="right">{item.quantity}</TableCell>
                             <TableCell align="right">
-                              {new Intl.NumberFormat('en-US', {
+                              {new Intl.NumberFormat('fr-DZ', {
                                 style: 'currency',
-                                currency: 'USD',
+                                currency: 'DZD',
                               }).format(item.unitPrice)}
                             </TableCell>
                             <TableCell align="right">
-                              {new Intl.NumberFormat('en-US', {
+                              {new Intl.NumberFormat('fr-DZ', {
                                 style: 'currency',
-                                currency: 'USD',
+                                currency: 'DZD',
                               }).format(item.quantity * item.unitPrice)}
                             </TableCell>
                           </TableRow>
@@ -319,24 +329,24 @@ const PurchaseOrders: React.FC = () => {
                 </Grid>
                 {selectedOrder.notes && (
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2">{t('stock.purchaseOrders.notes')}</Typography>
+                    <Typography variant="subtitle2">Notes</Typography>
                     <Typography>{selectedOrder.notes}</Typography>
                   </Grid>
                 )}
                 {selectedOrder.status !== 'received' && selectedOrder.status !== 'cancelled' && (
                   <Grid item xs={12}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('stock.purchaseOrders.updateStatus')}</InputLabel>
+                      <InputLabel>Update Status</InputLabel>
                       <Select
                         value={selectedOrder.status}
                         onChange={(e) => handleStatusUpdate(selectedOrder._id, e.target.value)}
-                        label={t('stock.purchaseOrders.updateStatus')}
+                        label="Update Status"
                       >
-                        <MenuItem value="pending">{t('stock.purchaseOrders.status.pending')}</MenuItem>
-                        <MenuItem value="approved">{t('stock.purchaseOrders.status.approved')}</MenuItem>
-                        <MenuItem value="ordered">{t('stock.purchaseOrders.status.ordered')}</MenuItem>
-                        <MenuItem value="received">{t('stock.purchaseOrders.status.received')}</MenuItem>
-                        <MenuItem value="cancelled">{t('stock.purchaseOrders.status.cancelled')}</MenuItem>
+                        <MenuItem value="pending">Pending</MenuItem>
+                        <MenuItem value="approved">Approved</MenuItem>
+                        <MenuItem value="ordered">Ordered</MenuItem>
+                        <MenuItem value="received">Received</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -346,13 +356,13 @@ const PurchaseOrders: React.FC = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
                   <FormControl fullWidth required>
-                    <InputLabel>{t('stock.purchaseOrders.supplier')}</InputLabel>
+                    <InputLabel>Supplier</InputLabel>
                     <Select
                       value={formData.supplier}
                       onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                      label={t('stock.purchaseOrders.supplier')}
+                      label="Supplier"
                     >
-                      {suppliers.map((supplier) => (
+                      {suppliers?.map((supplier) => (
                         <MenuItem key={supplier._id} value={supplier._id}>
                           {supplier.name}
                         </MenuItem>
@@ -363,7 +373,7 @@ const PurchaseOrders: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     type="date"
-                    label={t('stock.purchaseOrders.expectedDelivery')}
+                    label="Expected Delivery"
                     value={formData.expectedDeliveryDate}
                     onChange={(e) => setFormData({ ...formData, expectedDeliveryDate: e.target.value })}
                     fullWidth
@@ -373,25 +383,25 @@ const PurchaseOrders: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle1">{t('stock.purchaseOrders.items')}</Typography>
+                    <Typography variant="subtitle1">Items</Typography>
                     <Button
                       startIcon={<AddItemIcon />}
                       onClick={handleAddItem}
                     >
-                      {t('stock.purchaseOrders.addItem')}
+                      Add Item
                     </Button>
                   </Box>
                   {formData.items.map((item, index) => (
                     <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
                       <Grid item xs={12} md={4}>
                         <FormControl fullWidth required>
-                          <InputLabel>{t('stock.purchaseOrders.item')}</InputLabel>
+                          <InputLabel>Item</InputLabel>
                           <Select
                             value={item.inventoryItem}
                             onChange={(e) => handleItemChange(index, 'inventoryItem', e.target.value)}
-                            label={t('stock.purchaseOrders.item')}
+                            label="Item"
                           >
-                            {inventoryItems.map((invItem) => (
+                            {inventoryItems?.map((invItem) => (
                               <MenuItem key={invItem._id} value={invItem._id}>
                                 {invItem.name}
                               </MenuItem>
@@ -402,7 +412,7 @@ const PurchaseOrders: React.FC = () => {
                       <Grid item xs={12} md={3}>
                         <TextField
                           type="number"
-                          label={t('stock.purchaseOrders.quantity')}
+                          label="Quantity"
                           value={item.quantity}
                           onChange={(e) => handleItemChange(index, 'quantity', Number(e.target.value))}
                           fullWidth
@@ -412,7 +422,7 @@ const PurchaseOrders: React.FC = () => {
                       <Grid item xs={12} md={3}>
                         <TextField
                           type="number"
-                          label={t('stock.purchaseOrders.unitPrice')}
+                          label="Unit Price"
                           value={item.unitPrice}
                           onChange={(e) => handleItemChange(index, 'unitPrice', Number(e.target.value))}
                           fullWidth
@@ -435,7 +445,7 @@ const PurchaseOrders: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label={t('stock.purchaseOrders.notes')}
+                    label="Notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     fullWidth
@@ -449,11 +459,11 @@ const PurchaseOrders: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>
-            {selectedOrder ? t('common.close') : t('common.cancel')}
+            {selectedOrder ? 'Close' : 'Cancel'}
           </Button>
           {!selectedOrder && (
             <GradientButton onClick={handleSubmit} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : t('common.save')}
+              {loading ? <CircularProgress size={24} /> : 'Save'}
             </GradientButton>
           )}
         </DialogActions>
@@ -462,4 +472,3 @@ const PurchaseOrders: React.FC = () => {
   );
 };
 
-export default PurchaseOrders; 

@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import { store } from './features/store';
 import App from './App';
 import './i18n';
 import './index.css';
+import './styles/rtl.css';
 // i18n is now handled in App.tsx with our custom provider
 
 const root = ReactDOM.createRoot(
@@ -14,7 +16,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <App />
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>
 );

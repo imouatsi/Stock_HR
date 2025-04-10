@@ -53,9 +53,9 @@ export const columns: ColumnDef<Contract>[] = [
     },
     cell: ({ row }) => {
       const value = parseFloat(row.getValue("value"))
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("fr-DZ", {
         style: "currency",
-        currency: "USD",
+        currency: "DZD",
       }).format(value)
 
       return <div className="font-medium">{formatted}</div>
@@ -109,4 +109,4 @@ export const columns: ColumnDef<Contract>[] = [
       )
     },
   },
-] 
+]

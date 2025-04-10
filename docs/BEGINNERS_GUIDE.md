@@ -1,15 +1,17 @@
-# 🔰 Beginner's Guide to Stock & HR Management System
+# 🔰 Beginner's Guide to 404 ENTERPRISE
 
 Welcome to the Stock & HR Management System! This guide is designed to help absolute beginners understand, install, and use the system. We'll go through each step in detail, with clear explanations.
 
-## 📖 What is Stock & HR Management System?
+## 📖 What is 404 ENTERPRISE?
 
-Stock & HR Management System is an application that helps businesses:
+404 ENTERPRISE is a comprehensive application that helps businesses in Algeria:
 - Track inventory and stock levels
-- Manage employee information
+- Manage employee information and HR processes
 - Create and track contracts
-- Generate invoices
-- View business metrics through a dashboard
+- Generate invoices and manage accounting
+- View business metrics through a comprehensive dashboard
+- Handle financial statements and reporting
+- Manage suppliers and purchase orders
 
 Think of it as your business's digital command center where you can manage everything in one place.
 
@@ -110,17 +112,17 @@ MongoDB is where our data is stored.
    ```
    # On Windows
    cd C:\Projects
-   
+
    # On macOS/Linux
    cd ~/Projects
    ```
 4. Clone the repository:
    ```
-   git clone https://github.com/yourusername/stock-hr.git
+   git clone https://github.com/imouatsi/Stock_HR.git
    ```
 5. Move into the project folder:
    ```
-   cd stock-hr
+   cd Stock_HR
    ```
 
 ### Option B: Downloading ZIP (Easiest for Beginners)
@@ -158,7 +160,7 @@ Now that you have the code, let's install everything needed to run the applicati
    ```
    # On Windows
    copy .env.example .env
-   
+
    # On macOS/Linux
    cp .env.example .env
    ```
@@ -169,7 +171,7 @@ Now that you have the code, let's install everything needed to run the applicati
    ```
    # If you're in the frontend directory
    cd ../backend
-   
+
    # If you're in the root directory
    cd backend
    ```
@@ -181,7 +183,7 @@ Now that you have the code, let's install everything needed to run the applicati
    ```
    # On Windows
    copy .env.example .env
-   
+
    # On macOS/Linux
    cp .env.example .env
    ```
@@ -193,7 +195,7 @@ Now that you have the code, let's install everything needed to run the applicati
 
 2. Open the `.env` file in the backend directory with a text editor
    - Set `PORT` to `5000`
-   - Set `MONGODB_URI` to `mongodb://localhost:27017/stockhr`
+   - Set `MONGODB_URI` to `mongodb://localhost:27017/404enterprise`
    - Set `JWT_SECRET` to any random string (e.g., `my_super_secret_key`)
    - Set `NODE_ENV` to `development`
 
@@ -491,4 +493,8 @@ npm start
 
 ---
 
-Now you're ready to use the Stock & HR Management System! As you get more comfortable, explore more features and functionalities. 
+Now you're ready to use 404 ENTERPRISE! As you get more comfortable, explore more features and functionalities.
+
+## 💰 Currency
+
+404 ENTERPRISE uses the Algerian Dinar (DZD) as the default currency throughout the application. All financial transactions, invoices, and reports will display amounts in DZD.

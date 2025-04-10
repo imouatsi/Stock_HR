@@ -3,13 +3,7 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
+  Button as MuiButton,
   IconButton,
   Dialog,
   DialogTitle,
@@ -27,6 +21,7 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -40,8 +35,9 @@ import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
 import { useToast } from '../../../hooks/useToast';
-import apiService from "../../../services/api.service";
+// Using stockService instead of direct API calls
 import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
 import {
   DialogDescription,
   DialogFooter,
@@ -132,8 +128,8 @@ export const Movements: React.FC = () => {
   const fetchMovements = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get('/movements');
-      setMovements(response.data);
+      const movements = await stockService.getAllMovements();
+      setMovements(movements);
       setError(null);
     } catch (err) {
       setError(t('common.error.loading'));
@@ -149,8 +145,12 @@ export const Movements: React.FC = () => {
 
   const fetchStockItems = async () => {
     try {
-      const response = await apiService.get('/stock');
-      setStockItems(response.data);
+      const items = await stockService.getAllInventoryItems();
+      setStockItems(items.map(item => ({
+        _id: item._id,
+        name: item.name,
+        quantity: item.currentStock
+      })));
     } catch (err) {
       showToast({
         title: t('common.error.title'),
@@ -242,7 +242,13 @@ export const Movements: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiService.post('/movements', formData);
+      await stockService.createMovement({
+        inventoryItem: formData.inventoryItem,
+        quantity: formData.quantity,
+        type: formData.type,
+        reference: formData.source,
+        notes: formData.notes
+      });
       showToast({
         title: t('common.success'),
         description: t('stock.movements.createSuccess')
@@ -273,13 +279,13 @@ export const Movements: React.FC = () => {
     try {
       setLoading(true);
       if (actionType === 'delete') {
-        await apiService.delete(`/movements/${selectedMovement._id}`);
+        await stockService.deleteMovement(selectedMovement._id);
         showToast({
           title: t('common.success'),
           description: t('stock.movements.deleteSuccess')
         });
       } else if (actionType === 'cancel') {
-        await apiService.put(`/movements/${selectedMovement._id}/cancel`);
+        await stockService.updateMovementStatus(selectedMovement._id, 'cancelled');
         showToast({
           title: t('common.success'),
           description: t('stock.movements.cancelSuccess')
@@ -327,12 +333,12 @@ export const Movements: React.FC = () => {
     }
   };
 
-  const filteredMovements = movements.filter(movement =>
-    movement.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    movement.reason.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMovements = Array.isArray(movements) ? movements.filter(movement =>
+    movement.itemName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    movement.reason?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : [];
 
-  if (loading && movements.length === 0) {
+  if (loading && (!movements || movements.length === 0)) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -377,19 +383,19 @@ export const Movements: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredMovements.map((movement) => (
+              {filteredMovements?.map((movement) => (
                 <TableRow key={movement._id}>
-                  <TableCell>{movement.itemName}</TableCell>
+                  <TableCell>{movement?.itemName}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      movement.type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      movement?.type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
-                      {movement.type === 'in' ? t('stock.movements.in') : t('stock.movements.out')}
+                      {movement?.type === 'in' ? t('stock.movements.in') : t('stock.movements.out')}
                     </span>
                   </TableCell>
-                  <TableCell>{movement.quantity}</TableCell>
-                  <TableCell>{new Date(movement.date).toLocaleDateString()}</TableCell>
-                  <TableCell>{movement.reason}</TableCell>
+                  <TableCell>{movement?.quantity}</TableCell>
+                  <TableCell>{movement?.date ? new Date(movement.date).toLocaleDateString() : ''}</TableCell>
+                  <TableCell>{movement?.reason}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -494,4 +500,4 @@ export const Movements: React.FC = () => {
       </Dialog>
     </div>
   );
-}; 
+};

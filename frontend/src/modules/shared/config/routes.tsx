@@ -146,6 +146,14 @@ export const protectedRoutes: RouteConfig[] = [
         roles: ['superadmin', 'admin', 'hr_manager'],
         permissions: ['hr:read'],
       },
+      {
+        path: 'payroll',
+        element: <React.Suspense fallback={<div>Loading...</div>}>
+          {React.createElement(React.lazy(() => import('../../hr/pages/Payroll')))}
+        </React.Suspense>,
+        roles: ['superadmin', 'admin', 'hr_manager', 'accountant'],
+        permissions: ['hr:read', 'accounting:read'],
+      },
     ],
   },
 
@@ -193,4 +201,4 @@ export const protectedRoutes: RouteConfig[] = [
     </React.Suspense>,
     roles: ['superadmin', 'admin'],
   },
-]; 
+];

@@ -30,10 +30,37 @@
     "browserNotifications": "Notifications du navigateur",
     "soundNotifications": "Notifications sonores",
     "desktopNotifications": "Notifications du bureau",
-    "autoLogout": "Déconnexion automatique (minutes)",
+    "autoLogout": "Déconnexion automatique",
     "theme": "Thème",
     "profile": "Profil",
-    "preferences": "Préférences"
+    "preferences": "Préférences",
+    "appearance": "Apparence",
+    "customizeLookAndFeel": "Personnaliser l'apparence de l'application",
+    "toggleDarkMode": "Basculer entre le mode clair et sombre",
+    "changeLanguage": "Changer la langue de l'application",
+    "security": "Sécurité",
+    "manageSecuritySettings": "Gérer vos paramètres de sécurité",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordChanged": "Votre mot de passe a été changé avec succès",
+    "passwordError": "Échec du changement de mot de passe",
+    "currentPasswordRequired": "Le mot de passe actuel est requis",
+    "newPasswordRequired": "Le nouveau mot de passe est requis",
+    "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas",
+    "passwordTooShort": "Le nouveau mot de passe doit contenir au moins 8 caractères",
+    "currentPasswordIncorrect": "Le mot de passe actuel est incorrect",
+    "inactivityTimeout": "Délai d'inactivité",
+    "inactivityTimeoutDescription": "Vous serez automatiquement déconnecté après cette période d'inactivité.",
+    "inactivityTimeoutRange": "Plage: 10 secondes à 10 minutes (600 secondes).",
+    "inactivityTimeoutUpdated": "Délai d'inactivité mis à jour",
+    "manageNotificationPreferences": "Gérer vos préférences de notification",
+    "pushNotifications": "Notifications push",
+    "receivePushNotifications": "Recevoir des notifications push",
+    "saveSettings": "Enregistrer les paramètres",
+    "settingsSaved": "Vos paramètres ont été enregistrés avec succès."
   },
   "common": {
     "noData": "Aucune donnée disponible",
@@ -59,6 +86,12 @@
     "filter": "Filtrer",
     "actions": "Actions",
     "loading": "Chargement...",
+    "notifications": "Notifications",
+    "timeAgo": {
+      "hour": "il y a {{count}}h",
+      "minute": "il y a {{count}}m",
+      "day": "il y a {{count}}j"
+    },
     "error": {
       "title": "Erreur",
       "loading": "Échec du chargement des données",
@@ -68,15 +101,21 @@
     "success": "Succès",
     "confirm": "Confirmer",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "reset": "Réinitialiser"
   },
   "auth": {
     "login": "Connexion",
     "logout": "Déconnexion",
     "email": "Email",
     "password": "Mot de passe",
+    "username": "Nom d'utilisateur",
     "submit": "Envoyer",
-    "error": "Email ou mot de passe invalide"
+    "signIn": "Connectez-vous à votre compte",
+    "signInButton": "Se connecter",
+    "error": {
+      "invalidCredentials": "Nom d'utilisateur ou mot de passe invalide"
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -200,5 +239,368 @@
     "title": "Analytique",
     "overview": "Aperçu",
     "reports": "Rapports"
+  },
+  "accounting": {
+    "title": "Comptabilité",
+    "invoices": {
+      "title": "Factures"
+    },
+    "proforma": {
+      "title": "Factures Proforma"
+    },
+    "contracts": {
+      "title": "Contrats"
+    },
+    "journalEntries": {
+      "title": "Journal Comptable",
+      "description": "Enregistrer et gérer les transactions comptables",
+      "addEntry": "Ajouter une Écriture",
+      "editEntry": "Modifier l'Écriture",
+      "date": "Date",
+      "reference": "Référence",
+      "description": "Description",
+      "account": "Compte",
+      "debit": "Débit",
+      "credit": "Crédit",
+      "period": "Période",
+      "selectPeriod": "Sélectionner une période",
+      "status": "Statut",
+      "balanced": "Équilibrée",
+      "notBalanced": "Non Équilibrée",
+      "lines": "Lignes d'Écriture",
+      "addLine": "Ajouter une Ligne",
+      "lineDescription": "Description de la ligne",
+      "selectAccount": "Sélectionner un compte",
+      "totalDebit": "Total Débit",
+      "totalCredit": "Total Crédit",
+      "difference": "Différence",
+      "error": {
+        "loading": "Erreur lors du chargement de l'écriture",
+        "referenceRequired": "La référence est requise",
+        "dateRequired": "La date est requise",
+        "descriptionRequired": "La description est requise",
+        "periodRequired": "La période comptable est requise",
+        "accountRequired": "Le compte est requis",
+        "lineDescriptionRequired": "La description de la ligne est requise",
+        "amountRequired": "Le montant est requis",
+        "bothDebitCredit": "Impossible d'avoir à la fois un débit et un crédit",
+        "notBalanced": "L'écriture doit être équilibrée (total débit = total crédit)"
+      },
+      "success": {
+        "created": "Écriture créée avec succès",
+        "updated": "Écriture mise à jour avec succès"
+      }
+    },
+    "chartOfAccounts": {
+      "title": "Plan Comptable",
+      "scfDescription": "Conforme au SCF (Système Comptable Financier)",
+      "addAccount": "Ajouter un Compte",
+      "editAccount": "Modifier le Compte",
+      "code": "Code",
+      "codeHelp": "Doit commencer par le numéro de classe SCF",
+      "label": "Libellé",
+      "name": "Nom",
+      "type": "Type",
+      "selectType": "Sélectionner le type de compte",
+      "types": {
+        "asset": "Actif",
+        "liability": "Passif",
+        "equity": "Capitaux Propres",
+        "income": "Produit",
+        "expense": "Charge"
+      },
+      "scfClass": "Classe SCF",
+      "class": "Classe",
+      "selectClass": "Sélectionner la classe SCF",
+      "classes": {
+        "1": "Comptes de capitaux",
+        "2": "Comptes d'immobilisations",
+        "3": "Comptes de stocks",
+        "4": "Comptes de tiers",
+        "5": "Comptes financiers",
+        "6": "Comptes de charges",
+        "7": "Comptes de produits"
+      },
+      "parent": "Parent",
+      "isParent": "Compte Parent",
+      "parentAccount": "Compte Parent",
+      "selectParent": "Sélectionner le compte parent",
+      "category": "Catégorie",
+      "balance": "Solde",
+      "description": "Description",
+      "isActive": "Actif",
+      "error": {
+        "codeRequired": "Le code du compte est requis",
+        "codeNumeric": "Le code du compte doit contenir uniquement des chiffres",
+        "codeStartWithClass": "Le code du compte doit commencer par la classe {{class}}",
+        "labelRequired": "Le libellé du compte est requis",
+        "parentRequired": "Le compte parent est requis pour les comptes non-parents"
+      },
+      "success": {
+        "created": "Compte créé avec succès",
+        "updated": "Compte mis à jour avec succès"
+      }
+    },
+    "taxReporting": {
+      "title": "Déclarations Fiscales",
+      "description": "Gérer les déclarations et rapports fiscaux",
+      "monthly": "Mensuel",
+      "quarterly": "Trimestriel",
+      "annual": "Annuel",
+      "upcomingDeadlines": "Échéances à Venir",
+      "dueIn": "Dans",
+      "days": "jours",
+      "prepare": "Préparer",
+      "g50": {
+        "title": "Déclaration G50",
+        "description": "Déclaration fiscale mensuelle pour TVA, TAP et IRG",
+        "generateDeclaration": "Générer Déclaration G50",
+        "generateDescription": "Créer une nouvelle déclaration G50 basée sur les données comptables",
+        "number": "Numéro de Déclaration",
+        "period": "Période",
+        "selectPeriod": "Sélectionner une période",
+        "periodDescription": "Sélectionnez la période pour laquelle vous souhaitez générer la déclaration G50",
+        "periodType": "Type de Période",
+        "periodType": {
+          "monthly": "Mensuel",
+          "quarterly": "Trimestriel"
+        },
+        "submissionDate": "Date de Soumission",
+        "dueDate": "Date d'Échéance",
+        "amount": "Montant",
+        "status": "Statut",
+        "status": {
+          "draft": "Brouillon",
+          "submitted": "Soumis",
+          "accepted": "Accepté",
+          "rejected": "Rejeté"
+        },
+        "submit": "Soumettre la Déclaration",
+        "exportPDF": "Exporter en PDF",
+        "exportExcel": "Exporter en Excel",
+        "declaration": "Déclaration",
+        "details": "Détails",
+        "declarationDetails": "Détails de la Déclaration",
+        "companyInfo": "Informations de l'Entreprise",
+        "companyName": "Nom de l'Entreprise",
+        "taxId": "Identifiant Fiscal (NIF)",
+        "taxRegistrationNumber": "Numéro d'Identification Statistique (NIS)",
+        "activityCode": "Code d'Activité",
+        "address": "Adresse",
+        "municipality": "Commune",
+        "wilaya": "Wilaya",
+        "taxSections": "Sections Fiscales",
+        "code": "Code",
+        "name": "Nom",
+        "taxType": "Type d'Impôt",
+        "taxableAmount": "Montant Imposable",
+        "taxRate": "Taux d'Imposition",
+        "taxAmount": "Montant de l'Impôt",
+        "totalAmount": "Montant Total",
+        "paymentInfo": "Informations de Paiement",
+        "paymentMethod": "Méthode de Paiement",
+        "paymentReference": "Référence de Paiement",
+        "paymentDate": "Date de Paiement",
+        "year": "Année",
+        "month": "Mois",
+        "quarter": "Trimestre",
+        "createdBy": "Créé Par",
+        "createdAt": "Créé Le",
+        "submittedAt": "Soumis Le",
+        "submittedBy": "Soumis Par",
+        "manage": "Gérer les Déclarations G50"
+      },
+      "tva": {
+        "title": "Déclaration TVA",
+        "description": "Déclaration de la Taxe sur la Valeur Ajoutée",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer les Déclarations TVA"
+      },
+      "irg": {
+        "title": "IRG Salaires",
+        "description": "Impôt sur le revenu des salaires",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer les Déclarations IRG"
+      },
+      "g50Quarterly": {
+        "title": "G50 Trimestriel",
+        "description": "Déclaration fiscale trimestrielle",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer les G50 Trimestriels"
+      },
+      "ibsAdvance": {
+        "title": "Acomptes Provisionnels IBS",
+        "description": "Acomptes provisionnels d'impôt sur les bénéfices",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer les Acomptes IBS"
+      },
+      "ibs": {
+        "title": "Déclaration Annuelle IBS",
+        "description": "Déclaration annuelle d'impôt sur les bénéfices",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer la Déclaration IBS"
+      },
+      "annualSummary": {
+        "title": "Récapitulatif Annuel",
+        "description": "Récapitulatif annuel des clients et fournisseurs",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer le Récapitulatif Annuel"
+      },
+      "das": {
+        "title": "DAS",
+        "description": "Déclaration annuelle des salaires",
+        "dueDate": "Date d'Échéance",
+        "includes": "Inclut",
+        "requiredFor": "Requis Pour",
+        "manage": "Gérer la DAS"
+      },
+      "error": {
+        "loading": "Échec du chargement des déclarations fiscales",
+        "generating": "Échec de la génération de la déclaration fiscale",
+        "submitting": "Échec de la soumission de la déclaration fiscale",
+        "exporting": "Échec de l'exportation de la déclaration fiscale",
+        "missingFields": "Veuillez sélectionner une période"
+      },
+      "success": {
+        "generated": "Déclaration fiscale générée avec succès",
+        "submitted": "Déclaration fiscale soumise avec succès",
+        "exported": "Déclaration fiscale exportée avec succès"
+      }
+    },
+    "financialStatements": {
+      "title": "États Financiers",
+      "description": "Générer et consulter les rapports financiers selon les normes SCF",
+      "generateStatement": "Générer un État",
+      "generateDescription": "Créer un nouvel état financier basé sur les données comptables",
+      "type": "Type",
+      "selectType": "Sélectionner le type d'état",
+      "balanceSheet": "Bilan",
+      "incomeStatement": "Compte de Résultat",
+      "cashFlowStatement": "Tableau des Flux de Trésorerie",
+      "period": "Période",
+      "selectPeriod": "Sélectionner une période comptable",
+      "comparisonPeriod": "Période de Comparaison",
+      "selectComparisonPeriod": "Sélectionner une période de comparaison (optionnel)",
+      "noComparison": "Pas de comparaison",
+      "comparisonDescription": "Comparer avec une période précédente pour montrer les changements",
+      "date": "Date",
+      "status": "Statut",
+      "status": {
+        "draft": "Brouillon",
+        "final": "Final"
+      },
+      "finalize": "Finaliser",
+      "exportPDF": "Exporter en PDF",
+      "exportExcel": "Exporter en Excel",
+      "statement": "État",
+      "details": "Détails",
+      "statementDetails": "Détails de l'État",
+      "createdBy": "Créé Par",
+      "createdAt": "Créé Le",
+      "updatedAt": "Mis à Jour Le",
+      "code": "Code",
+      "item": "Élément",
+      "amount": "Montant",
+      "previousAmount": "Montant Précédent",
+      "asOf": "Au",
+      "assets": "Actifs",
+      "totalAssets": "Total des Actifs",
+      "liabilitiesAndEquity": "Passifs et Capitaux Propres",
+      "totalLiabilitiesAndEquity": "Total des Passifs et Capitaux Propres",
+      "error": {
+        "loading": "Échec du chargement des états financiers",
+        "generating": "Échec de la génération de l'état financier",
+        "finalizing": "Échec de la finalisation de l'état financier",
+        "exporting": "Échec de l'exportation de l'état financier",
+        "missingFields": "Veuillez sélectionner un type d'état et une période"
+      },
+      "success": {
+        "generated": "État financier généré avec succès",
+        "finalized": "État financier finalisé avec succès",
+        "exported": "État financier exporté avec succès"
+      }
+    },
+    "accountingPeriods": {
+      "title": "Périodes Comptables",
+      "description": "Gérer les périodes comptables pour les rapports financiers",
+      "addPeriod": "Ajouter une Période",
+      "editPeriod": "Modifier la Période",
+      "name": "Nom",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "status": "Statut",
+      "open": "Ouverte",
+      "closed": "Clôturée",
+      "closedBy": "Clôturée Par",
+      "closedAt": "Clôturée Le",
+      "isClosed": "Clôturée",
+      "close": "Clôturer la Période",
+      "error": {
+        "nameRequired": "Le nom de la période est requis",
+        "startDateRequired": "La date de début est requise",
+        "endDateRequired": "La date de fin est requise",
+        "startDateBeforeEndDate": "La date de début doit être antérieure à la date de fin",
+        "closing": "Erreur lors de la clôture de la période"
+      },
+      "success": {
+        "created": "Période créée avec succès",
+        "updated": "Période mise à jour avec succès",
+        "closed": "Période clôturée avec succès"
+      }
+    },
+    "generalLedger": {
+      "title": "Grand Livre",
+      "description": "Consulter et analyser les transactions des comptes",
+      "filters": "Filtres",
+      "account": "Compte",
+      "allAccounts": "Tous les Comptes",
+      "period": "Période",
+      "selectPeriod": "Sélectionner une Période",
+      "customPeriod": "Période Personnalisée",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "applyFilters": "Appliquer les Filtres",
+      "date": "Date",
+      "reference": "Référence",
+      "description": "Description",
+      "debit": "Débit",
+      "credit": "Crédit",
+      "balance": "Solde",
+      "openingBalance": "Solde d'Ouverture",
+      "closingBalance": "Solde de Clôture",
+      "totalDebit": "Total Débit",
+      "totalCredit": "Total Crédit",
+      "netChange": "Variation Nette",
+      "noEntries": "Aucune écriture trouvée",
+      "error": {
+        "loading": "Erreur lors du chargement du grand livre"
+      }
+    }
+  },
+  "notifications": {
+    "newUpdate": {
+      "title": "Nouvelle mise à jour disponible",
+      "description": "Une nouvelle mise à jour logicielle est disponible au téléchargement."
+    },
+    "newMessage": {
+      "title": "Nouveau message",
+      "description": "Vous avez un nouveau message de l'administrateur."
+    },
+    "subscription": {
+      "title": "Votre abonnement expire bientôt",
+      "description": "Votre abonnement expirera dans 3 jours."
+    }
   }
 }

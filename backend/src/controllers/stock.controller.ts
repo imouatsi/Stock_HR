@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StockItem } from '../models/stock.model';
-import { AppError } from '../utils/AppError';
+import { AppError } from '../utils/appError';
 import { catchAsync } from '../utils/catchAsync';
 
 class StockController {
@@ -8,7 +8,7 @@ class StockController {
     const newItem = new StockItem({
       ...req.body,
       lastRestocked: new Date(),
-      createdBy: req.user._id,
+      createdBy: req.user?._id,
     });
     await newItem.save();
     res.status(201).json(newItem);
@@ -68,7 +68,7 @@ class StockController {
 
     const updatedItem = await StockItem.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedBy: req.user._id },
+      { ...req.body, updatedBy: req.user?._id },
       { new: true, runValidators: true }
     );
 
@@ -83,7 +83,7 @@ class StockController {
     if (!item) {
       return next(new AppError('No stock item found with that ID', 404));
     }
-    await item.remove();
+    await StockItem.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: 'success',
       data: null
@@ -107,4 +107,4 @@ class StockController {
   });
 }
 
-export const stockController = new StockController(); 
+export const stockController = new StockController();
